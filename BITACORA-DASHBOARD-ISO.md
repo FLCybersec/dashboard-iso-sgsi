@@ -5,6 +5,33 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Export no genera archivos vacios (2026-06-09)
+
+**Estado:** Aplicado y pusheado (`3a5f98f`).
+
+**Sintoma:** al exportar "Solicitudes aprobadas" sin nada aprobado, se descargaba
+un CSV (y JSON) con solo el encabezado, que se interpretaba como export
+defectuoso (todo en columna A al abrirlo en Excel espanol por el separador `;`).
+
+**Causa:** `exportSolicitudesAprobadas` y `exportCambiosCSV` disparaban la
+descarga aunque no hubiera filas. El CSV en si es correcto (coma estandar); el
+problema era el archivo vacio + la visualizacion en Excel.
+
+**Arreglo:**
+- `exporter.js`: ambas funciones retornan `total: 0` sin descargar cuando no hay
+  nada que exportar (sin CSV/JSON de puro encabezado).
+- `EvidenciaView.js`: mensaje claro cuando no hay cambios de estructura.
+- Delimitador: se mantiene la **coma** (es lo mas universal para que el proyecto
+  de Claude/PnP ingiera el archivo). Para conocer los cambios, el artefacto
+  recomendado es el **JSON** estructurado, no el CSV.
+
+```
+src/lib/exporter.js
+src/components/EvidenciaView.js
+```
+
+---
+
 ## Tanda 14 — Lenguaje llano + descripcion de carpetas de control
 
 **Fecha:** 2026-06-09
