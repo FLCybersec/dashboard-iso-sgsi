@@ -214,9 +214,11 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
   addHeader(rCam, [
     { header: 'Sitio', key: 'slug', width: 24 },
     { header: 'Tipo', key: 'tipo', width: 12 },
-    { header: 'Ruta', key: 'ruta', width: 46 },
+    { header: 'Ruta solicitada', key: 'ruta', width: 40 },
+    { header: 'Nombre final acordado', key: 'nombreFinal', width: 40 },
     { header: 'Clasificacion', key: 'clasificacion', width: 14 },
     { header: 'Estado', key: 'estado', width: 14 },
+    { header: 'Comentario', key: 'comentario', width: 40 },
     { header: 'Responsable', key: 'responsable', width: 20 },
     { header: 'Notas', key: 'notas', width: 40 },
     { header: 'Creado por', key: 'creadoPor', width: 22 }
@@ -226,8 +228,10 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
       slug: c.slug || '',
       tipo: c.tipo,
       ruta: c.ruta,
+      nombreFinal: c.nombreFinal || '',
       clasificacion: c.clasificacion || '',
       estado: c.estado,
+      comentario: c.comentario || '',
       responsable: c.responsable || '',
       notas: c.notas || '',
       creadoPor: c.creadoPor || ''
@@ -296,13 +300,15 @@ export function exportSolicitudesAprobadas() {
   const fecha = fechaArchivo(new Date())
 
   // CSV unificado.
-  const cab = ['Categoria', 'Sitio', 'Tipo/Accion', 'Ruta/Persona', 'Detalle', 'Estado', 'Solicitante']
+  const cab = ['Categoria', 'Sitio', 'Tipo/Accion', 'Ruta/Persona', 'Nombre final', 'Detalle', 'Estado', 'Solicitante']
   const lineas = [cab.join(',')]
   for (const c of pend.cambios_estructura) {
-    lineas.push(['estructura', c.slug, c.tipo, c.ruta, c.clasificacion || c.notas || '', c.estado, c.creadoPor || ''].map(csvCampo).join(','))
+    const detalle = [c.clasificacion || c.notas || '', c.comentario].filter(Boolean).join(' — ')
+    lineas.push(['estructura', c.slug, c.tipo, c.ruta, c.nombreFinal || '', detalle, c.estado, c.creadoPor || ''].map(csvCampo).join(','))
   }
   for (const p of pend.solicitudes_permisos) {
-    lineas.push(['permiso', p.slug, p.tipo, p.persona, `${p.rol}${p.motivo ? ' — ' + p.motivo : ''}`, p.estado, p.creadoPor || ''].map(csvCampo).join(','))
+    const detalle = [`${p.rol}${p.motivo ? ' — ' + p.motivo : ''}`, p.comentario].filter(Boolean).join(' — ')
+    lineas.push(['permiso', p.slug, p.tipo, p.persona, '', detalle, p.estado, p.creadoPor || ''].map(csvCampo).join(','))
   }
   const csv = new Blob(['﻿' + lineas.join('\r\n')], { type: 'text/csv;charset=utf-8' })
   descargar(csv, `SolicitudesAprobadas-PnP-${fecha}.csv`)

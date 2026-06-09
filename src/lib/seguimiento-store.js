@@ -592,11 +592,32 @@ export async function addCambioEstructura(structure, { slug, tipo, ruta, clasifi
   return item
 }
 
-export async function setCambioEstado(structure, id, estado) {
+// Aplica el cambio de estado + metadatos (nombre final acordado y comentario que
+// se anotan al aprobar) y sella quien/cuando segun el destino. El paso a
+// "aplicado" (Creada/Aplicada) es SIEMPRE manual desde Aprobaciones; no se
+// autodetecta por nombre/ruta porque el nombre final puede diferir del solicitado.
+function aplicarMetaEstado(item, estado, extra = {}) {
+  const user = currentUser()
+  const ahora = new Date().toISOString()
+  if (extra.nombreFinal !== undefined) item.nombreFinal = (extra.nombreFinal || '').trim()
+  if (extra.comentario !== undefined) item.comentario = (extra.comentario || '').trim()
+  if (estado === 'aprobado') {
+    item.aprobadoPor = user.name
+    item.aprobadoPorEmail = user.email
+    item.aprobadoEn = ahora
+  } else if (estado === 'aplicado') {
+    item.aplicadoPor = user.name
+    item.aplicadoPorEmail = user.email
+    item.aplicadoEn = ahora
+  }
+}
+
+export async function setCambioEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('cambios_estructura', id)
   if (!found) throw new Error('Cambio no encontrado')
   if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
+  aplicarMetaEstado(found.item, estado, extra)
   await uploadSitio(found.item.slug || found.slug)
   return found.item
 }
@@ -627,11 +648,12 @@ export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol,
   return item
 }
 
-export async function setSolicitudPermisoEstado(structure, id, estado) {
+export async function setSolicitudPermisoEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('solicitudes_permisos', id)
   if (!found) throw new Error('Solicitud no encontrada')
   if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
+  aplicarMetaEstado(found.item, estado, extra)
   await uploadSitio(found.item.slug || found.slug)
   return found.item
 }

@@ -5,6 +5,55 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Aprobaciones: ciclo de vida explicito + nombre final acordado (2026-06-09)
+
+**Estado:** Code-complete. Build + 18/18 E2E (nuevo `aprobaciones.spec.js`).
+
+**Necesidad:** gestionar las solicitudes (crear/sobrante/acceso) con estados en
+lenguaje llano, todo el ciclo visible y gestionable en la MISMA pantalla de
+Aprobaciones, sin autodetectar nada por nombre/ruta (el nombre final puede
+diferir del solicitado: podemos renombrar al crear).
+
+**Ciclo de vida (lenguaje llano, todo manual desde Aprobaciones):**
+- **Pendiente** (interno `propuesto`): la pide el usuario.
+- **Aprobada** (`aprobado`): la aprueba un admin; al aprobar se anota el
+  **nombre final acordado** (puede diferir del solicitado) y un **comentario**.
+- **Creada/Aplicada** (`aplicado`): ya se hizo en la realidad; lo marca el admin
+  a mano. "Creada" para carpetas nuevas, "Aplicada" para sobrantes y permisos.
+- **Descartada** (`descartado`): si no procede.
+
+NO se autodetecta por nombre/ruta: el paso a Creada/Aplicada es siempre manual.
+
+**Arreglo (codigo):**
+- `seguimiento-store.js`: `setCambioEstado`/`setSolicitudPermisoEstado` aceptan
+  `extra = { nombreFinal, comentario }`; nuevo `aplicarMetaEstado` sella
+  `nombreFinal`, `comentario`, y `aprobadoPor/En` o `aplicadoPor/En` segun el
+  destino. Estados internos sin cambio (backward-compat).
+- `AprobacionesView.js`: reescrita. Etiquetas llanas (`estadoLabel`), ciclo
+  completo visible (se ordena abiertas primero, luego cerradas), formulario de
+  aprobacion inline (nombre final solo en carpetas `crear`; comentario en todo),
+  botones por estado (Aprobar / Marcar creada-aplicada / Descartar) y linea de
+  meta con el nombre final acordado y la nota.
+- `exporter.js`: hoja Excel "Cambios estructura" gana columnas "Nombre final
+  acordado" y "Comentario"; el CSV de PnP (solicitudes aprobadas) suma columna
+  "Nombre final" y mete el comentario en el detalle. El JSON ya los lleva.
+- `components.css`: `.aprobar-row` para la fila del formulario embebida.
+- `tests/e2e/aprobaciones.spec.js`: Pendiente -> Aprobada (con nombre final +
+  comentario) -> Creada, validando persistencia y etiquetas.
+
+**Nota de verificacion:** la prueba efectiva son los E2E con el mock de Graph;
+un preview en navegador no ejercita esto sin MSAL real + mock de Graph.
+
+```
+src/lib/seguimiento-store.js       (extra nombreFinal/comentario + aplicarMetaEstado)
+src/components/AprobacionesView.js  (reescrita: ciclo llano + form de aprobacion)
+src/lib/exporter.js                 (nombre final + comentario en Excel y CSV PnP)
+src/styles/components.css           (.aprobar-row)
+tests/e2e/aprobaciones.spec.js      (ciclo completo)
+```
+
+---
+
 ## Ajuste — "Mi trabajo": el propietario del area edita estado sin "quien migra" (2026-06-09)
 
 **Estado:** Code-complete.
