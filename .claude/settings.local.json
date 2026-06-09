@@ -1,0 +1,20 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npm --version)",
+      "Bash(npm install *)",
+      "Bash(npm run *)",
+      "Bash(node -e ' *)",
+      "mcp__Claude_Preview__preview_start",
+      "Bash(npm uninstall *)",
+      "Bash(npm audit *)",
+      "Bash(npx playwright *)",
+      "PowerShell(git init -b main)",
+      "PowerShell(git config user.name)",
+      "PowerShell(git config user.email)",
+      "PowerShell(git config --global user.name)",
+      "PowerShell(git config --global user.email)",
+      "PowerShell(git add -A; git status --short | Select-Object -First 200; \"---TOTAL---\"; \\(git status --short | Measure-Object -Line\\).Lines; \"---node_modules incluidos?---\"; \\(git status --short | Select-String \"node_modules\" | Measure-Object -Line\\).Lines)"
+    ]
+  }
+}

@@ -1,0 +1,43 @@
+/* Tokens de marca JMA - paleta sobria, sin emojis, tipografia Arial.
+   Los colores de clasificacion replican los definidos en la estructura
+   maestra (estructura-maestra-sgsi.json) para mantener una sola fuente. */
+
+:root {
+  /* Marca */
+  --jma-azul: #1f3a5f;
+  --jma-azul-oscuro: #142840;
+  --jma-azul-claro: #2563eb;
+  --jma-gris-texto: #1f2937;
+  --jma-gris-suave: #6b7280;
+  --jma-gris-borde: #e5e7eb;
+  --jma-fondo: #f4f6f8;
+  --jma-superficie: #ffffff;
+
+  /* Estado / semaforo */
+  --estado-ok: #2e8b57;
+  --estado-prog: #d97706;
+  --estado-pend: #6b7280;
+  --estado-error: #dc2626;
+
+  /* Clasificaciones (alineadas al JSON) */
+  --clf-publica: #2e8b57;
+  --clf-interna: #2563eb;
+  --clf-confidencial: #d97706;
+  --clf-restringida: #dc2626;
+
+  /* Tipografia */
+  --fuente: Arial, Helvetica, "Segoe UI", sans-serif;
+  --fs-xs: 12px;
+  --fs-sm: 13px;
+  --fs-base: 14px;
+  --fs-lg: 16px;
+  --fs-xl: 20px;
+  --fs-2xl: 26px;
+
+  /* Espaciado / formas */
+  --radio: 8px;
+  --radio-sm: 4px;
+  --sombra: 0 1px 3px rgba(20, 40, 64, 0.08), 0 1px 2px rgba(20, 40, 64, 0.06);
+  --sombra-md: 0 4px 12px rgba(20, 40, 64, 0.1);
+  --gap: 16px;
+}

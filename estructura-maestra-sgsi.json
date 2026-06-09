@@ -1,0 +1,934 @@
+{
+  "proyecto": "Migracion ISO 27001 - Arquitectura documental SharePoint JMA",
+  "version": "1.0",
+  "generado": "2026-06-08",
+  "tenant_host": "jmaseguridad.sharepoint.com",
+  "hub_slug": "SGSI-Concentrador",
+  "clasificaciones": [
+    {
+      "nivel": "Publica",
+      "color": "#2e8b57",
+      "retencion": "Sin requisito"
+    },
+    {
+      "nivel": "Interna",
+      "color": "#2563eb",
+      "retencion": "3 anos"
+    },
+    {
+      "nivel": "Confidencial",
+      "color": "#d97706",
+      "retencion": "5 anos"
+    },
+    {
+      "nivel": "Restringida",
+      "color": "#dc2626",
+      "retencion": "Segun ley (5+ anos)"
+    }
+  ],
+  "reglas": [
+    "La clasificacion es metadato, no va en el nombre de la carpeta.",
+    "Nombres de carpeta saneados (sin / : * ? etc).",
+    "Cara B (Medica 04-B, limpieza, choferes) NO se publica en SharePoint.",
+    "Cada sitio tiene _Plantillas, _Migracion y _Archivo."
+  ],
+  "sitios": [
+    {
+      "slug": "SGSI-Concentrador",
+      "nombre": "Concentrador Documental SGSI",
+      "tipo": "hub",
+      "propietario": "Franco Lazzarini",
+      "acceso": [
+        "Franco",
+        "Carmen",
+        "Ezequiel"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "00.1 Contexto y Alcance",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "00.2 Politica y Liderazgo",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "00.3 Riesgos y Declaracion de Aplicabilidad (SOA)",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "00.4 Inventario de Activos",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "00.5 Partes Interesadas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "00.6 Procedimientos y Lineamientos",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "00.7 Auditoria Interna",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "00.8 No Conformidades y Mejora",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "00.9 Matriz de Accesos y Exclusiones",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-DireccionGobierno",
+      "nombre": "Direccion y Gobierno",
+      "tipo": "team",
+      "propietario": "Jorge Alvarez",
+      "acceso": [
+        "Jorge",
+        "Jose Maria",
+        "Martha"
+      ],
+      "nota": "3 bibliotecas: Consejo, Direccion General, Gerencia General. Todos editan.",
+      "bibliotecas": [
+        {
+          "nombre": "Consejo",
+          "carpetas": [
+            {
+              "nombre": "01.1 Actas de Sesion",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "01.2 Acuerdos y Seguimiento",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "01.3 Informes Ejecutivos",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "01.4 Planeacion Estrategica",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "01.5 Presupuestos y Proyectos",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "01.6 Documentacion Confidencial",
+              "clasificacion": "Restringida"
+            }
+          ]
+        },
+        {
+          "nombre": "Direccion General",
+          "carpetas": [
+            {
+              "nombre": "02.1 Planeacion y Direccion Estrategica",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "02.2 Curriculum y Capacidades",
+              "clasificacion": "Publica"
+            },
+            {
+              "nombre": "02.3 Programas y Servicios (SP-K9-CyberSec)",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "K9 - Registro de Caninos en Carga Aerea (AFAC)",
+                  "clasificacion": "Restringida"
+                }
+              ]
+            },
+            {
+              "nombre": "02.4 Manuales de Operacion (version cliente)",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "02.5 Contratos y Planeacion de Clientes",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "02.6 Permisos y Acreditaciones Oficiales (SSP-AFAC)",
+              "clasificacion": "Restringida"
+            },
+            {
+              "nombre": "02.7 Supervision y Control de Calidad",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "02.8 Auditorias y Cumplimiento (ISO 27001)",
+              "clasificacion": "Confidencial"
+            }
+          ]
+        },
+        {
+          "nombre": "Gerencia General",
+          "carpetas": [
+            {
+              "nombre": "03.1 Presupuesto, Cotizaciones y Contratos",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "03.2 Supervision de Operaciones",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "03.3 Nomina y Compensaciones",
+              "clasificacion": "Restringida"
+            },
+            {
+              "nombre": "03.4 Gastos por Plaza",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "03.5 Clientes y Socios (TECNIP-TRABLISA)",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "03.6 Expedientes de Empleados",
+              "clasificacion": "Restringida"
+            },
+            {
+              "nombre": "03.7 Finiquitos",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "03.8 Vacaciones",
+              "clasificacion": "Interna"
+            }
+          ]
+        }
+      ],
+      "carpetasComunes": [
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-RecursosHumanos",
+      "nombre": "Recursos Humanos",
+      "tipo": "team",
+      "propietario": "Wendy Rodriguez",
+      "acceso": [
+        "Wendy",
+        "Nabiki"
+      ],
+      "nota": "Area 04. La sub-area 04-B Medica NO se publica (Cara B, local).",
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "04.1 Ano 2026",
+          "clasificacion": "Restringida",
+          "hijos": [
+            {
+              "nombre": "04.1.1 IMSS 2026",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "04.1.1.1 Altas",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "04.1.1.2 Bajas",
+                  "clasificacion": "Confidencial"
+                }
+              ]
+            },
+            {
+              "nombre": "04.1.2 Bajas para Andrea los viernes",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "04.1.3 Contratos JMA 2026",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "04.1.3.1 Vigentes",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "04.1.3.2 Terminados",
+                  "clasificacion": "Confidencial"
+                }
+              ]
+            },
+            {
+              "nombre": "04.1.4 Documentos generales del personal contratado",
+              "clasificacion": "Restringida"
+            },
+            {
+              "nombre": "04.1.5 Documentos y permisos para el area medica",
+              "clasificacion": "Restringida"
+            },
+            {
+              "nombre": "04.1.6 Finiquitos pagados 2026",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "04.1.7 Informacion para Andrea - Nuevos Ingresos",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "04.1.8 Auditorias",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "04.1.8.1 En curso",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "04.1.8.2 Terminadas",
+                  "clasificacion": "Confidencial"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nombre": "04.2 Expedientes de Personal",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "04.3 Reclutamiento y Seleccion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "04.4 Expedientes Medicos",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "04.5 Contratos y Altas IMSS",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "04.6 Capacitacion y Concientizacion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "04.7 Evaluaciones de Desempeno",
+          "clasificacion": "Confidencial",
+          "hijos": [
+            {
+              "nombre": "04.7.1 Indicadores KPI",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "04.7.2 Informes de Evaluacion",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "04.7.3 Planes de Desarrollo - Mejora",
+              "clasificacion": "Confidencial"
+            }
+          ]
+        },
+        {
+          "nombre": "04.8 Bajas y Finiquitos",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-Juridico",
+      "nombre": "Juridico",
+      "tipo": "team",
+      "propietario": "Jorge Alvarez",
+      "acceso": [
+        "Miguel",
+        "Rita"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "05.1 Contratos Clientes (Registro Patronal)",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "05.2 Contratos Proveedor",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "05.3 FIEL y Firmas Digitales",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "05.4 Cartas de Antecedentes Penales",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "05.5 Cumplimiento Normativo",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "05.6 Cartas de Recomendacion y Bajas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-Finanzas",
+      "nombre": "Finanzas y Contabilidad",
+      "tipo": "team",
+      "propietario": "Martha Alvarez",
+      "acceso": [
+        "Martha",
+        "Daniela",
+        "Joel"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "06.1 Facturacion (Emitidas-Recibidas)",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "06.2 Movimientos Bancarios",
+          "clasificacion": "Restringida",
+          "hijos": [
+            {
+              "nombre": "06.2.1 Santander",
+              "clasificacion": "Restringida"
+            },
+            {
+              "nombre": "06.2.2 Bancomer",
+              "clasificacion": "Restringida"
+            }
+          ]
+        },
+        {
+          "nombre": "06.3 Cuentas por Cobrar",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "06.4 Cuentas por Pagar",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "06.5 Egresos por Cliente",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "06.6 Impuestos y Declaraciones",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "06.7 Proveedores",
+          "clasificacion": "Confidencial",
+          "hijos": [
+            {
+              "nombre": "06.7.1 JMA Seguridad Privada",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "06.7.2 JMA K9",
+              "clasificacion": "Confidencial"
+            },
+            {
+              "nombre": "06.7.3 JMA CyberSec",
+              "clasificacion": "Confidencial"
+            }
+          ]
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-Administracion",
+      "nombre": "Administracion",
+      "tipo": "team",
+      "propietario": "Nabiki Parada / Wendy Rodriguez",
+      "acceso": [
+        "Nabiki",
+        "Wendy",
+        "Martha"
+      ],
+      "nota": "Incluye Registros Federales y CUIP corporativos de Seguridad Privada.",
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "07.1 Inventario de Activos",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "07.2 Personal de Guardias Tijuana",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "07.3 Personal de Guardias Ensenada",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "07.4 Permisos Federales y Estatales",
+          "clasificacion": "Restringida",
+          "hijos": [
+            {
+              "nombre": "Registros Federales SP (corporativo)",
+              "clasificacion": "Restringida"
+            }
+          ]
+        },
+        {
+          "nombre": "07.5 Permisos y Licencias K9",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "07.6 Expedientes Operativos",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-SP-Tijuana",
+      "nombre": "Seguridad Privada - Tijuana",
+      "tipo": "team",
+      "propietario": "Jose Maria Gonzalez / Nabiki Parada",
+      "acceso": [
+        "Jose Maria",
+        "Nabiki",
+        "Juan Manuel"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "Expedientes",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "Altas-Bajas",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "Servicios",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "CUIP y Registro Estatal",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "Supervision Operativa",
+          "clasificacion": "Interna",
+          "hijos": [
+            {
+              "nombre": "Bitacoras",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "Rondines",
+              "clasificacion": "Interna"
+            }
+          ]
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-SP-Ensenada",
+      "nombre": "Seguridad Privada - Ensenada",
+      "tipo": "team",
+      "propietario": "Jose Maria Gonzalez / Nabiki Parada",
+      "acceso": [
+        "Jose Maria",
+        "Nabiki",
+        "Mauro"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "Expedientes",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "Altas-Bajas",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "Servicios",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "CUIP y Registro Estatal",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "Supervision Operativa",
+          "clasificacion": "Interna",
+          "hijos": [
+            {
+              "nombre": "Bitacoras",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "Rondines",
+              "clasificacion": "Interna"
+            }
+          ]
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-CyberSec",
+      "nombre": "CyberSec",
+      "tipo": "team",
+      "piloto": true,
+      "propietario": "Franco Lazzarini",
+      "acceso": [
+        "Franco",
+        "Carmen",
+        "Ezequiel",
+        "Chema (reducido)"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "09.1 Proyectos y Servicios (AFAC y otros)",
+          "clasificacion": "Confidencial",
+          "hijos": [
+            {
+              "nombre": "AFAC",
+              "clasificacion": "Confidencial"
+            }
+          ]
+        },
+        {
+          "nombre": "09.2 SOC - Monitoreo, Alertas e Incidentes",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "09.3 Clientes - Servicios de Ciberseguridad",
+          "clasificacion": "Confidencial",
+          "hijos": [
+            {
+              "nombre": "_PlantillaCliente",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "Contrato, Alcance y Onboarding",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "Monitoreo SOC 24-7",
+                  "clasificacion": "Restringida"
+                },
+                {
+                  "nombre": "Respuesta a Incidentes",
+                  "clasificacion": "Restringida"
+                },
+                {
+                  "nombre": "Pruebas de Penetracion (Pentest)",
+                  "clasificacion": "Restringida"
+                },
+                {
+                  "nombre": "Evaluacion de Vulnerabilidades",
+                  "clasificacion": "Restringida"
+                },
+                {
+                  "nombre": "Hardening y Configuracion Segura",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "Seguridad de Microsoft 365 y Correo",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "Concientizacion y Capacitacion",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Cumplimiento y Documentacion",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "Reportes y Entregables",
+                  "clasificacion": "Confidencial"
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "nombre": "09.4 Pentest y Evaluaciones (metodologia y catalogo)",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "09.5 Documentacion Tecnica",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "09.6 Capacitacion - Pasantia",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-K9",
+      "nombre": "JMA K9",
+      "tipo": "team",
+      "propietario": "Jose Arley Velasquez",
+      "acceso": [
+        "Jose Arley",
+        "Samuel",
+        "Ireri"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "10.1 Binomios y Manejadores",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "10.2 Adiestramiento y Programas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "10.3 Calendario y Servicios K9",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "10.4 Salud y Certificados Veterinarios",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "10.5 Licencias y Permisos K9 (estatal-federal)",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "10.6 Expedientes de Perros",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "10.7 Informes",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "10.8 Facturas",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-Marketing",
+      "nombre": "Marketing",
+      "tipo": "team",
+      "propietario": "Franco Lazzarini",
+      "acceso": [
+        "Por asignar"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "11.1 Marca e Identidad Corporativa",
+          "clasificacion": "Publica"
+        },
+        {
+          "nombre": "11.2 Redes Sociales",
+          "clasificacion": "Publica"
+        },
+        {
+          "nombre": "11.3 Campanas Publicitarias",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "11.4 Diseno Grafico",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "11.5 Contenido",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "11.6 Fotografia y Video",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "11.7 Eventos",
+          "clasificacion": "Publica"
+        },
+        {
+          "nombre": "11.8 Clientes y Testimonios",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "11.9 Analitica y Reportes",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    },
+    {
+      "slug": "SGSI-TI",
+      "nombre": "TI e Infraestructura",
+      "tipo": "team",
+      "propietario": "Franco Lazzarini",
+      "acceso": [
+        "Angel",
+        "Carmen",
+        "Ezequiel"
+      ],
+      "biblioteca": "Documents",
+      "carpetas": [
+        {
+          "nombre": "12.1 Inventario de Equipos",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "12.2 Red y Comunicaciones",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "12.3 Respaldo y Continuidad",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "12.4 Accesos y Cuentas",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "_Plantillas",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Migracion",
+          "clasificacion": "Interna"
+        },
+        {
+          "nombre": "_Archivo",
+          "clasificacion": "Interna"
+        }
+      ]
+    }
+  ]
+}

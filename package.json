@@ -1,0 +1,27 @@
+{
+  "name": "dashboard-iso-sgsi",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Dashboard de migracion documental ISO 27001 - SGSI JMA",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "test:e2e": "playwright test"
+  },
+  "dependencies": {
+    "@azure/msal-browser": "^3.28.1",
+    "@microsoft/microsoft-graph-client": "^3.0.7",
+    "chart.js": "^4.4.7",
+    "exceljs": "^4.4.0",
+    "htm": "^3.1.1",
+    "idb": "^8.0.0",
+    "preact": "^10.25.4",
+    "preact-router": "^4.1.2"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.49.1",
+    "vite": "^5.4.11"
+  }
+}

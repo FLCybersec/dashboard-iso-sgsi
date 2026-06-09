@@ -1,0 +1,637 @@
+// Seguimiento de migracion. Almacenamiento POR SITIO: cada area guarda su propio
+// `_seguimiento/seguimiento-migracion.json` en su sitio, para que cada persona
+// escriba donde ya tiene permiso (alcance impuesto por SharePoint via Graph
+// delegado). El dashboard agrega los sitios accesibles para las vistas globales.
+//
+// Migracion no destructiva: el archivo legado del hub (que tenia TODO) se lee
+// como semilla/respaldo; cada sitio sin archivo propio se siembra en memoria
+// desde ese legado y persiste a su sitio en la primera escritura. El hub queda
+// intacto. La agregacion scope-a cada sitio a su slug para no duplicar.
+//
+// Clave de nodo canonica: `${slug}::${ruta}`.
+
+import { getGraphClient } from '../graph/graph-client.js'
+import { resolveSiteId } from '../graph/sharepoint-reader.js'
+import { downloadSeguimiento, uploadSeguimiento } from '../graph/seguimiento-graph.js'
+import { currentUser } from '../auth/auth-provider.js'
+import { esAdmin } from '../auth/allowed-users.js'
+
+export const ESTADOS = ['Pendiente', 'En progreso', 'Creada', 'Verificada', 'Bloqueada', 'N/A']
+export const PRIORIDADES = ['alta', 'media', 'baja']
+export const ESTADOS_MIGRACION_CARPETA = ['Sin empezar', 'En progreso', 'Migrada', 'Verificada']
+const MIGRADAS = new Set(['Migrada', 'Verificada'])
+
+export const TIPOS_CAMBIO = ['crear', 'sobrante']
+export const ESTADOS_CAMBIO = ['propuesto', 'aprobado', 'aplicado', 'descartado']
+
+export const EQUIPO_MIGRACION = ['Franco', 'Carmen', 'Ezequiel', 'Chema']
+
+// ¿La persona figura en el propietario/acceso del maestro de ESTE sitio?
+export function esMiembroMaestro(nombre, sitio) {
+  const n = limpiarNombre(nombre).toLowerCase()
+  if (!n) return false
+  const enAcceso = (sitio?.acceso || []).some((a) => {
+    const x = limpiarNombre(a).toLowerCase()
+    return x === n || x.split(/[ /]+/)[0] === n
+  })
+  const propi = limpiarNombre(sitio?.propietario || '').toLowerCase()
+  const enPropi = propi === n || propi.split(/[ /]+/).includes(n)
+  return enAcceso || enPropi
+}
+
+// Miembros del equipo de migracion que en ESTE sitio tienen acceso SOLO temporal
+// (es decir, no figuran en su propietario/acceso del maestro). En su area propia
+// son permanentes y no llevan badge.
+export function accesoTemporalSitio(sitio) {
+  return EQUIPO_MIGRACION.filter((p) => !esMiembroMaestro(p, sitio))
+}
+
+export const EQUIPO_APOYO = ['Carmen', 'Ezequiel', 'Chema']
+
+export const ROSTER = [
+  'Jorge', 'Jose Maria', 'Martha', 'Franco', 'Jose Arley', 'Daniela', 'Wendy',
+  'Nabiki', 'Miguel', 'Ezequiel', 'Carmen', 'America', 'Mauro', 'Juan Manuel',
+  'Samuel', 'Ireri', 'Chema', 'Rita', 'Joel', 'Angel'
+]
+
+export const ROSTER_UPN = {
+  Franco: 'flazzarini@jmacybersec.com',
+  Ezequiel: 'etorres@jmacybersec.com',
+  Carmen: 'crodriguez@jmacybersec.com',
+  Chema: 'cgonzalez@jmacybersec.com',
+  Jorge: 'jalvarez@jmaseguridad.com'
+}
+
+const VERIFICADORES_EMAIL = new Set([
+  'flazzarini@jmacybersec.com',
+  'etorres@jmacybersec.com',
+  'crodriguez@jmacybersec.com',
+  'cgonzalez@jmacybersec.com'
+])
+
+export function nombreDesdeEmail(email) {
+  const e = (email || '').trim().toLowerCase()
+  for (const [nombre, upn] of Object.entries(ROSTER_UPN)) {
+    if (upn.toLowerCase() === e) return nombre
+  }
+  return ''
+}
+
+// Nombre del roster del usuario: por correo conocido, o por el primer nombre de
+// su display name de Entra (heuristica para el personal sin UPN mapeado).
+export function nombreDesdeUsuario(user) {
+  const porEmail = nombreDesdeEmail(user?.email)
+  if (porEmail) return porEmail
+  const dn = limpiarNombre(user?.name || '').toLowerCase()
+  if (!dn) return ''
+  const primero = dn.split(/\s+/)[0]
+  return ROSTER.find((r) => r.toLowerCase().split(/\s+/)[0] === primero) || ''
+}
+
+export function puedeVerificar() {
+  return VERIFICADORES_EMAIL.has((currentUser().email || '').trim().toLowerCase())
+}
+
+export const TIPOS_PERMISO = ['agregar', 'quitar']
+export const ROLES_PERMISO = ['Propietario', 'Integrante', 'Lectura']
+
+export function limpiarNombre(nombre) {
+  return (nombre || '').replace(/\s*\(.*?\)\s*/g, ' ').trim()
+}
+
+export const FASES = [
+  { key: 'sitio_creado', label: 'Sitio creado' },
+  { key: 'asociado_hub', label: 'Asociado al hub' },
+  { key: 'carpetas_creadas', label: 'Carpetas creadas' },
+  { key: 'permisos_aplicados', label: 'Permisos aplicados' },
+  { key: 'retencion_aplicada', label: 'Retencion aplicada' },
+  { key: 'versionado_activado', label: 'Versionado activado' },
+  { key: 'sync_validado', label: 'Sync validado' }
+]
+function fasesVacias() {
+  return FASES.reduce((acc, f) => ((acc[f.key] = false), acc), {})
+}
+
+// ---- Estado en memoria (por sitio) ----
+let segPorSitio = new Map() // slug -> objeto de seguimiento (datos de ese sitio)
+let siteIdPorSlug = new Map() // slug -> siteId | null
+let hubSlugActual = null
+let cargado = false
+
+function emptySeg() {
+  return {
+    version: '1.0',
+    fecha_inicial: new Date().toISOString(),
+    nodos: {},
+    pendientes: [],
+    fases_por_sitio: {},
+    migracion_por_sitio: {},
+    cambios_estructura: [],
+    solicitudes_permisos: []
+  }
+}
+
+function normalize(raw) {
+  const s = raw && typeof raw === 'object' ? raw : {}
+  return {
+    version: s.version || '1.0',
+    fecha_inicial: s.fecha_inicial || new Date().toISOString(),
+    nodos: s.nodos && typeof s.nodos === 'object' ? s.nodos : {},
+    pendientes: Array.isArray(s.pendientes) ? s.pendientes : [],
+    fases_por_sitio: s.fases_por_sitio && typeof s.fases_por_sitio === 'object' ? s.fases_por_sitio : {},
+    migracion_por_sitio: s.migracion_por_sitio && typeof s.migracion_por_sitio === 'object' ? s.migracion_por_sitio : {},
+    cambios_estructura: Array.isArray(s.cambios_estructura) ? s.cambios_estructura : [],
+    solicitudes_permisos: Array.isArray(s.solicitudes_permisos) ? s.solicitudes_permisos : []
+  }
+}
+
+// Extrae de un seg (p. ej. el legado del hub) solo la porcion de un slug.
+function scopeSeg(s, slug, hubSlug) {
+  const out = emptySeg()
+  if (!s) return out
+  for (const [k, v] of Object.entries(s.nodos || {})) if (k.startsWith(`${slug}::`)) out.nodos[k] = v
+  const incluyeSinSitio = slug === hubSlug
+  out.pendientes = (s.pendientes || []).filter((p) => (p.sitio || '') === slug || (incluyeSinSitio && !(p.sitio || '')))
+  if (s.fases_por_sitio?.[slug]) out.fases_por_sitio[slug] = s.fases_por_sitio[slug]
+  if (s.migracion_por_sitio?.[slug]) out.migracion_por_sitio[slug] = s.migracion_por_sitio[slug]
+  out.cambios_estructura = (s.cambios_estructura || []).filter((c) => c.slug === slug)
+  out.solicitudes_permisos = (s.solicitudes_permisos || []).filter((x) => x.slug === slug)
+  return out
+}
+
+function segDe(slug) {
+  if (!segPorSitio.has(slug)) segPorSitio.set(slug, emptySeg())
+  return segPorSitio.get(slug)
+}
+
+async function ensureSiteId(slug) {
+  if (siteIdPorSlug.has(slug)) return siteIdPorSlug.get(slug)
+  let id = null
+  try {
+    id = await resolveSiteId(getGraphClient(), slug)
+  } catch {
+    id = null
+  }
+  siteIdPorSlug.set(slug, id)
+  return id
+}
+
+async function uploadSitio(slug) {
+  const siteId = await ensureSiteId(slug)
+  if (!siteId) throw new Error(`No tienes acceso al sitio "${slug}" o aun no existe; no se pudo guardar.`)
+  await uploadSeguimiento(siteId, segDe(slug))
+}
+
+// Carga el seguimiento de TODOS los sitios accesibles (cada uno de su sitio).
+// Siembra desde el legado del hub los sitios sin archivo propio. Sitios sin
+// acceso quedan vacios sin romper.
+export async function loadSeguimiento(structure, { force = false } = {}) {
+  if (cargado && !force) return getSeguimiento()
+  const client = getGraphClient()
+  segPorSitio = new Map()
+  siteIdPorSlug = new Map()
+  hubSlugActual = structure.hubSlug
+
+  const slugs = [structure.hubSlug, ...structure.sitios.map((s) => s.slug).filter((s) => s !== structure.hubSlug)]
+  let hubLegacy = null
+
+  for (const slug of slugs) {
+    let siteId = null
+    try {
+      siteId = await resolveSiteId(client, slug)
+    } catch {
+      siteId = null
+    }
+    siteIdPorSlug.set(slug, siteId)
+
+    let archivo = null
+    if (siteId) {
+      try {
+        archivo = await downloadSeguimiento(siteId)
+      } catch {
+        archivo = null
+      }
+    }
+
+    if (slug === structure.hubSlug) {
+      hubLegacy = archivo ? normalize(archivo) : null
+      segPorSitio.set(slug, hubLegacy || emptySeg())
+    } else if (archivo) {
+      segPorSitio.set(slug, normalize(archivo))
+    } else {
+      // Semilla no destructiva desde el legado del hub (persiste a su sitio al escribir).
+      segPorSitio.set(slug, scopeSeg(hubLegacy, slug, structure.hubSlug))
+    }
+  }
+
+  cargado = true
+  return getSeguimiento()
+}
+
+// Vista agregada (scope por slug, sin duplicar) para el export y EvidenciaView.
+export function getSeguimiento() {
+  const agg = emptySeg()
+  for (const [slug, s] of segPorSitio) {
+    const part = scopeSeg(s, slug, hubSlugActual)
+    Object.assign(agg.nodos, part.nodos)
+    agg.pendientes.push(...part.pendientes)
+    Object.assign(agg.fases_por_sitio, part.fases_por_sitio)
+    Object.assign(agg.migracion_por_sitio, part.migracion_por_sitio)
+    agg.cambios_estructura.push(...part.cambios_estructura)
+    agg.solicitudes_permisos.push(...part.solicitudes_permisos)
+  }
+  return agg
+}
+
+function slugDeKey(key) {
+  return key.split('::')[0]
+}
+
+export function getOverride(key) {
+  return segDe(slugDeKey(key)).nodos[key] || null
+}
+
+export function estadoEfectivo(existe, override) {
+  if (override?.estado) return { estado: override.estado, fuente: 'manual' }
+  return { estado: existe ? 'Creada' : 'Pendiente', fuente: 'auto' }
+}
+
+export function quienMigra(key) {
+  const ov = segDe(slugDeKey(key)).nodos[key]
+  return (ov?.quienMigra || ov?.responsable || '').trim()
+}
+
+export function migracionDeNodo(key) {
+  return segDe(slugDeKey(key)).nodos[key]?.migracionEstado || 'Sin empezar'
+}
+
+// Cambios a un nodo. Verificacion controlada: "Verificada" solo Apoyo o Franco.
+export async function updateNodo(
+  structure,
+  { key, tipo = 'carpeta', estado, migracionEstado, notas, quienMigra: quien, nota }
+) {
+  if (!cargado) await loadSeguimiento(structure)
+  if (migracionEstado === 'Verificada' && !puedeVerificar()) {
+    throw new Error('Solo el Apoyo SGSI o Franco pueden marcar "Verificada".')
+  }
+  if (quien !== undefined && !esAdmin(currentUser().email)) {
+    throw new Error('Solo un administrador (SGSI) puede asignar "quien migra".')
+  }
+  const slug = slugDeKey(key)
+  const seg = segDe(slug)
+  const user = currentUser()
+  const ahora = new Date().toISOString()
+  const prev = seg.nodos[key] || null
+
+  const estadoNuevo = estado ?? prev?.estado ?? null
+  const migNuevo = migracionEstado !== undefined ? migracionEstado : prev?.migracionEstado ?? null
+  const quienNuevo = quien !== undefined ? quien : prev?.quienMigra ?? prev?.responsable ?? ''
+
+  const entry = {
+    tipo: prev?.tipo || tipo,
+    estado: estadoNuevo,
+    migracionEstado: migNuevo,
+    quienMigra: quienNuevo,
+    notas: notas !== undefined ? notas : prev?.notas ?? '',
+    ultimaModificacion: ahora,
+    modificadoPor: user.name,
+    modificadoPorEmail: user.email,
+    historial: Array.isArray(prev?.historial) ? [...prev.historial] : []
+  }
+  entry.historial.push({
+    fecha: ahora,
+    estado_anterior: prev?.estado ?? null,
+    estado_nuevo: estadoNuevo,
+    migracion_anterior: prev?.migracionEstado ?? null,
+    migracion_nuevo: migNuevo,
+    quienMigra: quienNuevo,
+    nota: nota || '',
+    modificadoPor: user.name,
+    modificadoPorEmail: user.email
+  })
+
+  seg.nodos[key] = entry
+  await uploadSitio(slug)
+  return entry
+}
+
+// ---- Migracion derivada ----
+
+export function statsMigracionSitio(sitio) {
+  const seg = segDe(sitio.slug)
+  let migradas = 0
+  let ultima = null
+  for (const n of sitio.nodos) {
+    const ov = seg.nodos[n.key]
+    if (MIGRADAS.has(ov?.migracionEstado || 'Sin empezar')) migradas++
+    if (ov?.ultimaModificacion && (!ultima || ov.ultimaModificacion > ultima)) ultima = ov.ultimaModificacion
+  }
+  const total = sitio.nodos.length
+  return { migradas, total, pct: total ? Math.round((migradas / total) * 100) : 0, ultima }
+}
+
+export function statsMigracionGlobal(structure) {
+  let migradas = 0
+  let total = 0
+  for (const sitio of structure.sitios) {
+    const s = statsMigracionSitio(sitio)
+    migradas += s.migradas
+    total += s.total
+  }
+  return { migradas, total, pct: total ? Math.round((migradas / total) * 100) : 0 }
+}
+
+export function statsMigracionPorPersona(structure) {
+  const mapa = new Map()
+  const get = (nombre) => {
+    if (!mapa.has(nombre)) {
+      mapa.set(nombre, { nombre, upn: ROSTER_UPN[nombre] || null, carpetas: [], migradas: 0, total: 0, ultima: null, pendientes: 0 })
+    }
+    return mapa.get(nombre)
+  }
+  for (const sitio of structure.sitios) {
+    const seg = segDe(sitio.slug)
+    for (const n of sitio.nodos) {
+      const quien = quienMigra(n.key)
+      if (!quien) continue
+      const ov = seg.nodos[n.key]
+      const estado = ov?.migracionEstado || 'Sin empezar'
+      const p = get(quien)
+      p.total++
+      if (MIGRADAS.has(estado)) p.migradas++
+      if (ov?.ultimaModificacion && (!p.ultima || ov.ultimaModificacion > p.ultima)) p.ultima = ov.ultimaModificacion
+      p.carpetas.push({ key: n.key, slug: sitio.slug, sitioNombre: sitio.nombre, ruta: n.ruta, nombre: n.nombre, estado })
+    }
+  }
+  for (const pend of getPendientes()) {
+    if (!pend.completado && pend.responsable && pend.responsable.trim()) get(pend.responsable.trim()).pendientes++
+  }
+  return [...mapa.values()]
+    .map((p) => ({ ...p, pct: p.total ? Math.round((p.migradas / p.total) * 100) : 0 }))
+    .sort((a, b) => a.nombre.localeCompare(b.nombre))
+}
+
+export function misCarpetas(structure, user) {
+  const nombre = nombreDesdeUsuario(user)
+  const personas = statsMigracionPorPersona(structure)
+  return { nombre, persona: personas.find((p) => p.nombre === nombre) || null }
+}
+
+// Sitios "de" un usuario: donde es propietario/acceso del maestro o tiene
+// carpetas asignadas como quien migra. Para "Mi trabajo".
+export function misSitios(structure, user) {
+  const nombre = nombreDesdeUsuario(user)
+  const slugs = new Set()
+  for (const sitio of structure.sitios) {
+    if (nombre && esMiembroMaestro(nombre, sitio)) slugs.add(sitio.slug)
+    for (const n of sitio.nodos) {
+      if (nombre && quienMigra(n.key) === nombre) slugs.add(sitio.slug)
+    }
+  }
+  return structure.sitios.filter((s) => slugs.has(s.slug))
+}
+
+export function actividadReciente(structure, limite = 40) {
+  const sitioPorSlug = new Map(structure.sitios.map((s) => [s.slug, s.nombre]))
+  const agg = getSeguimiento()
+  const eventos = []
+  for (const [key, ov] of Object.entries(agg.nodos)) {
+    const [slug, ruta] = key.split('::')
+    for (const h of ov.historial || []) {
+      eventos.push({
+        fecha: h.fecha,
+        sitio: sitioPorSlug.get(slug) || slug,
+        slug,
+        ruta: ruta || key,
+        migracion: h.migracion_nuevo || null,
+        quien: h.quienMigra || '',
+        por: h.modificadoPor || '',
+        nota: h.nota || ''
+      })
+    }
+  }
+  return eventos.sort((a, b) => (a.fecha < b.fecha ? 1 : -1)).slice(0, limite)
+}
+
+export function requiereAtencion(structure, migState) {
+  const ahora = Date.now()
+  const DIA = 86400000
+  const migByKey = new Map()
+  for (const s of migState?.sitios || []) for (const n of s.nodos) migByKey.set(n.key, n)
+
+  const sinQuien = []
+  const restringidasVacias = []
+  const bloqueadas = []
+  for (const sitio of structure.sitios) {
+    const seg = segDe(sitio.slug)
+    for (const n of sitio.nodos) {
+      const ov = seg.nodos[n.key]
+      const mn = migByKey.get(n.key)
+      const estadoMig = ov?.migracionEstado || 'Sin empezar'
+      if (!quienMigra(n.key) && !MIGRADAS.has(estadoMig)) sinQuien.push({ slug: sitio.slug, sitio: sitio.nombre, ruta: n.ruta })
+      if (n.clasificacion === 'Restringida' && !MIGRADAS.has(estadoMig)) {
+        restringidasVacias.push({ slug: sitio.slug, sitio: sitio.nombre, ruta: n.ruta, archivos: mn?.archivos })
+      }
+      if (ov?.estado === 'Bloqueada') bloqueadas.push({ slug: sitio.slug, sitio: sitio.nombre, ruta: n.ruta, motivo: ov?.notas || '' })
+    }
+  }
+
+  const sitiosEstancados = []
+  for (const sitio of structure.sitios) {
+    const s = statsMigracionSitio(sitio)
+    if (s.pct >= 100) continue
+    if (s.ultima && ahora - new Date(s.ultima).getTime() > 7 * DIA) {
+      sitiosEstancados.push({ slug: sitio.slug, sitio: sitio.nombre, pct: s.pct, ultima: s.ultima })
+    }
+  }
+  return { sinQuien, restringidasVacias, bloqueadas, sitiosEstancados }
+}
+
+// ---- Apoyo SGSI por sitio ----
+
+export function getApoyoSitio(slug) {
+  return segDe(slug).migracion_por_sitio?.[slug]?.apoyo || ''
+}
+
+export async function setApoyoSitio(structure, slug, apoyo) {
+  if (!cargado) await loadSeguimiento(structure)
+  const val = EQUIPO_APOYO.includes(apoyo) ? apoyo : ''
+  const seg = segDe(slug)
+  seg.migracion_por_sitio[slug] = { ...(seg.migracion_por_sitio[slug] || {}), apoyo: val }
+  await uploadSitio(slug)
+  return val
+}
+
+export function statsMigracionPorApoyo(structure) {
+  const out = EQUIPO_APOYO.map((nombre) => ({ nombre, sitios: [], migradas: 0, total: 0 }))
+  const byName = new Map(out.map((o) => [o.nombre, o]))
+  for (const sitio of structure.sitios) {
+    const apoyo = getApoyoSitio(sitio.slug)
+    if (!apoyo || !byName.has(apoyo)) continue
+    const s = statsMigracionSitio(sitio)
+    const o = byName.get(apoyo)
+    o.sitios.push({ slug: sitio.slug, nombre: sitio.nombre, ...s })
+    o.migradas += s.migradas
+    o.total += s.total
+  }
+  return out.map((o) => ({ ...o, pct: o.total ? Math.round((o.migradas / o.total) * 100) : 0 }))
+}
+
+// ---- Pendientes ----
+
+export function getPendientes() {
+  return getSeguimiento().pendientes
+}
+
+function nuevoId(p) {
+  return `${p}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+// Localiza el seg que contiene un item por id en un arreglo dado; devuelve {slug,item}.
+function localizar(arrayName, id) {
+  for (const [slug, s] of segPorSitio) {
+    const item = (s[arrayName] || []).find((x) => x.id === id)
+    if (item) return { slug, item }
+  }
+  return null
+}
+
+export async function addPendiente(structure, { descripcion, sitio, responsable, fechaObjetivo, prioridad }) {
+  if (!cargado) await loadSeguimiento(structure)
+  const slug = sitio || structure.hubSlug
+  const seg = segDe(slug)
+  const item = {
+    id: nuevoId('pend'),
+    descripcion: (descripcion || '').slice(0, 200),
+    sitio: sitio || '',
+    responsable: responsable || '',
+    fechaObjetivo: fechaObjetivo || '',
+    prioridad: PRIORIDADES.includes(prioridad) ? prioridad : 'media',
+    creado: new Date().toISOString(),
+    creadoPor: currentUser().name,
+    completado: false,
+    completadoEn: null
+  }
+  seg.pendientes.push(item)
+  await uploadSitio(slug)
+  return item
+}
+
+export async function updatePendiente(structure, id, patch) {
+  if (!cargado) await loadSeguimiento(structure)
+  const found = localizar('pendientes', id)
+  if (!found) throw new Error('Pendiente no encontrado')
+  const { slug, item } = found
+  if (patch.descripcion !== undefined) item.descripcion = patch.descripcion.slice(0, 200)
+  if (patch.responsable !== undefined) item.responsable = patch.responsable
+  if (patch.fechaObjetivo !== undefined) item.fechaObjetivo = patch.fechaObjetivo
+  if (patch.prioridad !== undefined && PRIORIDADES.includes(patch.prioridad)) item.prioridad = patch.prioridad
+  await uploadSitio(slug)
+  return item
+}
+
+export async function setPendienteCompletado(structure, id, completado) {
+  if (!cargado) await loadSeguimiento(structure)
+  const found = localizar('pendientes', id)
+  if (!found) throw new Error('Pendiente no encontrado')
+  found.item.completado = !!completado
+  found.item.completadoEn = completado ? new Date().toISOString() : null
+  await uploadSitio(found.slug)
+  return found.item
+}
+
+// ---- Fases por sitio ----
+
+export function getFases(slug) {
+  return { ...fasesVacias(), ...(segDe(slug).fases_por_sitio?.[slug] || {}) }
+}
+
+export async function setFase(structure, slug, key, value) {
+  if (!cargado) await loadSeguimiento(structure)
+  const seg = segDe(slug)
+  const actual = { ...fasesVacias(), ...(seg.fases_por_sitio[slug] || {}) }
+  actual[key] = !!value
+  seg.fases_por_sitio[slug] = actual
+  await uploadSitio(slug)
+  return actual
+}
+
+// ---- Cambios de estructura ----
+
+export function getCambiosEstructura(slug) {
+  if (slug) return segDe(slug).cambios_estructura.filter((c) => c.slug === slug)
+  return getSeguimiento().cambios_estructura
+}
+
+export async function addCambioEstructura(structure, { slug, tipo, ruta, clasificacion, responsable, notas }) {
+  if (!cargado) await loadSeguimiento(structure)
+  const seg = segDe(slug)
+  const item = {
+    id: nuevoId('cam'),
+    slug: slug || '',
+    tipo: TIPOS_CAMBIO.includes(tipo) ? tipo : 'crear',
+    ruta: (ruta || '').trim(),
+    clasificacion: clasificacion || '',
+    responsable: responsable || '',
+    notas: notas || '',
+    estado: 'propuesto',
+    creado: new Date().toISOString(),
+    creadoPor: currentUser().name
+  }
+  seg.cambios_estructura.push(item)
+  await uploadSitio(slug)
+  return item
+}
+
+export async function setCambioEstado(structure, id, estado) {
+  if (!cargado) await loadSeguimiento(structure)
+  const found = localizar('cambios_estructura', id)
+  if (!found) throw new Error('Cambio no encontrado')
+  if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
+  await uploadSitio(found.item.slug || found.slug)
+  return found.item
+}
+
+// ---- Solicitudes de permisos ----
+
+export function getSolicitudesPermiso(slug) {
+  if (slug) return segDe(slug).solicitudes_permisos.filter((s) => s.slug === slug)
+  return getSeguimiento().solicitudes_permisos
+}
+
+export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol, motivo }) {
+  if (!cargado) await loadSeguimiento(structure)
+  const seg = segDe(slug)
+  const item = {
+    id: nuevoId('perm'),
+    slug: slug || '',
+    tipo: TIPOS_PERMISO.includes(tipo) ? tipo : 'agregar',
+    persona: persona || '',
+    rol: ROLES_PERMISO.includes(rol) ? rol : 'Integrante',
+    motivo: motivo || '',
+    estado: 'propuesto',
+    creado: new Date().toISOString(),
+    creadoPor: currentUser().name
+  }
+  seg.solicitudes_permisos.push(item)
+  await uploadSitio(slug)
+  return item
+}
+
+export async function setSolicitudPermisoEstado(structure, id, estado) {
+  if (!cargado) await loadSeguimiento(structure)
+  const found = localizar('solicitudes_permisos', id)
+  if (!found) throw new Error('Solicitud no encontrada')
+  if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
+  await uploadSitio(found.item.slug || found.slug)
+  return found.item
+}
+
+// Solo lo APROBADO y aun no aplicado: lo unico que se exporta para PnP (spec §7).
+export function solicitudesAprobadas() {
+  const agg = getSeguimiento()
+  return {
+    cambios_estructura: agg.cambios_estructura.filter((c) => c.estado === 'aprobado'),
+    solicitudes_permisos: agg.solicitudes_permisos.filter((p) => p.estado === 'aprobado')
+  }
+}

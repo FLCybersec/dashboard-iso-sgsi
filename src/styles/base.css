@@ -1,0 +1,71 @@
+/* Reset ligero y estilos base */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--fuente);
+  font-size: var(--fs-base);
+  color: var(--jma-gris-texto);
+  background: var(--jma-fondo);
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+h1,
+h2,
+h3 {
+  margin: 0 0 0.4em;
+  font-weight: 500;
+  color: var(--jma-azul-oscuro);
+  line-height: 1.25;
+}
+
+strong,
+b {
+  font-weight: 500;
+}
+
+h1 {
+  font-size: var(--fs-2xl);
+}
+h2 {
+  font-size: var(--fs-xl);
+}
+
+p {
+  margin: 0 0 0.6em;
+}
+
+a {
+  color: var(--jma-azul-claro);
+}
+
+button {
+  font-family: inherit;
+  font-size: var(--fs-base);
+  cursor: pointer;
+}
+
+code {
+  font-family: "Consolas", "Courier New", monospace;
+  background: #eef1f4;
+  padding: 1px 5px;
+  border-radius: var(--radio-sm);
+  font-size: 0.9em;
+}
