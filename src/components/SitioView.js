@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
+import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import {
@@ -110,7 +111,7 @@ export function SitioView({ slug, puedeEditar = true }) {
     </div>
 
     ${error && html`<div class="alert error">${error}</div>`}
-    ${loading && html`<div class="loading">Cargando sitio...</div>`}
+    ${loading && html`<${Cargando} titulo="Cargando sitio..." />`}
 
     ${!loading && !error && !sitioDef &&
     html`<div class="alert error">No se encontro el sitio "${slug}" en la estructura maestra.</div>`}

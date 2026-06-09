@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
+import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import {
@@ -59,7 +60,7 @@ export function HomeView() {
     </div>
 
     ${error && html`<div class="alert error">No se pudo leer el estado en SharePoint: ${error}</div>`}
-    ${loading && !data && html`<div class="loading">Detectando estado en SharePoint...</div>`}
+    ${loading && !data && html`<${Cargando} />`}
     ${data && html`<${Resumen} data=${data} />`}
   `
 }

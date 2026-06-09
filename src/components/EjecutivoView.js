@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { loadStructure } from '../lib/structure-store.js'
+import { Cargando } from './Cargando.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
@@ -39,7 +40,7 @@ export function EjecutivoView() {
     })()
   }, [])
 
-  if (loading) return html`<div class="loading">Preparando resumen...</div>`
+  if (loading) return html`<${Cargando} titulo="Preparando resumen..." />`
   if (error) return html`<div class="alert error">${error}</div>`
 
   const fecha = fechaHoy()

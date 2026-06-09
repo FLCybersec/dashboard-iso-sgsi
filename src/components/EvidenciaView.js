@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { loadStructure } from '../lib/structure-store.js'
+import { Cargando } from './Cargando.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
@@ -84,7 +85,7 @@ export function EvidenciaView() {
     <div class="view-head"><h1>Evidencia / Export</h1></div>
 
     ${error && html`<div class="alert error">${error}</div>`}
-    ${loading && html`<div class="loading">Preparando datos...</div>`}
+    ${loading && html`<${Cargando} titulo="Preparando datos..." />`}
 
     ${!loading &&
     data &&

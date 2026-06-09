@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
+import { Cargando } from './Cargando.js'
 import { currentUser } from '../auth/auth-provider.js'
 import { loadStructure } from '../lib/structure-store.js'
 import { loadMigrationState } from '../lib/migration-store.js'
@@ -85,7 +86,7 @@ export function MiTrabajoView() {
     }
   }
 
-  if (loading) return html`<div class="loading">Cargando mi trabajo...</div>`
+  if (loading) return html`<${Cargando} titulo="Cargando mi trabajo..." />`
   if (error) return html`<div class="alert error">${error}</div>`
 
   const persona = datos?.persona

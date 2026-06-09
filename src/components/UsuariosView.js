@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
+import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
 import {
   loadSeguimiento,
@@ -47,7 +48,7 @@ export function UsuariosView({ embedded = false } = {}) {
     [structure, recompute]
   )
 
-  if (loading) return html`<div class="loading">Cargando avance por persona...</div>`
+  if (loading) return html`<${Cargando} titulo="Cargando avance por persona..." />`
   if (error) return html`<div class="alert error">${error}</div>`
 
   return html`

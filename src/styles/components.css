@@ -1367,30 +1367,139 @@
 }
 
 /* ---- Estado de carga ---- */
-.loading {
+/* El estado `loading` ahora se renderiza con el componente <Cargando>
+   (perro rastreador K9). El keyframe jma-spin se conserva porque lo usa
+   el splash de arranque (.splash-spin). */
+@keyframes jma-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ---- Carga K9: perro rastreador olfateando ---- */
+.cargando-k9 {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 14px;
-  flex: 1;
+  min-height: 300px;
+  gap: 18px;
+  text-align: center;
+}
+.cargando-k9-txt strong {
+  display: block;
+  font-size: 18px;
+}
+.cargando-k9-txt span {
+  display: block;
+  font-size: 14px;
   color: var(--jma-gris-suave);
-  font-size: var(--fs-sm);
-  padding: 60px;
+  margin-top: 6px;
 }
-.loading::before {
-  content: '';
-  width: 30px;
-  height: 30px;
-  border-radius: 50%;
-  border: 3px solid var(--jma-gris-borde);
-  border-top-color: var(--jma-azul-claro);
-  animation: jma-spin 0.7s linear infinite;
+.dog-bob {
+  animation: bob 1.2s ease-in-out infinite;
+  transform-box: fill-box;
 }
-
-@keyframes jma-spin {
-  to {
-    transform: rotate(360deg);
+@keyframes bob {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-2px);
+  }
+}
+.leg {
+  transform-box: fill-box;
+  transform-origin: top center;
+  animation: step 0.7s ease-in-out infinite;
+}
+.l2,
+.l3 {
+  animation-name: stepb;
+}
+@keyframes step {
+  0%,
+  100% {
+    transform: rotate(-9deg);
+  }
+  50% {
+    transform: rotate(9deg);
+  }
+}
+@keyframes stepb {
+  0%,
+  100% {
+    transform: rotate(9deg);
+  }
+  50% {
+    transform: rotate(-9deg);
+  }
+}
+.tail {
+  transform-box: fill-box;
+  transform-origin: bottom right;
+  animation: wag 0.45s ease-in-out infinite;
+}
+@keyframes wag {
+  0%,
+  100% {
+    transform: rotate(-16deg);
+  }
+  50% {
+    transform: rotate(16deg);
+  }
+}
+.head {
+  transform-box: fill-box;
+  transform-origin: left center;
+  animation: sniff 0.9s ease-in-out infinite;
+}
+@keyframes sniff {
+  0%,
+  100% {
+    transform: rotate(-3deg);
+  }
+  50% {
+    transform: rotate(2deg);
+  }
+}
+.sniff circle {
+  opacity: 0;
+  animation: puff 1.5s ease-out infinite;
+}
+.s1 {
+  animation-delay: 0s;
+}
+.s2 {
+  animation-delay: 0.5s;
+}
+.s3 {
+  animation-delay: 0.9s;
+}
+@keyframes puff {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0);
+  }
+  30% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(9px, -11px);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .dog-bob,
+  .leg,
+  .tail,
+  .head,
+  .sniff circle {
+    animation: none;
+  }
+  .sniff circle {
+    opacity: 0.5;
   }
 }
 

@@ -5,6 +5,32 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Estado de carga K9: perro rastreador olfateando (2026-06-09)
+
+**Estado:** Code-complete. Verificado en navegador (animaciones bob/step/wag/puff
+activas, titulo en Arial 18px, sin errores de consola).
+
+Se reemplazo el spinner generico del estado `loading` por un componente
+reutilizable `<Cargando>` (perro rastreador K9 que olfatea), alineado a la marca
+JMA Seguridad / K9 y al dominio del dashboard (rastreo del estado real en
+SharePoint).
+
+- **Nuevo** `src/components/Cargando.js`: SVG del perro (cuerpo, cabeza, oreja,
+  cuatro patas, cola, hocico + particulas de olfateo) con props `titulo` y
+  `detalle` configurables. Defaults: "Rastreando en SharePoint…" /
+  "Leyendo el estado real de la migracion. Esto puede tardar unos segundos."
+- **CSS** en `src/styles/components.css`: bloque `.cargando-k9` con animaciones
+  CSS (`transform-box: fill-box` para que las rotaciones giren sobre su punto) y
+  `@media (prefers-reduced-motion: reduce)` que las desactiva. Se elimino el CSS
+  muerto de `.loading`/`.loading::before`; el keyframe `jma-spin` se conserva
+  porque lo usa el splash de arranque.
+- **Reemplazo** de los 9 usos de `<div class="loading">` por `<${Cargando}>` en:
+  Home, Sitio, Sitios, Evidencia, Ejecutivo, Aprobaciones, MiTrabajo, Apoyo,
+  Usuarios. Home (carga inicial real) usa los textos por defecto; el resto pasa
+  su mensaje contextual como `titulo`.
+
+---
+
 ## Ajuste — Arbol: agregar carpeta dentro de una pendiente (pendiente anidada) (2026-06-09)
 
 **Estado:** Code-complete. Build + 19/19 E2E (nuevo `arbol-anidado.spec.js`).

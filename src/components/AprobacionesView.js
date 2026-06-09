@@ -1,5 +1,6 @@
 import { html } from 'htm/preact'
 import { Fragment } from 'preact'
+import { Cargando } from './Cargando.js'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
 import { loadStructure } from '../lib/structure-store.js'
@@ -87,7 +88,7 @@ export function AprobacionesView() {
     }
   }
 
-  if (loading) return html`<div class="loading">Cargando aprobaciones...</div>`
+  if (loading) return html`<${Cargando} titulo="Cargando aprobaciones..." />`
 
   const nombreSitio = (slug) =>
     structure?.sitios.find((s) => s.slug === slug)?.nombre || slug || '—'

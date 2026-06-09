@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { route } from 'preact-router'
+import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
 import { loadSeguimiento, statsMigracionPorApoyo } from '../lib/seguimiento-store.js'
 
@@ -35,7 +36,7 @@ export function ApoyoView({ embedded = false } = {}) {
     </p>
 
     ${error && html`<div class="alert error">${error}</div>`}
-    ${loading && html`<div class="loading">Cargando...</div>`}
+    ${loading && html`<${Cargando} titulo="Cargando apoyos..." />`}
 
     ${!loading &&
     apoyos &&

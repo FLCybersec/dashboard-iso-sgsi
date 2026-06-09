@@ -1,6 +1,7 @@
 import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { route } from 'preact-router'
+import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import { loadSeguimiento, statsMigracionSitio, getApoyoSitio } from '../lib/seguimiento-store.js'
@@ -38,7 +39,7 @@ export function SitiosView() {
     })()
   }, [])
 
-  if (loading) return html`<div class="loading">Cargando sitios...</div>`
+  if (loading) return html`<${Cargando} titulo="Cargando sitios..." />`
   if (error) return html`<div class="alert error">${error}</div>`
 
   return html`
