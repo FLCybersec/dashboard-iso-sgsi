@@ -5,6 +5,34 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Hoja Resumen del Excel lidera con migracion (2026-06-09)
+
+**Estado:** Aplicado. Build verificado (225 modulos).
+
+**Sintoma:** el exportador de evidencia a Excel no mostraba el avance de
+MIGRACION; la primera hoja ("Resumen") seguia mostrando solo la creacion de
+carpetas (estructura).
+
+**Causa:** la hoja Resumen se armaba con `mig.sitios` (deteccion de estructura
+via Graph) y su columna "% avance" era el % de carpetas creadas, no de migracion
+de contenido. El avance real estaba relegado a una hoja posterior. La UI ya
+lideraba con migracion desde la Tanda 7, pero el Excel no se habia actualizado.
+
+**Arreglo:**
+- `exporter.js`: la hoja **Resumen** ahora lidera con migracion de contenido
+  (`statsMigracionSitio`): % migracion, carpetas migradas/total, Apoyo SGSI,
+  ultima actualizacion, y una fila TOTAL global. La estructura (carpetas creadas)
+  queda como columnas secundarias, con etiquetas explicitas ("% migracion
+  contenido" vs "% estructura (carpetas creadas)").
+- Se elimina la hoja redundante "Migracion por sitio" (su contenido quedo en
+  Resumen). Se conserva "Migracion por persona".
+
+```
+src/lib/exporter.js
+```
+
+---
+
 ## Ajuste — Export no genera archivos vacios (2026-06-09)
 
 **Estado:** Aplicado y pusheado (`3a5f98f`).

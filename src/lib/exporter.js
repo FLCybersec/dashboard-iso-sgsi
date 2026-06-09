@@ -5,6 +5,7 @@
 import {
   estadoEfectivo,
   statsMigracionSitio,
+  statsMigracionGlobal,
   statsMigracionPorPersona,
   quienMigra,
   getApoyoSitio,
@@ -51,26 +52,50 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
   }
 
   // ---- Resumen ----
+  // Lidera con la MIGRACION de contenido (el eje del seguimiento); la estructura
+  // (carpetas creadas via Graph) queda como dato secundario, etiquetada aparte
+  // para no confundir un % con el otro.
   const rRes = wb.addWorksheet('Resumen')
   addHeader(rRes, [
     { header: 'Sitio', key: 'nombre', width: 34 },
     { header: 'Slug', key: 'slug', width: 24 },
-    { header: 'Existe', key: 'existe', width: 10 },
-    { header: '% avance', key: 'pct', width: 10 },
-    { header: 'Creadas', key: 'creadas', width: 10 },
-    { header: 'Total', key: 'total', width: 10 }
+    { header: 'Apoyo SGSI', key: 'apoyo', width: 16 },
+    { header: 'Sitio creado', key: 'existe', width: 14 },
+    { header: '% migracion contenido', key: 'pctMig', width: 20 },
+    { header: 'Carpetas migradas', key: 'migradas', width: 18 },
+    { header: 'Carpetas (total)', key: 'totalMig', width: 16 },
+    { header: '% estructura (carpetas creadas)', key: 'pctEstr', width: 28 },
+    { header: 'Carpetas creadas', key: 'creadas', width: 16 },
+    { header: 'Ultima actualizacion', key: 'ultima', width: 22 }
   ])
-  for (const s of mig?.sitios || []) {
+  const estructuraPorSlug = new Map((mig?.sitios || []).map((s) => [s.slug, s]))
+  for (const sitio of structure.sitios) {
+    const m = statsMigracionSitio(sitio)
+    const e = estructuraPorSlug.get(sitio.slug)
     rRes.addRow({
-      nombre: s.nombre,
-      slug: s.slug,
-      existe: s.existeSitio ? 'Si' : 'No',
-      pct: s.pct / 100,
-      creadas: s.creadas,
-      total: s.total
+      nombre: sitio.nombre,
+      slug: sitio.slug,
+      apoyo: getApoyoSitio(sitio.slug) || '',
+      existe: e?.existeSitio ? 'Si' : 'No',
+      pctMig: m.pct / 100,
+      migradas: m.migradas,
+      totalMig: m.total,
+      pctEstr: (e?.pct ?? 0) / 100,
+      creadas: e?.creadas ?? 0,
+      ultima: m.ultima || ''
     })
   }
-  rRes.getColumn('pct').numFmt = '0%'
+  // Fila de total global (migracion de contenido).
+  const g = statsMigracionGlobal(structure)
+  const fila = rRes.addRow({
+    nombre: 'TOTAL',
+    pctMig: g.pct / 100,
+    migradas: g.migradas,
+    totalMig: g.total
+  })
+  fila.font = { bold: true }
+  rRes.getColumn('pctMig').numFmt = '0%'
+  rRes.getColumn('pctEstr').numFmt = '0%'
 
   // ---- Carpetas (migracion + estructura) ----
   const rCar = wb.addWorksheet('Carpetas')
@@ -161,31 +186,6 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
       creadoPor: p.creadoPor || ''
     })
   }
-
-  // ---- Migracion por sitio (derivada de los estados por carpeta) ----
-  const rMig = wb.addWorksheet('Migracion por sitio')
-  addHeader(rMig, [
-    { header: 'Sitio', key: 'nombre', width: 34 },
-    { header: 'Slug', key: 'slug', width: 24 },
-    { header: 'Apoyo SGSI', key: 'apoyo', width: 16 },
-    { header: 'Migradas', key: 'migradas', width: 12 },
-    { header: 'Total', key: 'total', width: 10 },
-    { header: '% migracion', key: 'pct', width: 12 },
-    { header: 'Ultima actualizacion', key: 'ultima', width: 22 }
-  ])
-  for (const sitio of structure.sitios) {
-    const m = statsMigracionSitio(sitio)
-    rMig.addRow({
-      nombre: sitio.nombre,
-      slug: sitio.slug,
-      apoyo: getApoyoSitio(sitio.slug) || '',
-      migradas: m.migradas,
-      total: m.total,
-      pct: m.pct / 100,
-      ultima: m.ultima || ''
-    })
-  }
-  rMig.getColumn('pct').numFmt = '0%'
 
   // ---- Migracion por persona (derivada) ----
   const rPer = wb.addWorksheet('Migracion por persona')
