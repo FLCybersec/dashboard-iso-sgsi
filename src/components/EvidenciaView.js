@@ -55,7 +55,11 @@ export function EvidenciaView() {
     setDone(null)
     try {
       const { nombre, total } = exportCambiosCSV(data)
-      setDone(`CSV generado: ${nombre} (${total} cambio(s))`)
+      setDone(
+        total === 0
+          ? 'No hay cambios de estructura para exportar.'
+          : `CSV generado: ${nombre} (${total} cambio(s))`
+      )
     } catch (e) {
       setError(e?.message || String(e))
     }

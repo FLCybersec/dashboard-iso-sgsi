@@ -287,6 +287,12 @@ function csvCampo(v) {
 // solicitudes de permisos, en CSV y JSON para PnP. Solo se exporta lo aprobado.
 export function exportSolicitudesAprobadas() {
   const pend = solicitudesAprobadas()
+  const total = pend.cambios_estructura.length + pend.solicitudes_permisos.length
+
+  // Sin solicitudes aprobadas no hay nada que exportar: no generamos archivos
+  // vacios (solo encabezado), que confunden al revisarlos.
+  if (total === 0) return { total: 0 }
+
   const fecha = fechaArchivo(new Date())
 
   // CSV unificado.
@@ -307,7 +313,7 @@ export function exportSolicitudesAprobadas() {
   })
   descargar(json, `SolicitudesAprobadas-PnP-${fecha}.json`)
 
-  return { total: pend.cambios_estructura.length + pend.solicitudes_permisos.length }
+  return { total }
 }
 
 // Export de cambios de estructura a CSV plano (lista de trabajo para PnP).
@@ -316,6 +322,7 @@ export function exportCambiosCSV({ seg }, tipoFiltro = null) {
   const cols = ['slug', 'tipo', 'ruta', 'clasificacion', 'estado', 'responsable', 'notas', 'creadoPor']
   const cabecera = ['Sitio', 'Tipo', 'Ruta', 'Clasificacion', 'Estado', 'Responsable', 'Notas', 'CreadoPor']
   const items = (seg?.cambios_estructura || []).filter((c) => (tipoFiltro ? c.tipo === tipoFiltro : true))
+  if (items.length === 0) return { nombre: null, total: 0 }
   const lineas = [cabecera.join(',')]
   for (const c of items) lineas.push(cols.map((k) => csvCampo(c[k])).join(','))
   const blob = new Blob(['﻿' + lineas.join('\r\n')], { type: 'text/csv;charset=utf-8' })
