@@ -33,3 +33,13 @@ test('observador ve las vistas globales pero no Mi trabajo ni Aprobaciones', asy
   // Badge de solo lectura visible en la cuenta.
   await expect(page.locator('.rol-badge', { hasText: 'solo lectura' })).toBeVisible()
 })
+
+// El UPN de invitado B2B que emite Entra (#EXT#) tambien resuelve a observador,
+// no a usuario. El '#' va codificado (%23) para no truncar el query.
+test('observador: el UPN de invitado #EXT# resuelve a observador', async ({ page }) => {
+  await mockGraph(page)
+  await page.goto('/?e2e=1&as=socorro.rojas_hotmail.com%23EXT%23@jmaseguridad.onmicrosoft.com')
+  await expect(page.locator('.side-nav a', { hasText: 'Resumen' }).first()).toBeVisible()
+  await expect(page.locator('.side-nav a', { hasText: 'Mi trabajo' })).toHaveCount(0)
+  await expect(page.locator('.rol-badge', { hasText: 'solo lectura' })).toBeVisible()
+})

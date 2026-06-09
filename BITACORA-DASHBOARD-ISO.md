@@ -35,15 +35,19 @@ interferir": ver todo en general, sin editar.
 - `tests/e2e/roles.spec.js`: caso observador (ve globales, no Mi trabajo ni
   Aprobaciones, badge solo lectura).
 
-**Nota:** si Entra emite para la invitada un UPN distinto (formato
-`...#EXT#@...onmicrosoft.com`), agregarlo tambien a `OBSERVADORES`.
+**Nota:** la consultora ya fue invitada como externa en Entra (Franco,
+2026-06-09). El cotejo de la lista blanca reconoce automaticamente tanto su
+correo real como el UPN de invitado B2B (`usuario_dominio.com#EXT#@...
+onmicrosoft.com`), reconstruyendo el correo original (el ultimo `_` del prefijo
+era la `@`). Asi no hay que averiguar el UPN exacto. Falta solo darle **lectura
+en SharePoint** a los sitios para que vea datos.
 
 ```
-src/auth/allowed-users.js
+src/auth/allowed-users.js   (OBSERVADORES + cotejo tolerante a UPN #EXT#)
 src/app.js
 src/components/Sidebar.js
 src/components/SitioView.js
-tests/e2e/roles.spec.js
+tests/e2e/roles.spec.js      (observador por correo y por UPN #EXT#)
 ```
 
 ---

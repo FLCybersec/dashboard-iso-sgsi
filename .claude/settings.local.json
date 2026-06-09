@@ -14,7 +14,15 @@
       "PowerShell(git config user.email)",
       "PowerShell(git config --global user.name)",
       "PowerShell(git config --global user.email)",
-      "PowerShell(git add -A; git status --short | Select-Object -First 200; \"---TOTAL---\"; \\(git status --short | Measure-Object -Line\\).Lines; \"---node_modules incluidos?---\"; \\(git status --short | Select-String \"node_modules\" | Measure-Object -Line\\).Lines)"
+      "PowerShell(git add -A; git status --short | Select-Object -First 200; \"---TOTAL---\"; \\(git status --short | Measure-Object -Line\\).Lines; \"---node_modules incluidos?---\"; \\(git status --short | Select-String \"node_modules\" | Measure-Object -Line\\).Lines)",
+      "Bash(curl -s -o /dev/null -w \"%{http_code}\" http://localhost:5173/favicon.svg)",
+      "Bash(node -e \"console.log\\(require.resolve\\('sharp'\\)\\)\")",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright'\\)\\)\")",
+      "Bash(node -e \"console.log\\(require.resolve\\('playwright-core'\\)\\)\")",
+      "Bash(git commit *)",
+      "Bash(git push *)",
+      "Bash(git add *)",
+      "PowerShell(git push)"
     ]
   }
 }
