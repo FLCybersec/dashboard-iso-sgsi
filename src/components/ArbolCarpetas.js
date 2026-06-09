@@ -227,7 +227,7 @@ function ArbolNodo({ node, nivel, ctx }) {
                 ? html`<span class="muted">migra: ${node.quienMigra}</span>`
                 : html`<span class="muted">sin asignar</span>`}
           `}
-          ${!node.virtual && html`<button class="link-act" data-act="agregar" disabled=${busy} onClick=${() => setAgregando(!agregando)}>+ carpeta</button>`}
+          <button class="link-act" data-act="agregar" disabled=${busy} onClick=${() => setAgregando(!agregando)}>+ carpeta</button>
           ${node.real &&
           !node.sobrante &&
           html`<button class="link-act" data-act="sobrante" disabled=${busy} onClick=${() =>

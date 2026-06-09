@@ -5,6 +5,32 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Arbol: agregar carpeta dentro de una pendiente (pendiente anidada) (2026-06-09)
+
+**Estado:** Code-complete. Build + 19/19 E2E (nuevo `arbol-anidado.spec.js`).
+
+**Necesidad:** poder pedir una subcarpeta DENTRO de una carpeta que tambien esta
+"pendiente de crear" (nodo virtual), no solo dentro de las reales. Asi un usuario
+solicita una subcarpeta de una carpeta que acaba de solicitar.
+
+**Arreglo (codigo):**
+- `ArbolCarpetas.js`: el boton "+ carpeta" se muestra en TODOS los nodos (antes
+  se ocultaba en los virtuales con `!node.virtual`). El resto ya funcionaba:
+  `construirArbol` reconstruye los padres virtuales por su ruta y enlaza
+  `padre/hijo`, asi que cada subcarpeta es su propio `cambio_estructura` "crear"
+  con su ruta/padre y el arbol la muestra anidada (pendiente dentro de pendiente).
+
+**Sin cambios:** la salvaguarda de borrado (confirmacion de "sobrante" en
+carpetas con archivos) y el ciclo de estados en Aprobaciones siguen igual; los
+nodos virtuales conservan su accion "quitar" (descarta el cambio).
+
+```
+src/components/ArbolCarpetas.js   ("+ carpeta" incondicional)
+tests/e2e/arbol-anidado.spec.js   (pendiente dentro de pendiente)
+```
+
+---
+
 ## Ajuste — Aprobaciones: ciclo de vida explicito + nombre final acordado (2026-06-09)
 
 **Estado:** Code-complete. Build + 18/18 E2E (nuevo `aprobaciones.spec.js`).
