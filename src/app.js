@@ -12,6 +12,7 @@ import { EvidenciaView } from './components/EvidenciaView.js'
 import { PersonasView } from './components/PersonasView.js'
 import { MiTrabajoView } from './components/MiTrabajoView.js'
 import { EjecutivoView } from './components/EjecutivoView.js'
+import { AprobacionesView } from './components/AprobacionesView.js'
 
 // Componente raiz: sesion + login, y shell con barra lateral + contenido.
 // Navegacion concentrada en 5 entradas (Sidebar); rutas gateadas por rol.
@@ -57,6 +58,7 @@ export function App() {
   const rutasAdmin = admin
     ? [
         html`<${HomeView} path="/resumen" />`,
+        html`<${AprobacionesView} path="/aprobaciones" />`,
         html`<${PersonasView} path="/personas" />`,
         html`<${SitiosView} path="/sitios" />`,
         html`<${SitioView} path="/sitio/:slug" />`,

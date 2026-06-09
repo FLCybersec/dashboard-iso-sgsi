@@ -91,7 +91,7 @@ export function SitioView({ slug }) {
   return html`
     <div class="view-head">
       <div>
-        <a class="back-link" href="/" onClick=${(e) => (e.preventDefault(), route('/'))}>&larr; Resumen</a>
+        <a class="back-link" href="/sitios" onClick=${(e) => (e.preventDefault(), route('/sitios'))}>← Sitios</a>
         <h1>${sitioDef ? sitioDef.nombre : slug}</h1>
         <div class="muted"><code>${slug}</code></div>
       </div>
@@ -215,6 +215,8 @@ function PermisosSolicitudPanel({ structure, slug, onChange }) {
               <td>${s.rol}</td>
               <td><span class=${`estado-tag ${s.estado === 'aplicado' ? 'ok' : s.estado === 'descartado' ? 'pend' : 'prog'}`}>${s.estado}</span></td>
               <td>
+                ${s.estado === 'propuesto' &&
+                html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setSolicitudPermisoEstado(structure, s.id, 'aprobado'))}>Aprobar</button>`}
                 ${(s.estado === 'propuesto' || s.estado === 'aprobado') &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setSolicitudPermisoEstado(structure, s.id, 'aplicado'))}>Aplicado</button>
                   <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setSolicitudPermisoEstado(structure, s.id, 'descartado'))}>Descartar</button>`}

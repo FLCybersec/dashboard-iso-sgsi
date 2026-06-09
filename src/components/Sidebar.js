@@ -7,6 +7,7 @@ import { Avatar } from './Avatar.js'
 const ENTRADAS = [
   { path: '/', label: 'Mi trabajo', admin: false },
   { path: '/resumen', label: 'Resumen', admin: true },
+  { path: '/aprobaciones', label: 'Aprobaciones', admin: true },
   { path: '/personas', label: 'Personas', admin: true },
   { path: '/sitios', label: 'Sitios', admin: true },
   { path: '/evidencia', label: 'Evidencia', admin: true }
