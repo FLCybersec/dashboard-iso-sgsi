@@ -12,14 +12,31 @@ export const ADMINS = [
   'jalvarez@jmaseguridad.com' // Jorge
 ]
 
+// Observadores externos: solo lectura de TODAS las vistas globales (consultoria
+// ISO, auditoria). No editan ni aprueban nada. El alcance real de datos lo impone
+// igualmente SharePoint (necesitan acceso de lectura a los sitios). Para un
+// invitado B2B (cuenta externa, no corporativa) basta su correo aqui; si Entra
+// emite un UPN de invitado distinto (formato ...#EXT#@...onmicrosoft.com),
+// agregarlo tambien.
+export const OBSERVADORES = [
+  'socorro.rojas@hotmail.com' // Socorro Rojas — consultora ISO (invitada externa)
+]
+
 const normalize = (email) => (email || '').trim().toLowerCase()
 const ADMIN_SET = new Set(ADMINS.map(normalize))
+const OBSERVADOR_SET = new Set(OBSERVADORES.map(normalize))
 
 export function esAdmin(email) {
   return ADMIN_SET.has(normalize(email))
 }
 
-// Rol del usuario: 'admin' | 'usuario'.
+export function esObservador(email) {
+  return OBSERVADOR_SET.has(normalize(email))
+}
+
+// Rol del usuario: 'admin' | 'observador' | 'usuario'.
 export function rolDe(email) {
-  return esAdmin(email) ? 'admin' : 'usuario'
+  if (esAdmin(email)) return 'admin'
+  if (esObservador(email)) return 'observador'
+  return 'usuario'
 }

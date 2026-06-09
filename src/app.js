@@ -55,17 +55,27 @@ export function App() {
   }
 
   const admin = session.rol === 'admin'
-  const rutasAdmin = admin
+  const observador = session.rol === 'observador'
+  const verGlobal = admin || observador
+
+  // Vistas globales: admin edita; observador (consultoria ISO) solo lee
+  // (puedeEditar=false desactiva toda accion de escritura).
+  const rutasGlobales = verGlobal
     ? [
         html`<${HomeView} path="/resumen" />`,
-        html`<${AprobacionesView} path="/aprobaciones" />`,
         html`<${PersonasView} path="/personas" />`,
         html`<${SitiosView} path="/sitios" />`,
-        html`<${SitioView} path="/sitio/:slug" />`,
+        html`<${SitioView} path="/sitio/:slug" puedeEditar=${admin} />`,
         html`<${EvidenciaView} path="/evidencia" />`,
         html`<${EjecutivoView} path="/ejecutivo" />`
       ]
     : []
+  // Aprobaciones es bandeja de gestion (escritura): solo admin.
+  const rutasAdmin = admin ? [html`<${AprobacionesView} path="/aprobaciones" />`] : []
+
+  // Landing: el observador no tiene "Mi trabajo"; entra directo al Resumen.
+  const inicio = observador ? html`<${HomeView} path="/" />` : html`<${MiTrabajoView} path="/" />`
+  const fallback = observador ? html`<${HomeView} default />` : html`<${MiTrabajoView} default />`
 
   return html`
     <div class="app-shell">
@@ -79,9 +89,10 @@ export function App() {
       />
       <main class="main">
         <${Router} onChange=${(e) => setPath(e.url)}>
-          <${MiTrabajoView} path="/" />
+          ${inicio}
+          ${rutasGlobales}
           ${rutasAdmin}
-          <${MiTrabajoView} default />
+          ${fallback}
         <//>
       </main>
     </div>

@@ -26,7 +26,7 @@ import { ArbolCarpetas } from './ArbolCarpetas.js'
 // Vista Sitio: arbol visual de carpetas con migracion por carpeta. Cabecera con
 // propietario y acceso; panel de migracion con responsable del area y Apoyo SGSI;
 // avance del sitio DERIVADO. Se mantienen fases y estructura evolutiva.
-export function SitioView({ slug }) {
+export function SitioView({ slug, puedeEditar = true }) {
   const [structure, setStructure] = useState(null)
   const [sitioMig, setSitioMig] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -118,7 +118,7 @@ export function SitioView({ slug }) {
     ${!loading &&
     sitioDef &&
     html`
-      <${CabeceraSitio} sitioDef=${sitioDef} structure=${structure} slug=${slug} onChange=${rerender} />
+      <${CabeceraSitio} sitioDef=${sitioDef} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
 
       ${sitioMig && !sitioMig.existeSitio &&
       html`<div class="alert warn">
@@ -128,18 +128,18 @@ export function SitioView({ slug }) {
       ${sitioDef.nota && html`<div class="alert info">${sitioDef.nota}</div>`}
 
       <h2 style="margin-top:16px">Carpetas (arbol)</h2>
-      <${ArbolCarpetas} sitioDef=${sitioDef} structure=${structure} sitioMig=${sitioMig} acciones=${acciones} admin=${true} />
+      <${ArbolCarpetas} sitioDef=${sitioDef} structure=${structure} sitioMig=${sitioMig} acciones=${acciones} admin=${puedeEditar} />
 
       <h2 style="margin-top:28px">Informacion del sitio</h2>
       <${IndicadorSitio} sitioMig=${sitioMig} />
-      <${EstructuraEvolutivaPanel} structure=${structure} slug=${slug} onChange=${rerender} />
-      <${PermisosSolicitudPanel} structure=${structure} slug=${slug} onChange=${rerender} />
+      <${EstructuraEvolutivaPanel} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
+      <${PermisosSolicitudPanel} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
     `}
   `
 }
 
 // Solicitudes de permisos: registrar agregar/quitar a una persona en el sitio.
-function PermisosSolicitudPanel({ structure, slug, onChange }) {
+function PermisosSolicitudPanel({ structure, slug, onChange, puedeEditar = true }) {
   const [tipo, setTipo] = useState('agregar')
   const [persona, setPersona] = useState('')
   const [rol, setRol] = useState('Integrante')
@@ -176,7 +176,8 @@ function PermisosSolicitudPanel({ structure, slug, onChange }) {
         <strong>Solicitudes de permisos (para PnP)</strong>
         <span class="muted">solo registro; el dashboard NO cambia permisos reales</span>
       </div>
-      <div class="nodo-line2">
+      ${puedeEditar &&
+      html`<div class="nodo-line2">
         <label>
           Accion
           <select value=${tipo} onChange=${(e) => setTipo(e.target.value)} disabled=${busy}>
@@ -202,7 +203,7 @@ function PermisosSolicitudPanel({ structure, slug, onChange }) {
         </label>
         <button class="btn" onClick=${agregar} disabled=${busy || !persona}>Registrar</button>
       </div>
-      ${err && html`<div class="nodo-status err">${err}</div>`}
+      ${err && html`<div class="nodo-status err">${err}</div>`}`}
 
       ${solicitudes.length > 0 &&
       html`<table class="tabla" style="margin-top:12px">
@@ -215,9 +216,9 @@ function PermisosSolicitudPanel({ structure, slug, onChange }) {
               <td>${s.rol}</td>
               <td><span class=${`estado-tag ${s.estado === 'aplicado' ? 'ok' : s.estado === 'descartado' ? 'pend' : 'prog'}`}>${s.estado}</span></td>
               <td>
-                ${s.estado === 'propuesto' &&
+                ${puedeEditar && s.estado === 'propuesto' &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setSolicitudPermisoEstado(structure, s.id, 'aprobado'))}>Aprobar</button>`}
-                ${(s.estado === 'propuesto' || s.estado === 'aprobado') &&
+                ${puedeEditar && (s.estado === 'propuesto' || s.estado === 'aprobado') &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setSolicitudPermisoEstado(structure, s.id, 'aplicado'))}>Aplicado</button>
                   <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setSolicitudPermisoEstado(structure, s.id, 'descartado'))}>Descartar</button>`}
               </td>
@@ -230,7 +231,7 @@ function PermisosSolicitudPanel({ structure, slug, onChange }) {
 }
 
 // Cabecera del sitio: propietario, acceso (con temporal) y Apoyo SGSI editable.
-function CabeceraSitio({ sitioDef, structure, slug, onChange }) {
+function CabeceraSitio({ sitioDef, structure, slug, onChange, puedeEditar = true }) {
   const [apoyo, setApoyo] = useState(getApoyoSitio(slug))
   const [busy, setBusy] = useState(false)
   const acceso = sitioDef.acceso || []
@@ -255,10 +256,12 @@ function CabeceraSitio({ sitioDef, structure, slug, onChange }) {
         </div>
         <div>
           <div class="muted">Apoyo SGSI</div>
-          <select value=${apoyo} disabled=${busy} onChange=${(e) => cambiarApoyo(e.target.value)}>
-            <option value="">(sin asignar)</option>
-            ${EQUIPO_APOYO.map((n) => html`<option value=${n} selected=${n === apoyo}>${n}</option>`)}
-          </select>
+          ${puedeEditar
+            ? html`<select value=${apoyo} disabled=${busy} onChange=${(e) => cambiarApoyo(e.target.value)}>
+                <option value="">(sin asignar)</option>
+                ${EQUIPO_APOYO.map((n) => html`<option value=${n} selected=${n === apoyo}>${n}</option>`)}
+              </select>`
+            : html`<strong>${apoyo || '—'}</strong>`}
         </div>
         <div class="cab-acceso">
           <div class="muted">Acceso</div>
@@ -285,7 +288,7 @@ function CabeceraSitio({ sitioDef, structure, slug, onChange }) {
 // Cola de cambios de estructura (crear / sobrante) -> aprobar/aplicar para PnP.
 // El REGISTRO se hace de forma visual desde el arbol (agregar / sobrante), nunca
 // escribiendo rutas a mano.
-function EstructuraEvolutivaPanel({ structure, slug, onChange }) {
+function EstructuraEvolutivaPanel({ structure, slug, onChange, puedeEditar = true }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState(null)
   const cambios = getCambiosEstructura(slug)
@@ -312,7 +315,7 @@ function EstructuraEvolutivaPanel({ structure, slug, onChange }) {
       ${err && html`<div class="nodo-status err">${err}</div>`}
 
       ${cambios.length === 0
-        ? html`<div class="muted">Sin solicitudes de estructura. Usa el arbol de arriba para proponer una carpeta nueva o marcar una sobrante.</div>`
+        ? html`<div class="muted">Sin solicitudes de estructura.${puedeEditar ? ' Usa el arbol de arriba para proponer una carpeta nueva o marcar una sobrante.' : ''}</div>`
         : html`<table class="tabla" style="margin-top:12px">
         <thead>
           <tr><th>Tipo</th><th>Ruta</th><th>Clasif.</th><th>Estado</th><th></th></tr>
@@ -325,9 +328,9 @@ function EstructuraEvolutivaPanel({ structure, slug, onChange }) {
               <td>${c.clasificacion || '—'}</td>
               <td><span class=${`estado-tag ${c.estado === 'aplicado' ? 'ok' : c.estado === 'descartado' ? 'pend' : 'prog'}`}>${c.estado}</span></td>
               <td>
-                ${c.estado === 'propuesto' &&
+                ${puedeEditar && c.estado === 'propuesto' &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'aprobado'))}>Aprobar</button>`}
-                ${(c.estado === 'propuesto' || c.estado === 'aprobado') &&
+                ${puedeEditar && (c.estado === 'propuesto' || c.estado === 'aprobado') &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'aplicado'))}>Aplicado</button>
                   <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'descartado'))}>Descartar</button>`}
               </td>

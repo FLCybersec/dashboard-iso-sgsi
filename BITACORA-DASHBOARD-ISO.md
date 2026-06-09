@@ -5,6 +5,49 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Rol "observador" (consultoria ISO, solo lectura) (2026-06-09)
+
+**Estado:** Code-complete. Build + 16/16 E2E.
+
+**Necesidad:** dar acceso a la consultora ISO externa
+(socorro.rojas@hotmail.com, NO corporativa) para que siga el avance "sin
+interferir": ver todo en general, sin editar.
+
+**Dos capas (importante):**
+- **Microsoft 365 (accion de Franco en Entra, no codigo):** la app es
+  single-tenant; una cuenta @hotmail no entra tal cual. Hay que (1) invitarla
+  como **invitada B2B** en Entra ID y (2) darle **lectura** a los sitios de
+  SharePoint (Visitante/solo lectura, idealmente via grupo); si no, el dashboard
+  le mostraria todo vacio (lee con sus permisos delegados). SharePoint mismo le
+  impide escribir aunque el token traiga Files.ReadWrite.All. No se vuelve la app
+  multi-tenant (rompe el modelo single-tenant).
+- **Dashboard (codigo):** nuevo rol `observador` ademas de admin/usuario.
+
+**Arreglo (codigo):**
+- `allowed-users.js`: lista `OBSERVADORES` + `esObservador`; `rolDe` ->
+  'admin' | 'observador' | 'usuario'.
+- `app.js`: el observador ve las vistas globales (Resumen, Personas, Sitios,
+  detalle de Sitio, Evidencia, Ejecutivo) en **solo lectura** (`puedeEditar=false`);
+  NO ve "Mi trabajo" ni "Aprobaciones"; aterriza en Resumen.
+- `Sidebar.js`: entradas por rol; badge "consultor · solo lectura".
+- `SitioView.js`: `puedeEditar` desactiva todas las escrituras (arbol, Apoyo SGSI,
+  cola de cambios, solicitudes de permiso); se mantienen las tablas visibles.
+- `tests/e2e/roles.spec.js`: caso observador (ve globales, no Mi trabajo ni
+  Aprobaciones, badge solo lectura).
+
+**Nota:** si Entra emite para la invitada un UPN distinto (formato
+`...#EXT#@...onmicrosoft.com`), agregarlo tambien a `OBSERVADORES`.
+
+```
+src/auth/allowed-users.js
+src/app.js
+src/components/Sidebar.js
+src/components/SitioView.js
+tests/e2e/roles.spec.js
+```
+
+---
+
 ## Ajuste — Hoja Resumen del Excel lidera con migracion (2026-06-09)
 
 **Estado:** Aplicado. Build verificado (225 modulos).
