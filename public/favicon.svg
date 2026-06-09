@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <clipPath id="shield">
+      <path d="M32 4 L56 10 V32 C56 47 45 56 32 60 C19 56 8 47 8 32 V10 Z"/>
+    </clipPath>
+  </defs>
+  <g clip-path="url(#shield)">
+    <!-- mitad izquierda verde -->
+    <rect x="0" y="0" width="32" height="64" fill="#5cb030"/>
+    <!-- borde claro izquierdo -->
+    <rect x="0" y="0" width="6" height="64" fill="#8bc34a"/>
+    <!-- mitad derecha azul -->
+    <rect x="32" y="0" width="32" height="64" fill="#1d5b7c"/>
+  </g>
+  <!-- candado abierto blanco al centro -->
+  <g fill="#ffffff">
+    <!-- cuerpo del candado -->
+    <rect x="22" y="33" width="20" height="17" rx="2.5"/>
+    <!-- arco (shackle) abierto, inclinado hacia la izquierda -->
+    <path d="M24 35 V27 C24 21 28 18 33 18 C36.5 18 39.4 20 40.6 23"
+          fill="none" stroke="#ffffff" stroke-width="4.2" stroke-linecap="round"/>
+  </g>
+  <!-- ojo de la cerradura -->
+  <circle cx="32" cy="40" r="2.6" fill="#5cb030"/>
+  <rect x="30.8" y="41.5" width="2.4" height="5" rx="1" fill="#5cb030"/>
+</svg>
