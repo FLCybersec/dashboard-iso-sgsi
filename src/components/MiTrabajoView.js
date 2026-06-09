@@ -12,7 +12,8 @@ import {
   addCambioEstructura,
   setCambioEstado,
   addSolicitudPermiso,
-  nombreDesdeUsuario
+  nombreDesdeUsuario,
+  esPropietarioSitio
 } from '../lib/seguimiento-store.js'
 import { Avatar } from './Avatar.js'
 import { ArbolCarpetas } from './ArbolCarpetas.js'
@@ -133,6 +134,7 @@ export function MiTrabajoView() {
               acciones=${accionesDe(sitio.slug)}
               admin=${false}
               miNombre=${miNombre}
+              esPropietario=${esPropietarioSitio(miNombre, sitio)}
             />
           </div>`
         })}

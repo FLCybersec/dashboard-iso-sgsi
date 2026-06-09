@@ -117,7 +117,7 @@ function construirArbol(sitioDef, structure, migByKey, cambios) {
   return roots
 }
 
-export function ArbolCarpetas({ sitioDef, structure, sitioMig, acciones, admin = false, miNombre = '' }) {
+export function ArbolCarpetas({ sitioDef, structure, sitioMig, acciones, admin = false, miNombre = '', esPropietario = false }) {
   const [colapsados, setColapsados] = useState(() => new Set())
   const [, setTick] = useState(0)
   const rerender = () => setTick((t) => t + 1)
@@ -132,7 +132,7 @@ export function ArbolCarpetas({ sitioDef, structure, sitioMig, acciones, admin =
     s.has(ruta) ? s.delete(ruta) : s.add(ruta)
     setColapsados(s)
   }
-  const ctx = { colapsados, toggle, niveles, acciones, rerender, admin, miNombre }
+  const ctx = { colapsados, toggle, niveles, acciones, rerender, admin, miNombre, esPropietario }
 
   return html`
     <div class="arbol-toolbar">
@@ -214,7 +214,7 @@ function ArbolNodo({ node, nivel, ctx }) {
             <span class="arbol-mig">
               <${SelectorMigracion}
                 valor=${node.migracionEstado}
-                disabled=${busy || !(ctx.admin || (node.quienMigra && node.quienMigra === ctx.miNombre))}
+                disabled=${busy || !(ctx.admin || ctx.esPropietario || (node.quienMigra && node.quienMigra === ctx.miNombre))}
                 onCambio=${(v) => run(() => ctx.acciones.onMigracion(node.key, v))}
               />
             </span>

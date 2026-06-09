@@ -5,6 +5,39 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — "Mi trabajo": el propietario del area edita estado sin "quien migra" (2026-06-09)
+
+**Estado:** Code-complete.
+
+**Necesidad:** en "Mi trabajo" el selector de estado de migracion quedaba
+bloqueado cuando ninguna carpeta tenia "quien migra" asignado. El dueno de un
+area no podia marcar el avance de su propia area sin que un admin le delegara
+carpeta por carpeta.
+
+**Arreglo (codigo):**
+- `seguimiento-store.js`: nuevo `esPropietarioSitio(nombre, sitio)` — como
+  `esMiembroMaestro` pero ignora la lista de acceso; solo el `propietario` del
+  maestro.
+- `ArbolCarpetas.js`: nuevo prop `esPropietario` (default `false`); el selector
+  se habilita si `admin || esPropietario || (quien migra === yo)`.
+- `MiTrabajoView.js`: pasa `esPropietario=esPropietarioSitio(miNombre, sitio)`
+  por cada area.
+
+**Regla resultante:** el dueno del area marca el estado de cualquier carpeta de
+SU area directo; los delegados marcan solo las carpetas donde figuran como
+"quien migra". La asignacion explicita de "quien migra" sigue siendo de admin
+desde "Sitios". Backward-compat: en otras vistas (SitioView) `esPropietario`
+queda en `false` y el comportamiento no cambia. La escritura no destructiva de
+`updateNodo` no cambia; "Verificada" sigue restringida a Apoyo/Franco.
+
+```
+src/lib/seguimiento-store.js       (esPropietarioSitio)
+src/components/ArbolCarpetas.js    (prop esPropietario en el gate del selector)
+src/components/MiTrabajoView.js    (pasa esPropietario por sitio)
+```
+
+---
+
 ## Ajuste — Rol "observador" (consultoria ISO, solo lectura) (2026-06-09)
 
 **Estado:** Code-complete. Build + 16/16 E2E.

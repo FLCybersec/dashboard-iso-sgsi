@@ -39,6 +39,15 @@ export function esMiembroMaestro(nombre, sitio) {
   return enAcceso || enPropi
 }
 
+// ¿La persona es el PROPIETARIO del maestro de ESTE sitio (su area propia)? A
+// diferencia de `esMiembroMaestro`, ignora la lista de acceso: solo el dueno.
+export function esPropietarioSitio(nombre, sitio) {
+  const n = limpiarNombre(nombre).toLowerCase()
+  if (!n) return false
+  const propi = limpiarNombre(sitio?.propietario || '').toLowerCase()
+  return propi === n || propi.split(/[ /]+/).includes(n)
+}
+
 // Miembros del equipo de migracion que en ESTE sitio tienen acceso SOLO temporal
 // (es decir, no figuran en su propietario/acceso del maestro). En su area propia
 // son permanentes y no llevan badge.
