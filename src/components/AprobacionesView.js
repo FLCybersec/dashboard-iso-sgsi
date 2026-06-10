@@ -188,7 +188,11 @@ function Acciones({ item, tipo, ctx, aprobando, setAprobando, onAplicar, onDesca
 
 function FormAprobar({ ctx, colSpan, conNombreFinal, valorNombre, valorSolicitado, valorComentario, onConfirmar, onCancelar }) {
   const { busy } = ctx
-  const [nombreFinal, setNombreFinal] = useState(valorNombre || '')
+  // Precargar con el nombre ya acordado si existe, o con el solicitado como base
+  // editable. Asi el campo nunca arranca vacio (el boton queda habilitado) y el
+  // SGSI solo confirma o ajusta el numeral. Sigue siendo obligatorio: si se borra,
+  // no se puede aprobar.
+  const [nombreFinal, setNombreFinal] = useState(valorNombre || valorSolicitado || '')
   const [comentario, setComentario] = useState(valorComentario || '')
   const faltaNombre = conNombreFinal && !nombreFinal.trim()
   return html`<tr class="aprobar-row">
