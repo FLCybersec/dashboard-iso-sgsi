@@ -63,7 +63,10 @@ export function AprobacionesView() {
     setError(null)
     try {
       const st = await loadStructure()
-      await loadSeguimiento(st)
+      // Releer SIEMPRE de SharePoint: las solicitudes las crean OTRAS sesiones
+      // (cada area escribe su propio archivo); con la cache en memoria de esta
+      // sesion no aparecerian hasta recargar el navegador.
+      await loadSeguimiento(st, { force: true })
       setStructure(st)
     } catch (e) {
       setError(e?.message || String(e))

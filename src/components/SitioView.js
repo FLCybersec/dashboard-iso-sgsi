@@ -6,6 +6,7 @@ import { loadStructure } from '../lib/structure-store.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
+  refreshSeguimientoSitio,
   updateNodo,
   statsMigracionSitio,
   getApoyoSitio,
@@ -43,6 +44,9 @@ export function SitioView({ slug, puedeEditar = true }) {
       setStructure(st)
       const mig = await loadMigrationState(st)
       await loadSeguimiento(st)
+      // Refrescar ESTE sitio desde SharePoint: otras sesiones (el area o el
+      // admin) pueden haber agregado/aprobado solicitudes desde que cargamos.
+      await refreshSeguimientoSitio(st, slug)
       setSitioMig(mig.sitios.find((s) => s.slug === slug) || null)
     } catch (e) {
       setError(e?.message || String(e))

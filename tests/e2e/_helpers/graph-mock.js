@@ -27,6 +27,10 @@ function parentRel(url) {
 export async function mockGraph(page, opts = {}) {
   const { foldersByDrive = {}, seguimientoSeed = null } = opts
   const puts = []
+  // Como SharePoint real: el GET del seguimiento devuelve lo ULTIMO escrito con
+  // PUT en ese sitio (y la semilla/404 mientras no se haya escrito).
+  const putsPorSitio = new Map()
+  const siteIdDe = (url) => (url.match(/\/sites\/([^/]+)\//) || [])[1] || ''
 
   await page.route(/graph\.microsoft\.com/, async (route) => {
     const req = route.request()
@@ -47,11 +51,15 @@ export async function mockGraph(page, opts = {}) {
         bodyObj = null
       }
       puts.push(bodyObj)
+      putsPorSitio.set(siteIdDe(url), bodyObj)
       return json(route, { id: 'file-seg', name: 'seguimiento-migracion.json' })
     }
 
-    // Lectura del seguimiento (GET .../content): semilla opcional o 404.
+    // Lectura del seguimiento (GET .../content): lo ultimo escrito en ese sitio,
+    // o la semilla opcional, o 404.
     if (method === 'GET' && /seguimiento-migracion\.json:\/content/.test(url)) {
+      const escrito = putsPorSitio.get(siteIdDe(url))
+      if (escrito) return json(route, escrito)
       if (seguimientoSeed) return json(route, seguimientoSeed)
       return json(route, { error: { code: 'itemNotFound' } }, 404)
     }

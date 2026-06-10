@@ -5,6 +5,45 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Fix — Lost update entre sesiones: la subcarpeta virtual "desaparecia" (2026-06-10)
+
+**Estado:** Code-complete. 20/20 E2E (incluye regresion nueva `concurrencia.spec.js`).
+
+**Sintoma (Franco):** crear una carpeta virtual funcionaba (la aprobacion
+aparecia), pero al crear una carpeta virtual DENTRO de otra virtual, la
+aprobacion no aparecia y la subcarpeta desaparecia al poco tiempo.
+
+**Causa raiz:** cada escritura sube el archivo COMPLETO del sitio
+(`seguimiento-migracion.json`) desde la copia en memoria de la sesion, y esa
+copia no se refrescaba en toda la sesion (`loadSeguimiento` cachea). Con dos
+sesiones vivas (el area que propone + el admin que aprueba), cualquier
+escritura desde una copia vieja pisaba lo escrito por la otra: al aprobar el
+padre, el PUT del admin borraba del servidor la subcarpeta recien propuesta.
+El caso anidado lo disparaba siempre porque exige una ronda previa de
+crear/aprobar con ambas sesiones ya cargadas (copia vieja garantizada).
+
+**Arreglo:**
+- `seguimiento-store.js`: nueva `escribirSitio(slug, mutar)` — cola secuencial
+  por sitio + RELEIDO del archivo del servidor y fusion (`fusionarConLocal`,
+  union por id/clave; en conflicto manda el servidor y la mutacion se aplica
+  despues sobre la copia fresca). TODAS las escrituras (nodos, apoyo,
+  pendientes, fases, cambios de estructura, permisos) pasan por ahi.
+- `refreshSeguimientoSitio(structure, slug)`: re-descarga un sitio y fusiona,
+  sin escribir. Se usa al montar SitioView y Mi trabajo (mis areas).
+- `AprobacionesView`: `loadSeguimiento(..., { force: true })` al entrar — las
+  solicitudes las crean OTRAS sesiones; con la cache no aparecian sin F5.
+- `ArbolCarpetas` (`FormAgregar`): los errores de guardado ahora se muestran
+  (antes fallaba en silencio y la carpeta quedaba solo en memoria).
+- Mock e2e (`graph-mock.js`): el GET del seguimiento ahora devuelve lo ultimo
+  escrito por sitio (como SharePoint real), para poder probar recargas.
+
+**Verificacion:** la regresion `concurrencia.spec.js` simula la otra sesion con
+un PUT directo y aprueba desde la copia vieja: el ultimo PUT debe conservar la
+subcarpeta (propuesto) y aprobar el padre. Sin el releido, el test falla
+(comprobado); con el fix, 20/20.
+
+---
+
 ## Ajuste — Aprobaciones: nombre final OBLIGATORIO al aprobar "crear" (2026-06-10)
 
 **Estado:** Code-complete. Build no requerido (solo JS); 19/19 E2E.

@@ -185,10 +185,66 @@ async function ensureSiteId(slug) {
   return id
 }
 
-async function uploadSitio(slug) {
+// Une en `base` (copia fresca del servidor) lo que solo existe localmente, por
+// id/clave. En conflicto manda el servidor: las mutaciones se aplican DESPUES
+// sobre la copia fusionada, asi que lo recien editado localmente siempre gana.
+function fusionarConLocal(base, local) {
+  const unionPorId = (a, b) => {
+    const ids = new Set(a.map((x) => x.id))
+    for (const x of b) if (!ids.has(x.id)) a.push(x)
+  }
+  unionPorId(base.pendientes, local.pendientes)
+  unionPorId(base.cambios_estructura, local.cambios_estructura)
+  unionPorId(base.solicitudes_permisos, local.solicitudes_permisos)
+  for (const [k, v] of Object.entries(local.nodos)) if (!base.nodos[k]) base.nodos[k] = v
+  for (const [k, v] of Object.entries(local.fases_por_sitio)) if (!(k in base.fases_por_sitio)) base.fases_por_sitio[k] = v
+  for (const [k, v] of Object.entries(local.migracion_por_sitio)) if (!(k in base.migracion_por_sitio)) base.migracion_por_sitio[k] = v
+  return base
+}
+
+// Re-descarga el seguimiento de UN sitio y lo funde con lo local (sin escribir).
+// Para que las vistas vean solicitudes/aprobaciones hechas por otras sesiones.
+export async function refreshSeguimientoSitio(structure, slug) {
+  if (!cargado) {
+    await loadSeguimiento(structure)
+    return
+  }
   const siteId = await ensureSiteId(slug)
-  if (!siteId) throw new Error(`No tienes acceso al sitio "${slug}" o aun no existe; no se pudo guardar.`)
-  await uploadSeguimiento(siteId, segDe(slug))
+  if (!siteId) return
+  let remoto = null
+  try {
+    remoto = await downloadSeguimiento(siteId)
+  } catch {
+    remoto = null
+  }
+  if (remoto) segPorSitio.set(slug, fusionarConLocal(normalize(remoto), segDe(slug)))
+}
+
+// Escritura por sitio: SECUENCIAL (cola por slug) y con releido previo. El PUT
+// reemplaza el archivo completo del sitio; sin re-descargar antes de mutar, una
+// sesion con copia vieja borraba lo escrito por otras sesiones (p. ej. la
+// subcarpeta propuesta dentro de una carpeta virtual desaparecia cuando el
+// admin aprobaba el padre desde su copia cargada antes).
+const colaPorSitio = new Map()
+function escribirSitio(slug, mutar) {
+  const previa = colaPorSitio.get(slug) || Promise.resolve()
+  const turno = previa.catch(() => {}).then(async () => {
+    const siteId = await ensureSiteId(slug)
+    if (!siteId) throw new Error(`No tienes acceso al sitio "${slug}" o aun no existe; no se pudo guardar.`)
+    let remoto = null
+    try {
+      remoto = await downloadSeguimiento(siteId)
+    } catch {
+      remoto = null
+    }
+    if (remoto) segPorSitio.set(slug, fusionarConLocal(normalize(remoto), segDe(slug)))
+    const seg = segDe(slug)
+    const out = mutar(seg)
+    await uploadSeguimiento(siteId, seg)
+    return out
+  })
+  colaPorSitio.set(slug, turno)
+  return turno
 }
 
 // Carga el seguimiento de TODOS los sitios accesibles (cada uno de su sitio).
@@ -287,41 +343,41 @@ export async function updateNodo(
     throw new Error('Solo un administrador (SGSI) puede asignar "quien migra".')
   }
   const slug = slugDeKey(key)
-  const seg = segDe(slug)
   const user = currentUser()
-  const ahora = new Date().toISOString()
-  const prev = seg.nodos[key] || null
+  return escribirSitio(slug, (seg) => {
+    const ahora = new Date().toISOString()
+    const prev = seg.nodos[key] || null
 
-  const estadoNuevo = estado ?? prev?.estado ?? null
-  const migNuevo = migracionEstado !== undefined ? migracionEstado : prev?.migracionEstado ?? null
-  const quienNuevo = quien !== undefined ? quien : prev?.quienMigra ?? prev?.responsable ?? ''
+    const estadoNuevo = estado ?? prev?.estado ?? null
+    const migNuevo = migracionEstado !== undefined ? migracionEstado : prev?.migracionEstado ?? null
+    const quienNuevo = quien !== undefined ? quien : prev?.quienMigra ?? prev?.responsable ?? ''
 
-  const entry = {
-    tipo: prev?.tipo || tipo,
-    estado: estadoNuevo,
-    migracionEstado: migNuevo,
-    quienMigra: quienNuevo,
-    notas: notas !== undefined ? notas : prev?.notas ?? '',
-    ultimaModificacion: ahora,
-    modificadoPor: user.name,
-    modificadoPorEmail: user.email,
-    historial: Array.isArray(prev?.historial) ? [...prev.historial] : []
-  }
-  entry.historial.push({
-    fecha: ahora,
-    estado_anterior: prev?.estado ?? null,
-    estado_nuevo: estadoNuevo,
-    migracion_anterior: prev?.migracionEstado ?? null,
-    migracion_nuevo: migNuevo,
-    quienMigra: quienNuevo,
-    nota: nota || '',
-    modificadoPor: user.name,
-    modificadoPorEmail: user.email
+    const entry = {
+      tipo: prev?.tipo || tipo,
+      estado: estadoNuevo,
+      migracionEstado: migNuevo,
+      quienMigra: quienNuevo,
+      notas: notas !== undefined ? notas : prev?.notas ?? '',
+      ultimaModificacion: ahora,
+      modificadoPor: user.name,
+      modificadoPorEmail: user.email,
+      historial: Array.isArray(prev?.historial) ? [...prev.historial] : []
+    }
+    entry.historial.push({
+      fecha: ahora,
+      estado_anterior: prev?.estado ?? null,
+      estado_nuevo: estadoNuevo,
+      migracion_anterior: prev?.migracionEstado ?? null,
+      migracion_nuevo: migNuevo,
+      quienMigra: quienNuevo,
+      nota: nota || '',
+      modificadoPor: user.name,
+      modificadoPorEmail: user.email
+    })
+
+    seg.nodos[key] = entry
+    return entry
   })
-
-  seg.nodos[key] = entry
-  await uploadSitio(slug)
-  return entry
 }
 
 // ---- Migracion derivada ----
@@ -465,10 +521,10 @@ export function getApoyoSitio(slug) {
 export async function setApoyoSitio(structure, slug, apoyo) {
   if (!cargado) await loadSeguimiento(structure)
   const val = EQUIPO_APOYO.includes(apoyo) ? apoyo : ''
-  const seg = segDe(slug)
-  seg.migracion_por_sitio[slug] = { ...(seg.migracion_por_sitio[slug] || {}), apoyo: val }
-  await uploadSitio(slug)
-  return val
+  return escribirSitio(slug, (seg) => {
+    seg.migracion_por_sitio[slug] = { ...(seg.migracion_por_sitio[slug] || {}), apoyo: val }
+    return val
+  })
 }
 
 export function statsMigracionPorApoyo(structure) {
@@ -508,7 +564,6 @@ function localizar(arrayName, id) {
 export async function addPendiente(structure, { descripcion, sitio, responsable, fechaObjetivo, prioridad }) {
   if (!cargado) await loadSeguimiento(structure)
   const slug = sitio || structure.hubSlug
-  const seg = segDe(slug)
   const item = {
     id: nuevoId('pend'),
     descripcion: (descripcion || '').slice(0, 200),
@@ -521,32 +576,38 @@ export async function addPendiente(structure, { descripcion, sitio, responsable,
     completado: false,
     completadoEn: null
   }
-  seg.pendientes.push(item)
-  await uploadSitio(slug)
-  return item
+  return escribirSitio(slug, (seg) => {
+    seg.pendientes.push(item)
+    return item
+  })
 }
 
 export async function updatePendiente(structure, id, patch) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('pendientes', id)
   if (!found) throw new Error('Pendiente no encontrado')
-  const { slug, item } = found
-  if (patch.descripcion !== undefined) item.descripcion = patch.descripcion.slice(0, 200)
-  if (patch.responsable !== undefined) item.responsable = patch.responsable
-  if (patch.fechaObjetivo !== undefined) item.fechaObjetivo = patch.fechaObjetivo
-  if (patch.prioridad !== undefined && PRIORIDADES.includes(patch.prioridad)) item.prioridad = patch.prioridad
-  await uploadSitio(slug)
-  return item
+  return escribirSitio(found.slug, (seg) => {
+    const item = seg.pendientes.find((x) => x.id === id)
+    if (!item) throw new Error('Pendiente no encontrado')
+    if (patch.descripcion !== undefined) item.descripcion = patch.descripcion.slice(0, 200)
+    if (patch.responsable !== undefined) item.responsable = patch.responsable
+    if (patch.fechaObjetivo !== undefined) item.fechaObjetivo = patch.fechaObjetivo
+    if (patch.prioridad !== undefined && PRIORIDADES.includes(patch.prioridad)) item.prioridad = patch.prioridad
+    return item
+  })
 }
 
 export async function setPendienteCompletado(structure, id, completado) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('pendientes', id)
   if (!found) throw new Error('Pendiente no encontrado')
-  found.item.completado = !!completado
-  found.item.completadoEn = completado ? new Date().toISOString() : null
-  await uploadSitio(found.slug)
-  return found.item
+  return escribirSitio(found.slug, (seg) => {
+    const item = seg.pendientes.find((x) => x.id === id)
+    if (!item) throw new Error('Pendiente no encontrado')
+    item.completado = !!completado
+    item.completadoEn = completado ? new Date().toISOString() : null
+    return item
+  })
 }
 
 // ---- Fases por sitio ----
@@ -557,12 +618,12 @@ export function getFases(slug) {
 
 export async function setFase(structure, slug, key, value) {
   if (!cargado) await loadSeguimiento(structure)
-  const seg = segDe(slug)
-  const actual = { ...fasesVacias(), ...(seg.fases_por_sitio[slug] || {}) }
-  actual[key] = !!value
-  seg.fases_por_sitio[slug] = actual
-  await uploadSitio(slug)
-  return actual
+  return escribirSitio(slug, (seg) => {
+    const actual = { ...fasesVacias(), ...(seg.fases_por_sitio[slug] || {}) }
+    actual[key] = !!value
+    seg.fases_por_sitio[slug] = actual
+    return actual
+  })
 }
 
 // ---- Cambios de estructura ----
@@ -574,7 +635,6 @@ export function getCambiosEstructura(slug) {
 
 export async function addCambioEstructura(structure, { slug, tipo, ruta, clasificacion, responsable, notas }) {
   if (!cargado) await loadSeguimiento(structure)
-  const seg = segDe(slug)
   const item = {
     id: nuevoId('cam'),
     slug: slug || '',
@@ -587,9 +647,10 @@ export async function addCambioEstructura(structure, { slug, tipo, ruta, clasifi
     creado: new Date().toISOString(),
     creadoPor: currentUser().name
   }
-  seg.cambios_estructura.push(item)
-  await uploadSitio(slug)
-  return item
+  return escribirSitio(slug, (seg) => {
+    seg.cambios_estructura.push(item)
+    return item
+  })
 }
 
 // Aplica el cambio de estado + metadatos (nombre final acordado y comentario que
@@ -616,17 +677,20 @@ export async function setCambioEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('cambios_estructura', id)
   if (!found) throw new Error('Cambio no encontrado')
-  // Una carpeta nueva no se aprueba sin "nombre final" acordado: es el momento en
-  // que el SGSI fija el nombre/numeral coherente (el dashboard solo registra; la
-  // creacion real la hace PnP con ese nombre).
-  if (estado === 'aprobado' && found.item.tipo === 'crear') {
-    const nombre = ((extra.nombreFinal !== undefined ? extra.nombreFinal : found.item.nombreFinal) || '').trim()
-    if (!nombre) throw new Error('Para aprobar una carpeta nueva debes fijar el "nombre final" (con su numeral).')
-  }
-  if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
-  aplicarMetaEstado(found.item, estado, extra)
-  await uploadSitio(found.item.slug || found.slug)
-  return found.item
+  return escribirSitio(found.item.slug || found.slug, (seg) => {
+    const item = seg.cambios_estructura.find((x) => x.id === id)
+    if (!item) throw new Error('Cambio no encontrado')
+    // Una carpeta nueva no se aprueba sin "nombre final" acordado: es el momento en
+    // que el SGSI fija el nombre/numeral coherente (el dashboard solo registra; la
+    // creacion real la hace PnP con ese nombre).
+    if (estado === 'aprobado' && item.tipo === 'crear') {
+      const nombre = ((extra.nombreFinal !== undefined ? extra.nombreFinal : item.nombreFinal) || '').trim()
+      if (!nombre) throw new Error('Para aprobar una carpeta nueva debes fijar el "nombre final" (con su numeral).')
+    }
+    if (ESTADOS_CAMBIO.includes(estado)) item.estado = estado
+    aplicarMetaEstado(item, estado, extra)
+    return item
+  })
 }
 
 // ---- Solicitudes de permisos ----
@@ -638,7 +702,6 @@ export function getSolicitudesPermiso(slug) {
 
 export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol, motivo }) {
   if (!cargado) await loadSeguimiento(structure)
-  const seg = segDe(slug)
   const item = {
     id: nuevoId('perm'),
     slug: slug || '',
@@ -650,19 +713,23 @@ export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol,
     creado: new Date().toISOString(),
     creadoPor: currentUser().name
   }
-  seg.solicitudes_permisos.push(item)
-  await uploadSitio(slug)
-  return item
+  return escribirSitio(slug, (seg) => {
+    seg.solicitudes_permisos.push(item)
+    return item
+  })
 }
 
 export async function setSolicitudPermisoEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('solicitudes_permisos', id)
   if (!found) throw new Error('Solicitud no encontrada')
-  if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
-  aplicarMetaEstado(found.item, estado, extra)
-  await uploadSitio(found.item.slug || found.slug)
-  return found.item
+  return escribirSitio(found.item.slug || found.slug, (seg) => {
+    const item = seg.solicitudes_permisos.find((x) => x.id === id)
+    if (!item) throw new Error('Solicitud no encontrada')
+    if (ESTADOS_CAMBIO.includes(estado)) item.estado = estado
+    aplicarMetaEstado(item, estado, extra)
+    return item
+  })
 }
 
 // Solo lo APROBADO y aun no aplicado: lo unico que se exporta para PnP (spec §7).

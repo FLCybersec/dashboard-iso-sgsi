@@ -276,16 +276,20 @@ function FormAgregar({ ctx, parentRuta, onClose }) {
   const [nombre, setNombre] = useState('')
   const [clasif, setClasif] = useState('')
   const [busy, setBusy] = useState(false)
+  const [err, setErr] = useState(null)
 
   async function agregar() {
     if (!nombre.trim()) return
     setBusy(true)
+    setErr(null)
     try {
       await ctx.acciones.onAgregar(parentRuta, nombre.trim(), clasif)
       setNombre('')
       setClasif('')
       onClose()
       ctx.rerender()
+    } catch (e) {
+      setErr(e?.message || String(e))
     } finally {
       setBusy(false)
     }
@@ -300,6 +304,7 @@ function FormAgregar({ ctx, parentRuta, onClose }) {
       </select>
       <button class="btn" onClick=${agregar} disabled=${busy || !nombre.trim()}>Registrar</button>
       <button class="btn secondary dark-on-light" onClick=${onClose} disabled=${busy}>Cancelar</button>
+      ${err && html`<span class="nodo-status err">No se pudo guardar: ${err}</span>`}
     </div>
   `
 }

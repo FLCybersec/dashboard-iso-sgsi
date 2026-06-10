@@ -7,6 +7,7 @@ import { loadStructure } from '../lib/structure-store.js'
 import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
+  refreshSeguimientoSitio,
   misCarpetas,
   misSitios,
   updateNodo,
@@ -49,6 +50,9 @@ export function MiTrabajoView() {
         const m = await loadMigrationState(st)
         setMig(m)
         await loadSeguimiento(st)
+        // Refrescar mis areas desde SharePoint: las aprobaciones del admin se
+        // escriben desde OTRA sesion y no estarian en la cache de esta.
+        await Promise.all(misSitios(st, currentUser()).map((s) => refreshSeguimientoSitio(st, s.slug)))
         recompute(st)
       } catch (e) {
         setError(e?.message || String(e))
