@@ -101,4 +101,10 @@ Cada solicitud lleva: solicitante, fecha, motivo y estado (propuesto / aprobado 
 - **No se reutilizan** números de carpetas borradas (trazabilidad ISO).
 - El **orden visual lo da el JSON maestro**, no el número; al añadir una carpeta al maestro se coloca donde corresponde.
 - La numeración correcta se **aplica en el script PnP** (la asigna Cowork según el maestro al generar el script) y se refleja en el maestro. El dashboard nunca renombra carpetas reales.
-- **Reorganización real** (renombrar/
+- **Reorganización real** (renombrar/renumerar): solo si es imprescindible, como cambio deliberado por PnP + actualizar el maestro + avisar a los usuarios para re-sincronizar.
+
+## 11. Fuera de alcance (no-go)
+
+- El dashboard no crea/borra carpetas ni cambia permisos directamente.
+- No se auto-asignan responsabilidades los usuarios.
+- No se conceden accesos desde el dashboard (solo se solicitan).
