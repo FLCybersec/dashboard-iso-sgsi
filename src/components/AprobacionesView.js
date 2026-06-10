@@ -4,6 +4,7 @@ import { Cargando } from './Cargando.js'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
 import { loadStructure } from '../lib/structure-store.js'
+import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   getCambiosEstructura,
@@ -257,7 +258,12 @@ function FilaCarpeta({ c, ctx }) {
           ctx=${ctx}
           aprobando=${aprobando}
           setAprobando=${setAprobando}
-          onAplicar=${() => run(() => setCambioEstado(structure, c.id, 'aplicado'))}
+          onAplicar=${() => run(async () => {
+            await setCambioEstado(structure, c.id, 'aplicado')
+            // La carpeta ya existe en SharePoint: refrescar el estado real para
+            // que el arbol y las metricas la detecten sin esperar al TTL.
+            if (c.tipo === 'crear') await loadMigrationState(structure, { force: true })
+          })}
           onDescartar=${() => run(() => setCambioEstado(structure, c.id, 'descartado'))}
         />
       </td>

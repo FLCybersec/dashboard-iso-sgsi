@@ -14,6 +14,7 @@ import {
 } from '../lib/seguimiento-store.js'
 import { AvanceChart } from './AvanceChart.js'
 import { Avatar } from './Avatar.js'
+import { BotonActualizar } from './BotonActualizar.js'
 
 // Vista Resumen (Tanda 7): encabeza con el avance de MIGRACION (global y por
 // persona). La estructura (carpetas creadas) queda como bloque secundario.
@@ -22,6 +23,15 @@ export function HomeView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const build = (st, mig) => ({
+    st,
+    mig,
+    migGlobal: statsMigracionGlobal(st),
+    personas: statsMigracionPorPersona(st),
+    atencion: requiereAtencion(st, mig),
+    actividad: actividadReciente(st, 12)
+  })
+
   const run = useCallback(async (force) => {
     setLoading(true)
     setError(null)
@@ -29,14 +39,7 @@ export function HomeView() {
       const st = await loadStructure()
       const mig = await loadMigrationState(st, { force })
       await loadSeguimiento(st, { force })
-      setData({
-        st,
-        mig,
-        migGlobal: statsMigracionGlobal(st),
-        personas: statsMigracionPorPersona(st),
-        atencion: requiereAtencion(st, mig),
-        actividad: actividadReciente(st, 12)
-      })
+      setData(build(st, mig))
     } catch (e) {
       setError(e?.message || String(e))
     } finally {
@@ -53,9 +56,7 @@ export function HomeView() {
       <h1>Resumen</h1>
       <div class="view-head-actions">
         ${data && html`<span class="muted">Actualizado: ${formatTs(data.mig.fetchedAt)}${data.mig.fromCache ? ' (cache)' : ''}</span>`}
-        <button class="btn secondary dark-on-light" onClick=${() => run(true)} disabled=${loading}>
-          ${loading ? 'Actualizando...' : 'Actualizar'}
-        </button>
+        <${BotonActualizar} onRefreshed=${({ st, mig }) => setData(build(st, mig))} />
       </div>
     </div>
 

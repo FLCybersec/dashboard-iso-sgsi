@@ -14,7 +14,7 @@ import {
 import { cacheGet, cacheSet, cacheDelete } from './db.js'
 
 const CACHE_KEY = 'migration-state'
-const TTL_MS = 10 * 60 * 1000 // 10 minutos
+const TTL_MS = 2 * 60 * 1000 // 2 minutos
 
 // Detecta el estado de un sitio. Nunca lanza por sitio inexistente; los errores
 // de red/permisos se reportan en `warning` y dejan los nodos como pendientes.
@@ -98,7 +98,7 @@ function computeGlobal(sitios) {
   }
 }
 
-// Carga el estado de migracion. Usa cache idb (TTL 10 min) salvo `force`.
+// Carga el estado de migracion. Usa cache idb (TTL 2 min) salvo `force`.
 export async function loadMigrationState(structure, { force = false } = {}) {
   if (!force) {
     const cached = await cacheGet(CACHE_KEY)

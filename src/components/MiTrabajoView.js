@@ -19,6 +19,7 @@ import {
 } from '../lib/seguimiento-store.js'
 import { Avatar } from './Avatar.js'
 import { ArbolCarpetas } from './ArbolCarpetas.js'
+import { BotonActualizar } from './BotonActualizar.js'
 
 // "Mi trabajo" (landing): mi avance + el arbol de MI(S) area(s) para marcar el
 // estado de migracion de mis carpetas y registrar solicitudes (crear/sobrante/
@@ -104,6 +105,9 @@ export function MiTrabajoView() {
           <h1 style="margin:0">Mi trabajo</h1>
           <div class="muted">${nombre}${persona ? ` · ${persona.migradas}/${persona.total} carpetas migradas · ${persona.pct}%` : ''}</div>
         </div>
+      </div>
+      <div class="view-head-actions">
+        <${BotonActualizar} onRefreshed=${({ st, mig }) => { setStructure(st); setMig(mig); recompute(st); rerender() }} />
       </div>
     </div>
 

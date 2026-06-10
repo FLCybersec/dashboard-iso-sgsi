@@ -837,6 +837,19 @@
   gap: 12px;
 }
 
+/* Columna derecha del encabezado: "Actualizar" arriba y metricas debajo */
+.head-derecha {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+.boton-actualizar {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
 /* Control secundario de estructura en la fila de carpeta */
 .nodo-secundario {
   display: flex;

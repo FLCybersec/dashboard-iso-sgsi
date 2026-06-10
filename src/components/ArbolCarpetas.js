@@ -136,8 +136,8 @@ export function ArbolCarpetas({ sitioDef, structure, sitioMig, acciones, admin =
 
   return html`
     <div class="arbol-toolbar">
-      <button class="btn secondary dark-on-light" onClick=${() => setColapsados(new Set())}>Expandir todo</button>
-      <button class="btn secondary dark-on-light" onClick=${() => setColapsados(new Set(todasLasRutas(roots)))}>Colapsar todo</button>
+      <button class="btn secondary dark-on-light" onClick=${() => setColapsados(new Set())}>Abrir todo</button>
+      <button class="btn secondary dark-on-light" onClick=${() => setColapsados(new Set(todasLasRutas(roots)))}>Cerrar todo</button>
       <${AgregarRaiz} ctx=${ctx} />
     </div>
     <div class="arbol">

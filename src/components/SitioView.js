@@ -24,6 +24,7 @@ import {
   setSolicitudPermisoEstado
 } from '../lib/seguimiento-store.js'
 import { ArbolCarpetas } from './ArbolCarpetas.js'
+import { BotonActualizar } from './BotonActualizar.js'
 
 // Vista Sitio: arbol visual de carpetas con migracion por carpeta. Cabecera con
 // propietario y acceso; panel de migracion con responsable del area y Apoyo SGSI;
@@ -101,7 +102,11 @@ export function SitioView({ slug, puedeEditar = true }) {
         <div class="muted"><code>${slug}</code></div>
       </div>
       ${sitioDef &&
-      html`<div class="sitio-metricas">
+      html`<div class="head-derecha">
+      <div class="view-head-actions">
+        <${BotonActualizar} onRefreshed=${({ mig }) => { setSitioMig(mig.sitios.find((s) => s.slug === slug) || null); rerender() }} />
+      </div>
+      <div class="sitio-metricas">
         <div class="card" style="min-width:150px">
           <div class="num">${statsMigracionSitio(sitioDef).pct}%</div>
           <div class="lbl">Migracion: ${statsMigracionSitio(sitioDef).migradas}/${statsMigracionSitio(sitioDef).total} carpetas</div>
@@ -111,6 +116,7 @@ export function SitioView({ slug, puedeEditar = true }) {
           <div class="num sec">${sitioMig.pct}%</div>
           <div class="lbl">Estructura: ${sitioMig.creadas}/${sitioMig.total}</div>
         </div>`}
+      </div>
       </div>`}
     </div>
 
@@ -137,7 +143,18 @@ export function SitioView({ slug, puedeEditar = true }) {
 
       <h2 style="margin-top:28px">Informacion del sitio</h2>
       <${IndicadorSitio} sitioMig=${sitioMig} />
-      <${EstructuraEvolutivaPanel} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
+      <${EstructuraEvolutivaPanel}
+        structure=${structure}
+        slug=${slug}
+        onChange=${rerender}
+        puedeEditar=${puedeEditar}
+        onCreada=${async () => {
+          // La carpeta ya existe en SharePoint: refrescar el estado real para
+          // que el arbol y las metricas la detecten sin esperar al TTL.
+          const mig = await loadMigrationState(structure, { force: true })
+          setSitioMig(mig.sitios.find((s) => s.slug === slug) || null)
+        }}
+      />
       <${PermisosSolicitudPanel} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
     `}
   `
@@ -293,7 +310,7 @@ function CabeceraSitio({ sitioDef, structure, slug, onChange, puedeEditar = true
 // Cola de cambios de estructura (crear / sobrante) -> aprobar/aplicar para PnP.
 // El REGISTRO se hace de forma visual desde el arbol (agregar / sobrante), nunca
 // escribiendo rutas a mano.
-function EstructuraEvolutivaPanel({ structure, slug, onChange, puedeEditar = true }) {
+function EstructuraEvolutivaPanel({ structure, slug, onChange, puedeEditar = true, onCreada = null }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState(null)
   const cambios = getCambiosEstructura(slug)
@@ -336,7 +353,10 @@ function EstructuraEvolutivaPanel({ structure, slug, onChange, puedeEditar = tru
                 ${puedeEditar && c.estado === 'propuesto' &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'aprobado'))}>Aprobar</button>`}
                 ${puedeEditar && (c.estado === 'propuesto' || c.estado === 'aprobado') &&
-                html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'aplicado'))}>Aplicado</button>
+                html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(async () => {
+                    await setCambioEstado(structure, c.id, 'aplicado')
+                    if (c.tipo === 'crear' && onCreada) await onCreada()
+                  })}>Aplicado</button>
                   <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'descartado'))}>Descartar</button>`}
               </td>
             </tr>`

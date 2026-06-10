@@ -35,6 +35,25 @@ filtraria al modelo de acceso. Pendiente de validacion de Franco + commit/push.
 
 ---
 
+## Ajustes UX — Refresh mas frecuente y boton "Actualizar" en mas vistas (2026-06-10)
+
+**Estado:** Code-complete. 21/21 E2E; build OK.
+
+- **TTL del estado real** (`migration-store.js`): de 10 a 2 minutos. El
+  seguimiento NO usa TTL (cachea por sesion y ya se refresca al montar cada
+  vista y antes de cada escritura), no requirio cambio.
+- **Boton "Actualizar" reutilizable** (`BotonActualizar.js`): fuerza
+  `loadMigrationState` + `loadSeguimiento` (ambos `force: true`) y entrega
+  `{ st, mig }` al padre. Colocado en Resumen (sustituye al boton propio),
+  Mi trabajo y Sitio (arriba a la derecha, sobre las metricas).
+- **Refresh automatico al marcar "Creada/Aplicada"** un cambio tipo `crear`
+  (Aprobaciones y panel del Sitio): se fuerza la relectura del estado real
+  para que el arbol y las metricas detecten la carpeta sin esperar al TTL.
+- **Arbol en lenguaje llano**: "Expandir todo" → "Abrir todo",
+  "Colapsar todo" → "Cerrar todo".
+
+---
+
 ## Fix QA #3 — "Solicitar acceso a un area" fallaba para perfiles no-admin (2026-06-10)
 
 **Estado:** Code-complete. 21/21 E2E (incluye regresion nueva `solicitud-acceso.spec.js`).
