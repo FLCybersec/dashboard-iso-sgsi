@@ -35,6 +35,22 @@ filtraria al modelo de acceso. Pendiente de validacion de Franco + commit/push.
 
 ---
 
+## Ajuste — Aprobaciones: nombre final PRECARGADO con el solicitado (2026-06-10)
+
+**Estado:** Code-complete. 20/20 E2E.
+
+- `FormAprobar` precarga el nombre final con el ya acordado o, si no hay, con el
+  solicitado (base editable; el boton arranca habilitado). Sigue siendo
+  obligatorio: si se borra el campo, no se puede confirmar (la regla del store
+  no cambia).
+- Tests actualizados a los dos ajustes de QA del dia: `aprobaciones.spec.js`
+  (precarga + obligatorio al borrar), `arbol.spec.js` y `arbol-anidado.spec.js`
+  (clasificacion obligatoria al registrar: Registrar deshabilitado y aviso sin
+  clasificacion). Nota: el Fix #2 se habia pusheado con 3 specs en rojo; quedan
+  en verde con esta tanda.
+
+---
+
 ## Fix — Lost update entre sesiones: la subcarpeta virtual "desaparecia" (2026-06-10)
 
 **Estado:** Code-complete. 20/20 E2E (incluye regresion nueva `concurrencia.spec.js`).

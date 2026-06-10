@@ -2,7 +2,8 @@ import { test, expect } from '@playwright/test'
 import { mockGraph } from './_helpers/graph-mock.js'
 
 // "Agregar carpeta" en el arbol registra un cambio_estructura tipo crear y la
-// muestra como "pendiente de crear" (sin tocar SharePoint real).
+// muestra como "pendiente de crear" (sin tocar SharePoint real). La
+// clasificacion es OBLIGATORIA: sin ella no se puede registrar (QA Fix #2).
 test('agregar carpeta en el arbol la registra como pendiente de crear', async ({ page }) => {
   const graph = await mockGraph(page)
 
@@ -11,12 +12,20 @@ test('agregar carpeta en el arbol la registra como pendiente de crear', async ({
   await page.getByTestId('agregar-raiz').click()
   const form = page.locator('.arbol-agregar').first()
   await form.locator('.arbol-nuevo-nombre').fill('99 Carpeta Nueva Test')
+
+  // Sin clasificacion: Registrar deshabilitado y aviso visible.
+  await expect(form.getByRole('button', { name: 'Registrar' })).toBeDisabled()
+  await expect(form.locator('.nodo-status.err')).toBeVisible()
+  await form.locator('select').selectOption('Interna')
+  await expect(form.getByRole('button', { name: 'Registrar' })).toBeEnabled()
   await form.getByRole('button', { name: 'Registrar' }).click()
 
   await expect.poll(() => graph.puts.length).toBeGreaterThan(0)
   const last = graph.puts[graph.puts.length - 1]
   expect(
-    (last.cambios_estructura || []).some((c) => c.tipo === 'crear' && c.ruta === '99 Carpeta Nueva Test')
+    (last.cambios_estructura || []).some(
+      (c) => c.tipo === 'crear' && c.ruta === '99 Carpeta Nueva Test' && c.clasificacion === 'Interna'
+    )
   ).toBe(true)
 
   await expect(

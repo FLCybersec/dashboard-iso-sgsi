@@ -12,6 +12,7 @@ test('aprobar una carpeta anota nombre final + comentario y pasa a Aprobada', as
   await page.getByTestId('agregar-raiz').click()
   const form = page.locator('.arbol-agregar').first()
   await form.locator('.arbol-nuevo-nombre').fill('99 Borrador Test')
+  await form.locator('select').selectOption('Interna')
   await form.getByRole('button', { name: 'Registrar' }).click()
   await expect.poll(() => graph.puts.length).toBeGreaterThan(0)
 
@@ -22,13 +23,16 @@ test('aprobar una carpeta anota nombre final + comentario y pasa a Aprobada', as
   await expect(fila).toBeVisible()
   await expect(fila.locator('.estado-tag', { hasText: 'Pendiente' })).toBeVisible()
 
-  // 3) Aprobar abre el formulario: el nombre final es OBLIGATORIO (el campo
-  // arranca vacio y sin el no se puede confirmar); luego nombre + comentario.
+  // 3) Aprobar abre el formulario: el nombre final arranca PRECARGADO con el
+  // solicitado (base editable; el boton queda habilitado), pero sigue siendo
+  // OBLIGATORIO: si se borra, no se puede confirmar.
   await fila.getByRole('button', { name: 'Aprobar' }).click()
   const fAprobar = page.getByTestId('aprobar-form')
   await expect(fAprobar).toBeVisible()
   const inputs = fAprobar.locator('input')
-  await expect(inputs.nth(0)).toHaveValue('')
+  await expect(inputs.nth(0)).toHaveValue('99 Borrador Test')
+  await expect(fAprobar.getByRole('button', { name: 'Confirmar aprobacion' })).toBeEnabled()
+  await inputs.nth(0).fill('')
   await expect(fAprobar.getByRole('button', { name: 'Confirmar aprobacion' })).toBeDisabled()
   await inputs.nth(0).fill('99 Nombre Final Acordado')
   await expect(fAprobar.getByRole('button', { name: 'Confirmar aprobacion' })).toBeEnabled()

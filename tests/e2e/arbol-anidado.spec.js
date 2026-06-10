@@ -13,6 +13,7 @@ test('agregar carpeta dentro de una pendiente la anida como pendiente', async ({
   await page.getByTestId('agregar-raiz').click()
   const rootForm = page.locator('.arbol-agregar').first()
   await rootForm.locator('.arbol-nuevo-nombre').fill('99 Padre Pendiente')
+  await rootForm.locator('select').selectOption('Interna')
   await rootForm.getByRole('button', { name: 'Registrar' }).click()
 
   const padre = page.locator('.arbol-nodo.pendiente', { hasText: '99 Padre Pendiente' }).first()
@@ -23,6 +24,7 @@ test('agregar carpeta dentro de una pendiente la anida como pendiente', async ({
   await filaPadre.getByRole('button', { name: '+ carpeta' }).click()
   const subForm = padre.locator('.arbol-agregar').first()
   await subForm.locator('.arbol-nuevo-nombre').fill('Sub Pendiente')
+  await subForm.locator('select').selectOption('Interna')
   await subForm.getByRole('button', { name: 'Registrar' }).click()
 
   // 3) Persiste como cambio "crear" con la ruta padre/hijo.
