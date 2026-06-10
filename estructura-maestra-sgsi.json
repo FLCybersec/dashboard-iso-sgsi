@@ -329,10 +329,6 @@
           "clasificacion": "Confidencial"
         },
         {
-          "nombre": "04.6 Capacitacion y Concientizacion",
-          "clasificacion": "Interna"
-        },
-        {
           "nombre": "04.7 Evaluaciones de Desempeno",
           "clasificacion": "Confidencial",
           "hijos": [
@@ -349,10 +345,6 @@
               "clasificacion": "Confidencial"
             }
           ]
-        },
-        {
-          "nombre": "04.8 Bajas y Finiquitos",
-          "clasificacion": "Confidencial"
         },
         {
           "nombre": "_Plantillas",
@@ -575,10 +567,6 @@
           "clasificacion": "Confidencial"
         },
         {
-          "nombre": "Altas-Bajas",
-          "clasificacion": "Confidencial"
-        },
-        {
           "nombre": "Servicios",
           "clasificacion": "Confidencial"
         },
@@ -628,10 +616,6 @@
       "carpetas": [
         {
           "nombre": "Expedientes",
-          "clasificacion": "Confidencial"
-        },
-        {
-          "nombre": "Altas-Bajas",
           "clasificacion": "Confidencial"
         },
         {
@@ -760,7 +744,23 @@
         },
         {
           "nombre": "09.6 Capacitacion - Pasantia",
-          "clasificacion": "Interna"
+          "clasificacion": "Interna",
+          "hijos": [
+            {
+              "nombre": "Ezequiel",
+              "clasificacion": "Interna"
+            },
+            {
+              "nombre": "Chema",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "Ficha de Alerta",
+                  "clasificacion": "Interna"
+                }
+              ]
+            }
+          ]
         },
         {
           "nombre": "_Plantillas",
