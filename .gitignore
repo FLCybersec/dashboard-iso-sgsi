@@ -4,3 +4,4 @@ dist/
 *.local
 .vite/
 npm-debug.log*
+.claude/settings.local.json
