@@ -35,6 +35,38 @@ filtraria al modelo de acceso. Pendiente de validacion de Franco + commit/push.
 
 ---
 
+## Fix QA #3 — "Solicitar acceso a un area" fallaba para perfiles no-admin (2026-06-10)
+
+**Estado:** Code-complete. 21/21 E2E (incluye regresion nueva `solicitud-acceso.spec.js`).
+
+**Reporte (Carmen, correo 10/06):** un usuario no-admin no puede solicitar
+acceso a un area distinta a la suya; el portal devuelve error y la solicitud no
+se registra. Con admin si funciona. Severidad Media-Alta.
+
+**Causa raiz (no eran roles del dashboard):** la solicitud se guardaba en el
+archivo `_seguimiento/seguimiento-migracion.json` del sitio DESTINO, donde el
+solicitante por definicion no tiene escritura (justo por eso pide acceso). El
+admin escribe en todos los sitios, por eso solo a admin le funcionaba.
+
+**Arreglo (`seguimiento-store.js`):**
+- `addSolicitudPermiso`: cascada de escritura — sitio destino → area(s)
+  propia(s) del solicitante (`misSitios`) → hub; primer sitio donde pueda
+  escribir. `item.slug` conserva el DESTINO solicitado.
+- `getSeguimiento`/`getSolicitudesPermiso`: las solicitudes se agregan por id
+  entre TODOS los archivos (prefiriendo la copia del archivo de su propio
+  sitio), porque ya pueden vivir en el archivo de otro sitio.
+- `setSolicitudPermisoEstado`: actualiza la copia "ganadora" (la misma que
+  muestra la agregacion), localizada con `localizarSolicitud`.
+- Mock e2e: opcion `denySites` (403 al resolver siteId) + `putsPorSitio`.
+
+**Verificacion:** `solicitud-acceso.spec.js` — Daniela (no-admin, area propia
+via quien-migra) solicita acceso a SGSI-Marketing con el sitio denegado: la
+solicitud se registra en el archivo de SU area (nunca en el destino) y el admin
+la ve Pendiente en Aprobaciones. Con la conducta anterior el test falla
+(comprobado). Limpieza: `test-results/` deja de versionarse.
+
+---
+
 ## Ajuste — Aprobaciones: nombre final PRECARGADO con el solicitado (2026-06-10)
 
 **Estado:** Code-complete. 20/20 E2E.

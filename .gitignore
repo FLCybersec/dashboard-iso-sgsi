@@ -5,3 +5,4 @@ dist/
 .vite/
 npm-debug.log*
 .claude/settings.local.json
+test-results/

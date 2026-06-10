@@ -294,8 +294,13 @@ export async function loadSeguimiento(structure, { force = false } = {}) {
 }
 
 // Vista agregada (scope por slug, sin duplicar) para el export y EvidenciaView.
+// Las solicitudes de permisos son la excepcion al scope: pueden vivir en un
+// archivo DISTINTO a su sitio destino (el solicitante escribe donde tiene
+// permiso; pedir acceso a un area ajena implica no poder escribir en ella).
+// Se unen por id, prefiriendo la copia del archivo de su propio sitio.
 export function getSeguimiento() {
   const agg = emptySeg()
+  const solicitudes = new Map() // id -> item
   for (const [slug, s] of segPorSitio) {
     const part = scopeSeg(s, slug, hubSlugActual)
     Object.assign(agg.nodos, part.nodos)
@@ -303,8 +308,11 @@ export function getSeguimiento() {
     Object.assign(agg.fases_por_sitio, part.fases_por_sitio)
     Object.assign(agg.migracion_por_sitio, part.migracion_por_sitio)
     agg.cambios_estructura.push(...part.cambios_estructura)
-    agg.solicitudes_permisos.push(...part.solicitudes_permisos)
+    for (const x of s.solicitudes_permisos || []) {
+      if (!solicitudes.has(x.id) || x.slug === slug) solicitudes.set(x.id, x)
+    }
   }
+  agg.solicitudes_permisos = [...solicitudes.values()]
   return agg
 }
 
@@ -710,8 +718,10 @@ export async function setCambioEstado(structure, id, estado, extra = {}) {
 // ---- Solicitudes de permisos ----
 
 export function getSolicitudesPermiso(slug) {
-  if (slug) return segDe(slug).solicitudes_permisos.filter((s) => s.slug === slug)
-  return getSeguimiento().solicitudes_permisos
+  // Siempre desde la vista agregada: una solicitud para `slug` puede vivir en
+  // el archivo de otro sitio (el del solicitante).
+  const todas = getSeguimiento().solicitudes_permisos
+  return slug ? todas.filter((s) => s.slug === slug) : todas
 }
 
 export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol, motivo }) {
@@ -727,17 +737,50 @@ export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol,
     creado: new Date().toISOString(),
     creadoPor: currentUser().name
   }
-  return escribirSitio(slug, (seg) => {
-    seg.solicitudes_permisos.push(item)
-    return item
-  })
+  // La solicitud se guarda donde el SOLICITANTE pueda escribir: primero el
+  // sitio destino (admins y miembros del area), si no su(s) propia(s) area(s),
+  // si no el hub. Quien pide acceso a un area ajena NO puede escribir en ella
+  // (es justo lo que esta pidiendo); antes esto fallaba para todo perfil
+  // no-admin (QA #3, 2026-06-10). `item.slug` conserva el sitio DESTINO; la
+  // agregacion une por id sin importar en que archivo quedo.
+  const propios = misSitios(structure, currentUser()).map((s) => s.slug)
+  const candidatos = [...new Set([slug, ...propios, structure.hubSlug].filter(Boolean))]
+  let ultimoError = null
+  for (const destino of candidatos) {
+    try {
+      return await escribirSitio(destino, (seg) => {
+        seg.solicitudes_permisos.push(item)
+        return item
+      })
+    } catch (e) {
+      ultimoError = e
+    }
+  }
+  throw new Error(
+    `No se pudo registrar la solicitud en ningun sitio donde tengas escritura. Contacta al equipo SGSI. Detalle: ${ultimoError?.message || ultimoError}`
+  )
+}
+
+// Copia "ganadora" de una solicitud: la del archivo de su propio sitio si
+// existe (canonica); si no, la primera encontrada (p. ej. en el archivo del
+// solicitante o en el legado del hub). Debe coincidir con la preferencia de
+// la agregacion en getSeguimiento para actualizar la copia que se muestra.
+function localizarSolicitud(id) {
+  let primero = null
+  for (const [slug, s] of segPorSitio) {
+    const item = (s.solicitudes_permisos || []).find((x) => x.id === id)
+    if (!item) continue
+    if (!primero) primero = { slug, item }
+    if (item.slug === slug) return { slug, item }
+  }
+  return primero
 }
 
 export async function setSolicitudPermisoEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
-  const found = localizar('solicitudes_permisos', id)
+  const found = localizarSolicitud(id)
   if (!found) throw new Error('Solicitud no encontrada')
-  return escribirSitio(found.item.slug || found.slug, (seg) => {
+  return escribirSitio(found.slug, (seg) => {
     const item = seg.solicitudes_permisos.find((x) => x.id === id)
     if (!item) throw new Error('Solicitud no encontrada')
     if (ESTADOS_CAMBIO.includes(estado)) item.estado = estado

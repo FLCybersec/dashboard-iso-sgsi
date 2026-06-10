@@ -25,7 +25,9 @@ function parentRel(url) {
 }
 
 export async function mockGraph(page, opts = {}) {
-  const { foldersByDrive = {}, seguimientoSeed = null } = opts
+  // `denySites`: slugs de sitios a los que el usuario simulado NO tiene acceso
+  // (resolver siteId responde 403, como SharePoint con permisos delegados).
+  const { foldersByDrive = {}, seguimientoSeed = null, denySites = [] } = opts
   const puts = []
   // Como SharePoint real: el GET del seguimiento devuelve lo ULTIMO escrito con
   // PUT en ese sitio (y la semilla/404 mientras no se haya escrito).
@@ -80,6 +82,7 @@ export async function mockGraph(page, opts = {}) {
     // Resolver siteId (GET /sites/{host}:/sites/{slug})
     if (method === 'GET' && /\/sites\/[^/]+:\/sites\//.test(url)) {
       const slug = decodeURIComponent(url.split(':/sites/')[1].split(/[?]/)[0])
+      if (denySites.includes(slug)) return json(route, { error: { code: 'accessDenied' } }, 403)
       return json(route, { id: `site-${slug}` })
     }
 
@@ -122,5 +125,5 @@ export async function mockGraph(page, opts = {}) {
     return json(route, {})
   })
 
-  return { puts }
+  return { puts, putsPorSitio }
 }
