@@ -759,6 +759,102 @@
                   "clasificacion": "Interna"
                 }
               ]
+            },
+            {
+              "nombre": "Formación CybrHawk",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "Sesión 1",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Sesión 2",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Sesión 3",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Sesión 4",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Sesión 5",
+                  "clasificacion": "Interna"
+                }
+              ]
+            },
+            {
+              "nombre": "Formación ISO 27001",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "Inventario de Activos",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "Proveedores",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "K9",
+                          "clasificacion": "Restringida"
+                        },
+                        {
+                          "nombre": "Cybersec",
+                          "clasificacion": "Restringida"
+                        },
+                        {
+                          "nombre": "Seguridad Privada",
+                          "clasificacion": "Restringida"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "Evidencia de Estructura de Carpetas",
+                  "clasificacion": "Confidencial"
+                }
+              ]
+            },
+            {
+              "nombre": "Carmen",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "Bitácoras",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Formación",
+                  "clasificacion": "Interna"
+                }
+              ]
+            },
+            {
+              "nombre": "Formatos",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "Alertas",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Bitácoras",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Entregable Semanal",
+                  "clasificacion": "Interna"
+                },
+                {
+                  "nombre": "Minutas",
+                  "clasificacion": "Interna"
+                }
+              ]
             }
           ]
         },
