@@ -635,12 +635,26 @@ export function getCambiosEstructura(slug) {
 
 export async function addCambioEstructura(structure, { slug, tipo, ruta, clasificacion, responsable, notas }) {
   if (!cargado) await loadSeguimiento(structure)
+  const tipoFinal = TIPOS_CAMBIO.includes(tipo) ? tipo : 'crear'
+  const clasif = (clasificacion || '').trim()
+  // La clasificacion es OBLIGATORIA al solicitar una carpeta nueva: es la base
+  // del control de acceso y de los requisitos del SGSI (A.5.12, A.5.13, A.5.15).
+  // No se permite registrar una carpeta a crear sin nivel de clasificacion.
+  if (tipoFinal === 'crear') {
+    const niveles = Object.keys((structure && structure.clasificaciones) || {})
+    if (!clasif) {
+      throw new Error('La clasificacion es obligatoria para crear una carpeta (Publica / Interna / Confidencial / Restringida).')
+    }
+    if (niveles.length && !niveles.includes(clasif)) {
+      throw new Error(`Clasificacion no valida: "${clasif}". Debe ser una de: ${niveles.join(', ')}.`)
+    }
+  }
   const item = {
     id: nuevoId('cam'),
     slug: slug || '',
-    tipo: TIPOS_CAMBIO.includes(tipo) ? tipo : 'crear',
+    tipo: tipoFinal,
     ruta: (ruta || '').trim(),
-    clasificacion: clasificacion || '',
+    clasificacion: clasif,
     responsable: responsable || '',
     notas: notas || '',
     estado: 'propuesto',

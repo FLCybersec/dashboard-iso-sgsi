@@ -5,6 +5,36 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Fix — Bug #2 (QA Carmen): clasificacion OBLIGATORIA al crear carpeta (2026-06-10)
+
+**Reporte (crodriguez@, severidad/prioridad Alta):** el portal permitia
+registrar/guardar una carpeta nueva sin asignar clasificacion (Publica / Interna
+/ Confidencial / Restringida). Rompe el modelo de sensibilidad y permisos
+(A.5.12, A.5.13, A.5.15).
+
+**Causa raiz:** en `ArbolCarpetas.js > FormAgregar.agregar()` solo se validaba
+`!nombre.trim()`; el `<select>` de clasificacion admitia valor vacio y el boton
+Registrar no lo bloqueaba. El store `addCambioEstructura` guardaba
+`clasificacion: clasificacion || ''` sin validar.
+
+**Fix (dos capas):**
+- Store (`seguimiento-store.js > addCambioEstructura`): para `tipo: 'crear'`
+  rechaza clasificacion vacia (`throw`) y valida que sea uno de los niveles
+  definidos en `structure.clasificaciones`. Defensa de fondo: cubre todos los
+  flujos (Mi trabajo, Sitio, raiz y anidado).
+- UI (`FormAgregar`): boton Registrar deshabilitado hasta que haya nombre Y
+  clasificacion; `<option>` placeholder "Clasificacion (obligatoria)"; borde
+  rojo + aviso "Selecciona una clasificacion..." cuando falta.
+- CSS: `.arbol-agregar select.campo-invalido` (borde rojo).
+
+**Decision:** se opto por validacion obligatoria (bloquear guardado), no por un
+valor por defecto "Por definir", porque una clasificacion placeholder se
+filtraria al modelo de acceso. Pendiente de validacion de Franco + commit/push.
+
+**Verificacion:** `node --check` OK en ambos archivos. Falta E2E de regresion.
+
+---
+
 ## Fix — Lost update entre sesiones: la subcarpeta virtual "desaparecia" (2026-06-10)
 
 **Estado:** Code-complete. 20/20 E2E (incluye regresion nueva `concurrencia.spec.js`).

@@ -279,7 +279,7 @@ function FormAgregar({ ctx, parentRuta, onClose }) {
   const [err, setErr] = useState(null)
 
   async function agregar() {
-    if (!nombre.trim()) return
+    if (!nombre.trim() || !clasif) return
     setBusy(true)
     setErr(null)
     try {
@@ -295,15 +295,18 @@ function FormAgregar({ ctx, parentRuta, onClose }) {
     }
   }
 
+  const faltaClasif = !!nombre.trim() && !clasif
+
   return html`
     <div class="arbol-agregar">
       <input class="arbol-nuevo-nombre" type="text" value=${nombre} placeholder="Nombre de la nueva carpeta" onInput=${(e) => setNombre(e.target.value)} disabled=${busy} />
-      <select value=${clasif} onChange=${(e) => setClasif(e.target.value)} disabled=${busy}>
-        <option value="">(clasificacion)</option>
+      <select value=${clasif} onChange=${(e) => setClasif(e.target.value)} disabled=${busy} class=${faltaClasif ? 'campo-invalido' : ''} aria-invalid=${faltaClasif} required>
+        <option value="">Clasificacion (obligatoria)</option>
         ${ctx.niveles.map((n) => html`<option value=${n}>${n}</option>`)}
       </select>
-      <button class="btn" onClick=${agregar} disabled=${busy || !nombre.trim()}>Registrar</button>
+      <button class="btn" onClick=${agregar} disabled=${busy || !nombre.trim() || !clasif}>Registrar</button>
       <button class="btn secondary dark-on-light" onClick=${onClose} disabled=${busy}>Cancelar</button>
+      ${faltaClasif && html`<span class="nodo-status err">Selecciona una clasificacion para poder registrar la carpeta.</span>`}
       ${err && html`<span class="nodo-status err">No se pudo guardar: ${err}</span>`}
     </div>
   `
