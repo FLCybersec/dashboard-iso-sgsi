@@ -616,6 +616,13 @@ export async function setCambioEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('cambios_estructura', id)
   if (!found) throw new Error('Cambio no encontrado')
+  // Una carpeta nueva no se aprueba sin "nombre final" acordado: es el momento en
+  // que el SGSI fija el nombre/numeral coherente (el dashboard solo registra; la
+  // creacion real la hace PnP con ese nombre).
+  if (estado === 'aprobado' && found.item.tipo === 'crear') {
+    const nombre = ((extra.nombreFinal !== undefined ? extra.nombreFinal : found.item.nombreFinal) || '').trim()
+    if (!nombre) throw new Error('Para aprobar una carpeta nueva debes fijar el "nombre final" (con su numeral).')
+  }
   if (ESTADOS_CAMBIO.includes(estado)) found.item.estado = estado
   aplicarMetaEstado(found.item, estado, extra)
   await uploadSitio(found.item.slug || found.slug)

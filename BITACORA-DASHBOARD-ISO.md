@@ -5,6 +5,34 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Aprobaciones: nombre final OBLIGATORIO al aprobar "crear" (2026-06-10)
+
+**Estado:** Code-complete. Build no requerido (solo JS); 19/19 E2E.
+
+**Necesidad:** al aprobar una solicitud de "crear carpeta", el admin debe FIJAR
+el "nombre final" (con su numeral correcto) en ese momento; antes se podia
+aprobar con el campo vacio o con el prellenado de la ruta solicitada sin
+revisarlo. El dashboard nunca renombra carpetas reales: solo registra; el cambio
+real lo hace PnP con el nombre acordado.
+
+**Arreglo (dos capas):**
+- `seguimiento-store.js` (`setCambioEstado`): regla de negocio — aprobar un
+  cambio `tipo: 'crear'` sin nombre final (ni en `extra` ni ya anotado en el
+  item) lanza error. Aplica a cualquier llamador, no solo a la vista.
+- `AprobacionesView.js` (`FormAprobar`): el campo arranca VACIO (ya no se
+  prellena con la ruta solicitada; esta queda como `placeholder` de referencia)
+  y "Confirmar aprobacion" se deshabilita mientras el nombre final este vacio
+  (con tooltip explicando por que). Etiqueta: "obligatorio, con su numeral".
+  Sobrantes y permisos no cambian (no llevan nombre final).
+
+```
+src/lib/seguimiento-store.js        (setCambioEstado valida nombre final en 'crear')
+src/components/AprobacionesView.js  (campo vacio + boton deshabilitado sin nombre)
+tests/e2e/aprobaciones.spec.js      (asegura: vacio => no se puede confirmar)
+```
+
+---
+
 ## Ajuste — Estado de carga K9: perro rastreador olfateando (2026-06-09)
 
 **Estado:** Code-complete. Verificado en navegador (animaciones bob/step/wag/puff

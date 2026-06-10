@@ -23,8 +23,9 @@ import {
 //   (en cualquier momento) -> Descartada (si no procede)
 // NO se autodetecta por nombre/ruta: el nombre final puede diferir del
 // solicitado (podemos renombrar al crear), por eso pasar a Creada/Aplicada es
-// manual. Al aprobar se anota el "nombre final" acordado y un comentario.
-// Solo lo "aprobado" entra al export para PnP (Evidencia).
+// manual. Al aprobar una carpeta nueva el "nombre final" (con su numeral) es
+// OBLIGATORIO: es el momento en que el SGSI fija el nombre coherente; sin el no
+// se puede aprobar. Solo lo "aprobado" entra al export para PnP (Evidencia).
 
 // estado interno -> etiqueta llana. "aplicado" se llama "Creada" para carpetas
 // nuevas y "Aplicada" para sobrantes y permisos.
@@ -182,23 +183,24 @@ function Acciones({ item, tipo, ctx, aprobando, setAprobando, onAplicar, onDesca
   return html`<span class="muted">—</span>`
 }
 
-function FormAprobar({ ctx, colSpan, conNombreFinal, valorNombre, valorComentario, onConfirmar, onCancelar }) {
+function FormAprobar({ ctx, colSpan, conNombreFinal, valorNombre, valorSolicitado, valorComentario, onConfirmar, onCancelar }) {
   const { busy } = ctx
   const [nombreFinal, setNombreFinal] = useState(valorNombre || '')
   const [comentario, setComentario] = useState(valorComentario || '')
+  const faltaNombre = conNombreFinal && !nombreFinal.trim()
   return html`<tr class="aprobar-row">
     <td colSpan=${colSpan}>
       <div class="nodo-line2" data-testid="aprobar-form">
         ${conNombreFinal &&
         html`<label class="grow">
-          Nombre final acordado (puede diferir del solicitado)
-          <input type="text" value=${nombreFinal} onInput=${(e) => setNombreFinal(e.target.value)} disabled=${busy} />
+          Nombre final acordado (obligatorio, con su numeral; puede diferir del solicitado)
+          <input type="text" value=${nombreFinal} placeholder=${valorSolicitado || ''} onInput=${(e) => setNombreFinal(e.target.value)} disabled=${busy} />
         </label>`}
         <label class="grow">
           Comentario
           <input type="text" value=${comentario} onInput=${(e) => setComentario(e.target.value)} disabled=${busy} />
         </label>
-        <button class="btn" disabled=${busy} onClick=${() => onConfirmar({ nombreFinal, comentario })}>Confirmar aprobacion</button>
+        <button class="btn" disabled=${busy || faltaNombre} title=${faltaNombre ? 'Fija el nombre final (con su numeral) para poder aprobar' : ''} onClick=${() => onConfirmar({ nombreFinal, comentario })}>Confirmar aprobacion</button>
         <button class="btn secondary dark-on-light" disabled=${busy} onClick=${onCancelar}>Cancelar</button>
       </div>
     </td>
@@ -258,7 +260,8 @@ function FilaCarpeta({ c, ctx }) {
       ctx=${ctx}
       colSpan=${7}
       conNombreFinal=${conNombreFinal}
-      valorNombre=${c.nombreFinal || c.ruta || ''}
+      valorNombre=${c.nombreFinal || ''}
+      valorSolicitado=${c.ruta || ''}
       valorComentario=${c.comentario || ''}
       onConfirmar=${confirmar}
       onCancelar=${() => setAprobando(false)}

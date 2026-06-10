@@ -22,12 +22,16 @@ test('aprobar una carpeta anota nombre final + comentario y pasa a Aprobada', as
   await expect(fila).toBeVisible()
   await expect(fila.locator('.estado-tag', { hasText: 'Pendiente' })).toBeVisible()
 
-  // 3) Aprobar abre el formulario: nombre final acordado (distinto) + comentario.
+  // 3) Aprobar abre el formulario: el nombre final es OBLIGATORIO (el campo
+  // arranca vacio y sin el no se puede confirmar); luego nombre + comentario.
   await fila.getByRole('button', { name: 'Aprobar' }).click()
   const fAprobar = page.getByTestId('aprobar-form')
   await expect(fAprobar).toBeVisible()
   const inputs = fAprobar.locator('input')
+  await expect(inputs.nth(0)).toHaveValue('')
+  await expect(fAprobar.getByRole('button', { name: 'Confirmar aprobacion' })).toBeDisabled()
   await inputs.nth(0).fill('99 Nombre Final Acordado')
+  await expect(fAprobar.getByRole('button', { name: 'Confirmar aprobacion' })).toBeEnabled()
   await inputs.nth(1).fill('Renombrada al crear segun acuerdo')
   await fAprobar.getByRole('button', { name: 'Confirmar aprobacion' }).click()
 
