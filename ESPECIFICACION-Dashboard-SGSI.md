@@ -89,4 +89,16 @@ Cada solicitud lleva: solicitante, fecha, motivo y estado (propuesto / aprobado 
 - Corregir el badge "temporal" (no marcar a quien es dueño legítimo del sitio).
 - Fotos en header y vistas de trabajo (re-login para tomar el scope nuevo).
 - Pase de diseño (sección 9).
-- Quitar lo que no aporta: % de estructura como protagoni
+- Quitar lo que no aporta: % de estructura como protagonista, % a mano, vistas vacías por modelo owner-only.
+
+## 12. Convención de numeración de carpetas
+
+- **Qué lleva numeral y qué no (coherente en todas las áreas):** llevan numeral las **secciones estructurales** del área (NN, NN.x y sus sub-secciones de categoría NN.x.y). Las **carpetas de instancia** —un cliente, un caso, un proveedor o un expediente concreto— van **por su nombre, sin numeral** (p. ej. "Trablisa"), igual que en el resto de áreas.
+- Los numerales (NN, NN.x) son **identificadores estables**: no se renumeran. Renombrar una carpeta en SharePoint cambia su URL y rompe enlaces, accesos directos de OneDrive y la detección por ruta del dashboard.
+- **Carpeta nueva = siguiente número libre de su nivel** (p. ej. tras 10.8 viene 10.9, 10.10…). No se inserta entre las existentes.
+- **Detalle dentro de un tema = sub-numeral** (NN.x.y), no se renumeran las hermanas.
+- El **equipo SGSI fija el número/nombre final al aprobar** la solicitud (campo "nombre final" obligatorio en Aprobaciones).
+- **No se reutilizan** números de carpetas borradas (trazabilidad ISO).
+- El **orden visual lo da el JSON maestro**, no el número; al añadir una carpeta al maestro se coloca donde corresponde.
+- La numeración correcta se **aplica en el script PnP** (la asigna Cowork según el maestro al generar el script) y se refleja en el maestro. El dashboard nunca renombra carpetas reales.
+- **Reorganización real** (renombrar/

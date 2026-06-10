@@ -381,7 +381,13 @@
       "carpetas": [
         {
           "nombre": "05.1 Contratos Clientes (Registro Patronal)",
-          "clasificacion": "Confidencial"
+          "clasificacion": "Confidencial",
+          "hijos": [
+            {
+              "nombre": "Trablisa",
+              "clasificacion": "Confidencial"
+            }
+          ]
         },
         {
           "nombre": "05.2 Contratos Proveedor",
@@ -812,6 +818,10 @@
         },
         {
           "nombre": "10.8 Facturas",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "10.9 Dirección de Operaciones",
           "clasificacion": "Confidencial"
         },
         {
