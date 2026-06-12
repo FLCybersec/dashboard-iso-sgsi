@@ -5,6 +5,26 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code CONFIRMA: Acceso-Total-RH.ps1 ejecutado y verificado (2026-06-12)
+
+Primera ejecucion PnP bajo el nuevo flujo (permisos, con autorizacion explicita
+de Franco en la bitacora y por mensaje directo):
+
+- **Pre-chequeo del script:** solo `Add-PnPGroupMember` (agrega, no quita ni
+  borra), credenciales desde `_secrets.ps1` (sin contrasena embebida), 7 UPN
+  coincidentes con lo autorizado.
+- **Ejecucion:** los 7 agregados como Integrantes de SGSI-RecursosHumanos sin
+  errores (jalvarez, rmarquez, mplantillas, nprolon, jlara, dhurtado, malvarez).
+- **Verificacion:** lectura posterior del grupo de Integrantes del sitio
+  confirma exactamente esos 7 miembros (Wendy queda como propietaria).
+- **Cola:** marcada como **Corrido** (Code). El paso a "Verificado" queda a
+  criterio de Franco como en las filas anteriores.
+- **Maestro:** validado (raiz == public, 209 carpetas, 0 errores, 23/23 E2E)
+  y publicado. El campo nuevo `accesoExtra` por carpeta no afecta al dashboard
+  (lo ignora); queda como referencia para herencias finas futuras.
+
+---
+
 ## Tarea para Code — Acceso total a RH (autorizado por Franco) + maestro (2026-06-12)
 
 Franco autoriza acceso a TODO Recursos Humanos (nivel sitio, Integrante) para:
