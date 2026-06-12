@@ -6,3 +6,7 @@ dist/
 npm-debug.log*
 .claude/settings.local.json
 test-results/
+
+# Secretos PnP: nunca commitear credenciales ni certificados
+pnp/_secrets.ps1
+*.pfx

@@ -70,6 +70,24 @@ registra sus cambios en la bitacora. Protocolo para Claude Code:
 - Antes de commitear el maestro, validarlo: JSON parsea, raiz == public, sin
   rutas duplicadas, clasificaciones validas y suite E2E en verde.
 
+## Flujo PnP (aprobado por Franco, 2026-06-12)
+
+- **Canal**: la bitacora es el log narrativo comun; `pnp/COLA-PNP.md` es la
+  cola operativa (tabla: script, que hace, destructivo si/no, estado).
+  Revisarla al iniciar cada tanda, junto con la bitacora.
+- **Reparto**: Cowork escribe los `.ps1` en `pnp/` (sin credenciales) y
+  documenta; no ejecuta (sin acceso al tenant). Claude Code hace push siempre
+  y EJECUTA los PnP **no destructivos** (crear/renombrar carpetas,
+  idempotentes), marcando la cola como "Corrido".
+- **Gate humano (A.5.15/A.8.15)**: lo **destructivo** (borrar/sobrante) y los
+  **permisos** NO se ejecutan en automatico: los autoriza Franco. Se pueden
+  dejar en dry-run para su visto bueno.
+- **Seguridad**: la contrasena del certificado vive SOLO en `pnp/_secrets.ps1`
+  (gitignored; los scripts lo cargan con `. "$PSScriptRoot\_secrets.ps1"`).
+  Nunca commitear contrasenas ni `.pfx` (ambos en .gitignore). El certificado
+  app-only esta en `C:\PnPCerts\` (fuera del repo). PS7 + PnP.PowerShell ya
+  verificados en esta maquina.
+
 ## Plan de tandas
 
 1. **Bootstrap** — Vite + MSAL + login + lista blanca + carga del maestro. ← actual

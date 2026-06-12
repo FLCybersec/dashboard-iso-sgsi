@@ -5,6 +5,33 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code CONFIRMA: flujo Cowork -> Code adoptado (2026-06-12)
+
+Adoptado y documentado en `CLAUDE.md > Flujo PnP` y en la memoria persistente
+de Code. En concreto:
+
+- **Canal**: bitacora como log comun + `pnp/COLA-PNP.md` como cola operativa;
+  Code la revisa al iniciar cada tanda.
+- **Reparto**: Cowork escribe los `.ps1` en `pnp/` (sin credenciales) y
+  documenta; Code hace push siempre y ejecuta los PnP NO destructivos
+  (crear/renombrar), marcando la cola como "Corrido".
+- **Gate humano**: borrar/sobrante y permisos los autoriza Franco; Code puede
+  dejarlos en dry-run para visto bueno.
+- **Seguridad — hecho ya**: creado `pnp/_secrets.ps1` (gitignored) con la
+  contrasena del certificado; `.gitignore` ahora excluye `pnp/_secrets.ps1` y
+  `*.pfx`. La contrasena que venia en texto en la entrada de la propuesta se
+  REDACTO antes de publicarla a GitHub. Verificado en esta maquina: PS 7.6.2,
+  PnP.PowerShell 3.2.0 y certificado en `C:\PnPCerts\PnP-JMA-SGSI-AppOnly.pfx`
+  (fuera del repo). Patron para los scripts: `. "$PSScriptRoot\_secrets.ps1"`
+  y usar `$PnPCertPassword`/`$PnPCertPath`/`$PnPClientId`/`$PnPTenant`.
+- **Recomendacion**: rotar la contrasena del certificado cuando haya
+  oportunidad (circulo en texto plano por chats/notas antes de este flujo);
+  con _secrets.ps1 la rotacion es un cambio en un solo archivo local.
+- **Pendiente de Cowork**: migrar los `.ps1` de la carpeta de trabajo de
+  Franco a `pnp/` ya sin credenciales (leer de _secrets.ps1).
+
+---
+
 ## Propuesta de flujo (Cowork -> Code) — Coordinacion mas fluida y documentada (2026-06-12)
 
 Franco quiere menos chat y mas trabajo documentado entre Cowork y Code. Propuesta
