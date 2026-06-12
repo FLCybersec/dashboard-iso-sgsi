@@ -5,6 +5,41 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tarea para Code — Aplicar aprobados 06.1/06.2/RH + convencion MAYUSCULAS (2026-06-12b)
+
+Franco reviso lo aprobado en el dashboard y decidio. Cowork ya genero scripts y
+actualizo el maestro. **Code: corre el de crear, push, y marca la COLA.**
+
+**Convencion NUEVA (Franco):** de ahora en adelante las carpetas que creemos van en
+MAYUSCULAS, sin acentos, sin numeral (instancias). El numeral sigue solo para
+secciones estructurales existentes. (Aplicado a este lote.)
+
+**Crear (no destructivo) -> `pnp/Crear-Aprobados-2026-06-12b.ps1` (corre Code):**
+- Finanzas `06.1 Facturacion`: divisiones SEGURIDAD, K9, CIBERSEGURIDAD; anios
+  (SEGURIDAD/K9: 2022-2026; CIBERSEGURIDAD: 2026); 12 MESES por anio; clientes por mes
+  (SEGURIDAD: DKM, HOSPITAL, ASCENSO, MOLOAKAN VALLE, TP&OIL DE MEXICO, BONATTI,
+  BF-MOTORS; K9: TRABLISA; CIBERSEGURIDAD: sin clientes). ~490 carpetas.
+- Finanzas `06.2 Movimientos Bancarios/EGRESOS/SEGURIDAD PRIVADA`.
+- RH `04.2 Expedientes de Personal/JMA SEGURIDAD/{TIJUANA,ENSENADA,K9}` y
+  `04.1 Ano 2026/04.1.6 Finiquitos pagados 2026/FINIQUITOS RESPALDOS`.
+
+**Borrar (destructivo, GATE Franco) -> `pnp/Borrar-Aprobados-2026-06-12b.ps1`:**
+- `06.5 Egresos por Cliente` (Finanzas) y `04.1.4 Documentos generales del personal
+  contratado` (RH). Arranca en MODO REVISION; lo corre Franco tras dry-run.
+
+**Maestro:** Cowork ya agrego las ~626 nodos de 06.1, EGRESOS y las de RH a
+`public/estructura-maestra-sgsi.json` (+ raiz). Las dos a BORRAR siguen en el maestro
+hasta confirmar el borrado. Incluir en commit+push.
+
+**Resueltos en revision (descartados/ignorados):** se ignoran los experimentos
+descartados de Martha (Año/2026/Junio/Egresos/DKM/HOSPITAL, Seguridad Privada en 06.1,
+Expediente Ensenada/*, Finiquitos Tijuana/Ensenada). El conflicto de 04.1.4
+(crear-dentro vs borrar) se resolvio: BORRAR (Franco).
+
+Code: corre el crear, push del maestro+scripts, marca COLA y confirma.
+
+---
+
 ## Fix — Carpetas "Año" en Facturacion (Finanzas) que "no se podian quitar" (2026-06-12)
 
 **Reporte de Franco:** en 06.1 Facturacion (Emitidas-Recibidas) habia una

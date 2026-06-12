@@ -285,7 +285,13 @@
             },
             {
               "nombre": "04.1.6 Finiquitos pagados 2026",
-              "clasificacion": "Confidencial"
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "FINIQUITOS RESPALDOS",
+                  "clasificacion": "Confidencial"
+                }
+              ]
             },
             {
               "nombre": "04.1.7 Informacion para Andrea - Nuevos Ingresos",
@@ -316,6 +322,26 @@
           "clasificacion": "Restringida",
           "accesoExtra": [
             "Daniela"
+          ],
+          "hijos": [
+            {
+              "nombre": "JMA SEGURIDAD",
+              "clasificacion": "Interna",
+              "hijos": [
+                {
+                  "nombre": "TIJUANA",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "ENSENADA",
+                  "clasificacion": "Confidencial"
+                },
+                {
+                  "nombre": "K9",
+                  "clasificacion": "Confidencial"
+                }
+              ]
+            }
           ]
         },
         {
@@ -435,7 +461,2793 @@
       "carpetas": [
         {
           "nombre": "06.1 Facturacion (Emitidas-Recibidas)",
-          "clasificacion": "Confidencial"
+          "clasificacion": "Confidencial",
+          "hijos": [
+            {
+              "nombre": "SEGURIDAD",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "2022",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2023",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2024",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2025",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2026",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "DKM",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "HOSPITAL",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "ASCENSO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "MOLOAKAN VALLE",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "TP&OIL DE MEXICO",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BONATTI",
+                          "clasificacion": "Confidencial"
+                        },
+                        {
+                          "nombre": "BF-MOTORS",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nombre": "K9",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "2022",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2023",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2024",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2025",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2026",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": [
+                        {
+                          "nombre": "TRABLISA",
+                          "clasificacion": "Confidencial"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "nombre": "CIBERSEGURIDAD",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "2026",
+                  "clasificacion": "Confidencial",
+                  "hijos": [
+                    {
+                      "nombre": "ENERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "FEBRERO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "MARZO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "ABRIL",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "MAYO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "JUNIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "JULIO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "AGOSTO",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "SEPTIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "OCTUBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "NOVIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    },
+                    {
+                      "nombre": "DICIEMBRE",
+                      "clasificacion": "Confidencial",
+                      "hijos": []
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
         },
         {
           "nombre": "06.2 Movimientos Bancarios",
@@ -530,6 +3342,16 @@
                       "clasificacion": "Restringida"
                     }
                   ]
+                }
+              ]
+            },
+            {
+              "nombre": "EGRESOS",
+              "clasificacion": "Confidencial",
+              "hijos": [
+                {
+                  "nombre": "SEGURIDAD PRIVADA",
+                  "clasificacion": "Confidencial"
                 }
               ]
             }
