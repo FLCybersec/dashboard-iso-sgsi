@@ -41,7 +41,8 @@
       "acceso": [
         "Franco",
         "Carmen",
-        "Ezequiel"
+        "Ezequiel",
+        "Chema"
       ],
       "biblioteca": "Documents",
       "carpetas": [
@@ -638,7 +639,7 @@
       "slug": "SGSI-SP-Tijuana",
       "nombre": "Seguridad Privada - Tijuana",
       "tipo": "team",
-      "propietario": "Jose Maria Gonzalez / Nabiki Parada",
+      "propietario": "Jorge Alvarez / Nabiki Parada",
       "acceso": [
         "Jose Maria",
         "Nabiki",
@@ -845,33 +846,33 @@
               ]
             },
             {
-              "nombre": "Formación CybrHawk",
+              "nombre": "Formacion CybrHawk",
               "clasificacion": "Interna",
               "hijos": [
                 {
-                  "nombre": "Sesión 1",
+                  "nombre": "Sesion 1",
                   "clasificacion": "Interna"
                 },
                 {
-                  "nombre": "Sesión 2",
+                  "nombre": "Sesion 2",
                   "clasificacion": "Interna"
                 },
                 {
-                  "nombre": "Sesión 3",
+                  "nombre": "Sesion 3",
                   "clasificacion": "Interna"
                 },
                 {
-                  "nombre": "Sesión 4",
+                  "nombre": "Sesion 4",
                   "clasificacion": "Interna"
                 },
                 {
-                  "nombre": "Sesión 5",
+                  "nombre": "Sesion 5",
                   "clasificacion": "Interna"
                 }
               ]
             },
             {
-              "nombre": "Formación ISO 27001",
+              "nombre": "Formacion ISO 27001",
               "clasificacion": "Confidencial",
               "hijos": [
                 {
@@ -887,7 +888,7 @@
                           "clasificacion": "Restringida"
                         },
                         {
-                          "nombre": "Cybersec",
+                          "nombre": "CyberSec",
                           "clasificacion": "Restringida"
                         },
                         {
@@ -909,11 +910,11 @@
               "clasificacion": "Interna",
               "hijos": [
                 {
-                  "nombre": "Bitácoras",
+                  "nombre": "Bitacoras",
                   "clasificacion": "Interna"
                 },
                 {
-                  "nombre": "Formación",
+                  "nombre": "Formacion",
                   "clasificacion": "Interna"
                 }
               ]
@@ -927,7 +928,7 @@
                   "clasificacion": "Interna"
                 },
                 {
-                  "nombre": "Bitácoras",
+                  "nombre": "Bitacoras",
                   "clasificacion": "Interna"
                 },
                 {
@@ -1001,7 +1002,7 @@
           "clasificacion": "Confidencial"
         },
         {
-          "nombre": "10.9 Dirección de Operaciones",
+          "nombre": "10.9 Direccion de Operaciones",
           "clasificacion": "Confidencial"
         },
         {
