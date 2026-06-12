@@ -1,10 +1,8 @@
 import { html } from 'htm/preact'
-import { Fragment } from 'preact'
 import { Cargando } from './Cargando.js'
 import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
 import { loadStructure } from '../lib/structure-store.js'
-import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   getCambiosEstructura,
@@ -23,10 +21,17 @@ import {
 //   Aprobada   -> "Creada/Aplicada" (cuando ya se hizo en la realidad)
 //   (en cualquier momento) -> Descartada (si no procede)
 // NO se autodetecta por nombre/ruta: el nombre final puede diferir del
-// solicitado (podemos renombrar al crear), por eso pasar a Creada/Aplicada es
-// manual. Al aprobar una carpeta nueva el "nombre final" (con su numeral) es
-// OBLIGATORIO: es el momento en que el SGSI fija el nombre coherente; sin el no
-// se puede aprobar. Solo lo "aprobado" entra al export para PnP (Evidencia).
+// solicitado, por eso pasar a Creada/Aplicada es manual. Aprobar SOLO cambia el
+// estado (un clic, sin formulario): el nombre canonico (numeral, acentos,
+// mayusculas) lo fija Cowork al generar el PnP y actualizar el maestro. Solo lo
+// "aprobado" entra al export para PnP (Evidencia).
+//
+// Marcado OPTIMISTA: cada accion cambia el estado en memoria y la UI al
+// instante; la escritura del seguimiento corre en segundo plano (cola por
+// sitio, que ademas serializa acciones rapidas consecutivas). No se relee la
+// estructura completa por Graph: el TTL de 2 min o el boton "Actualizar"
+// reconcilian el arbol y las metricas. Si la escritura falla, se revierte el
+// estado visible y se muestra el error.
 
 // estado interno -> etiqueta llana. "aplicado" se llama "Creada" para carpetas
 // nuevas y "Aplicada" para sobrantes y permisos.
@@ -51,13 +56,17 @@ function ordenar(arr) {
   return [...arr].sort((a, b) => (ORDEN[a.estado] ?? 9) - (ORDEN[b.estado] ?? 9))
 }
 
+const ABIERTOS = new Set(['propuesto', 'aprobado'])
+
 export function AprobacionesView() {
   const [structure, setStructure] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-  const [busy, setBusy] = useState(false)
   const [, setTick] = useState(0)
   const rerender = () => setTick((t) => t + 1)
+  // Seleccion para acciones por lote (ids), una por tabla.
+  const [selCarpetas, setSelCarpetas] = useState(() => new Set())
+  const [selPermisos, setSelPermisos] = useState(() => new Set())
 
   const cargar = useCallback(async () => {
     setLoading(true)
@@ -80,17 +89,26 @@ export function AprobacionesView() {
     cargar()
   }, [cargar])
 
-  async function run(fn) {
-    setBusy(true)
+  // Optimista: la UI cambia al instante; la escritura corre en segundo plano.
+  // En error se revierte sobre la copia vigente del store (la escritura pudo
+  // haber refundido el archivo con el servidor y reemplazado el objeto).
+  function aplicarOptimista(item, estado, persistir) {
+    const prev = item.estado
+    item.estado = estado
     setError(null)
-    try {
-      await fn()
-      rerender()
-    } catch (e) {
-      setError(e?.message || String(e))
-    } finally {
-      setBusy(false)
-    }
+    rerender()
+    persistir().then(
+      // Al confirmar tambien se re-renderiza: la escritura relee y fusiona el
+      // archivo del sitio, y pueden aparecer solicitudes de otras sesiones.
+      () => rerender(),
+      (e) => {
+        item.estado = prev
+        const vivo = [...getCambiosEstructura(), ...getSolicitudesPermiso()].find((x) => x.id === item.id)
+        if (vivo) vivo.estado = prev
+        setError(e?.message || String(e))
+        rerender()
+      }
+    )
   }
 
   if (loading) return html`<${Cargando} titulo="Cargando aprobaciones..." />`
@@ -108,7 +126,22 @@ export function AprobacionesView() {
     carpetas.filter((c) => c.estado === 'aprobado').length +
     permisos.filter((p) => p.estado === 'aprobado').length
 
-  const ctx = { structure, busy, run, nombreSitio }
+  const persistirCarpeta = (c, estado) => setCambioEstado(structure, c.id, estado)
+  const persistirPermiso = (p, estado) => setSolicitudPermisoEstado(structure, p.id, estado)
+
+  // Lote: aprueba las seleccionadas pendientes, o marca creadas/aplicadas las
+  // seleccionadas aprobadas. Cada item se escribe en segundo plano (la cola por
+  // sitio serializa); la seleccion se limpia al disparar.
+  function lote(items, sel, setSel, estadoDesde, estadoA, persistir) {
+    for (const it of items) {
+      if (sel.has(it.id) && it.estado === estadoDesde) {
+        aplicarOptimista(it, estadoA, () => persistir(it, estadoA))
+      }
+    }
+    setSel(new Set())
+  }
+
+  const ctx = { nombreSitio }
 
   return html`
     <div class="view-head">
@@ -120,7 +153,8 @@ export function AprobacionesView() {
           <strong>Creada/Aplicada</strong> (o <strong>Descartada</strong>). El
           dashboard solo registra; la creacion de carpetas y el cambio de permisos
           reales los ejecuta el equipo con PnP, y se marcan aqui a mano cuando ya
-          se hicieron.
+          se hicieron. El nombre definitivo de cada carpeta se fija al generar el
+          PnP y actualizar el maestro.
         </div>
       </div>
       <div class="sitio-metricas">
@@ -140,24 +174,60 @@ export function AprobacionesView() {
     <h2 style="margin-top:16px">Carpetas (cambios de estructura)</h2>
     ${carpetas.length === 0
       ? html`<div class="muted">No hay solicitudes de carpetas.</div>`
-      : html`<table class="tabla">
+      : html`
+        <${BarraLote}
+          items=${carpetas}
+          sel=${selCarpetas}
+          labelAplicar="Marcar creadas/aplicadas seleccionadas"
+          onAprobar=${() => lote(carpetas, selCarpetas, setSelCarpetas, 'propuesto', 'aprobado', persistirCarpeta)}
+          onAplicar=${() => lote(carpetas, selCarpetas, setSelCarpetas, 'aprobado', 'aplicado', persistirCarpeta)}
+        />
+        <table class="tabla" data-testid="tabla-carpetas">
         <thead>
-          <tr><th>Sitio</th><th>Tipo</th><th>Ruta / nombre final</th><th>Clasif.</th><th>Solicita</th><th>Estado</th><th></th></tr>
+          <tr>
+            <th><${CheckTodas} items=${carpetas} sel=${selCarpetas} setSel=${setSelCarpetas} /></th>
+            <th>Sitio</th><th>Tipo</th><th>Ruta / nombre final</th><th>Clasif.</th><th>Solicita</th><th>Estado</th><th></th>
+          </tr>
         </thead>
         <tbody>
-          ${carpetas.map((c) => html`<${FilaCarpeta} key=${c.id} c=${c} ctx=${ctx} />`)}
+          ${carpetas.map((c) => html`<${FilaCarpeta}
+            key=${c.id}
+            c=${c}
+            ctx=${ctx}
+            sel=${selCarpetas}
+            setSel=${setSelCarpetas}
+            onEstado=${(estado) => aplicarOptimista(c, estado, () => persistirCarpeta(c, estado))}
+          />`)}
         </tbody>
       </table>`}
 
     <h2 style="margin-top:28px">Permisos (accesos a sitios)</h2>
     ${permisos.length === 0
       ? html`<div class="muted">No hay solicitudes de permisos.</div>`
-      : html`<table class="tabla">
+      : html`
+        <${BarraLote}
+          items=${permisos}
+          sel=${selPermisos}
+          labelAplicar="Marcar aplicadas seleccionadas"
+          onAprobar=${() => lote(permisos, selPermisos, setSelPermisos, 'propuesto', 'aprobado', persistirPermiso)}
+          onAplicar=${() => lote(permisos, selPermisos, setSelPermisos, 'aprobado', 'aplicado', persistirPermiso)}
+        />
+        <table class="tabla" data-testid="tabla-permisos">
         <thead>
-          <tr><th>Sitio</th><th>Accion</th><th>Persona</th><th>Rol</th><th>Solicita</th><th>Estado</th><th></th></tr>
+          <tr>
+            <th><${CheckTodas} items=${permisos} sel=${selPermisos} setSel=${setSelPermisos} /></th>
+            <th>Sitio</th><th>Accion</th><th>Persona</th><th>Rol</th><th>Solicita</th><th>Estado</th><th></th>
+          </tr>
         </thead>
         <tbody>
-          ${permisos.map((p) => html`<${FilaPermiso} key=${p.id} p=${p} ctx=${ctx} />`)}
+          ${permisos.map((p) => html`<${FilaPermiso}
+            key=${p.id}
+            p=${p}
+            ctx=${ctx}
+            sel=${selPermisos}
+            setSel=${setSelPermisos}
+            onEstado=${(estado) => aplicarOptimista(p, estado, () => persistirPermiso(p, estado))}
+          />`)}
         </tbody>
       </table>`}
 
@@ -167,55 +237,71 @@ export function AprobacionesView() {
   `
 }
 
-// Botones de transicion + formulario de aprobacion (nombre final + comentario).
-// Devuelve el contenido de la celda de acciones; el formulario se muestra en una
-// fila aparte (ver Fila*). `conNombreFinal` solo para carpetas nuevas (crear).
-function Acciones({ item, tipo, ctx, aprobando, setAprobando, onAplicar, onDescartar }) {
-  const { busy } = ctx
+// Checkbox de cabecera: selecciona/deselecciona todas las solicitudes ABIERTAS
+// (Pendiente o Aprobada); las cerradas no tienen acciones y no se seleccionan.
+function CheckTodas({ items, sel, setSel }) {
+  const abiertas = items.filter((x) => ABIERTOS.has(x.estado))
+  const todas = abiertas.length > 0 && abiertas.every((x) => sel.has(x.id))
+  if (abiertas.length === 0) return null
+  return html`<input
+    type="checkbox"
+    title="Seleccionar todas"
+    aria-label="Seleccionar todas"
+    checked=${todas}
+    onChange=${() => setSel(todas ? new Set() : new Set(abiertas.map((x) => x.id)))}
+  />`
+}
+
+function CheckFila({ item, sel, setSel }) {
+  if (!ABIERTOS.has(item.estado)) return null
+  return html`<input
+    type="checkbox"
+    aria-label="Seleccionar solicitud"
+    checked=${sel.has(item.id)}
+    onChange=${() => {
+      const n = new Set(sel)
+      n.has(item.id) ? n.delete(item.id) : n.add(item.id)
+      setSel(n)
+    }}
+  />`
+}
+
+// Barra de acciones por lote sobre la seleccion de una tabla.
+function BarraLote({ items, sel, labelAplicar, onAprobar, onAplicar }) {
+  const nAprobar = items.filter((x) => sel.has(x.id) && x.estado === 'propuesto').length
+  const nAplicar = items.filter((x) => sel.has(x.id) && x.estado === 'aprobado').length
+  if (sel.size === 0) return null
+  return html`<div class="lote-bar" data-testid="lote-bar">
+    <span class="muted">${sel.size} seleccionada${sel.size === 1 ? '' : 's'}</span>
+    <button class="btn" disabled=${nAprobar === 0} onClick=${onAprobar}>
+      Aprobar seleccionadas${nAprobar ? ` (${nAprobar})` : ''}
+    </button>
+    <button class="btn secondary dark-on-light" disabled=${nAplicar === 0} onClick=${onAplicar}>
+      ${labelAplicar}${nAplicar ? ` (${nAplicar})` : ''}
+    </button>
+  </div>`
+}
+
+// Botones de transicion. Aprobar es UN clic (sin formulario): solo cambia el
+// estado; descartar y marcar creada/aplicada igual. Todo optimista.
+function Acciones({ item, tipo, onEstado }) {
   if (item.estado === 'propuesto') {
     return html`
-      <button class="btn secondary dark-on-light" disabled=${busy || aprobando} onClick=${() => setAprobando(true)}>Aprobar</button>
-      <button class="btn secondary dark-on-light" disabled=${busy} onClick=${onDescartar}>Descartar</button>
+      <button class="btn secondary dark-on-light" onClick=${() => onEstado('aprobado')}>Aprobar</button>
+      <button class="btn secondary dark-on-light" onClick=${() => onEstado('descartado')}>Descartar</button>
     `
   }
   if (item.estado === 'aprobado') {
     return html`
-      <button class="btn secondary dark-on-light" disabled=${busy} onClick=${onAplicar}>${tipo === 'crear' ? 'Marcar creada' : 'Marcar aplicada'}</button>
-      <button class="btn secondary dark-on-light" disabled=${busy} onClick=${onDescartar}>Descartar</button>
+      <button class="btn secondary dark-on-light" onClick=${() => onEstado('aplicado')}>${tipo === 'crear' ? 'Marcar creada' : 'Marcar aplicada'}</button>
+      <button class="btn secondary dark-on-light" onClick=${() => onEstado('descartado')}>Descartar</button>
     `
   }
   return html`<span class="muted">—</span>`
 }
 
-function FormAprobar({ ctx, colSpan, conNombreFinal, valorNombre, valorSolicitado, valorComentario, onConfirmar, onCancelar }) {
-  const { busy } = ctx
-  // Precargar con el nombre ya acordado si existe, o con el solicitado como base
-  // editable. Asi el campo nunca arranca vacio (el boton queda habilitado) y el
-  // SGSI solo confirma o ajusta el numeral. Sigue siendo obligatorio: si se borra,
-  // no se puede aprobar.
-  const [nombreFinal, setNombreFinal] = useState(valorNombre || valorSolicitado || '')
-  const [comentario, setComentario] = useState(valorComentario || '')
-  const faltaNombre = conNombreFinal && !nombreFinal.trim()
-  return html`<tr class="aprobar-row">
-    <td colSpan=${colSpan}>
-      <div class="nodo-line2" data-testid="aprobar-form">
-        ${conNombreFinal &&
-        html`<label class="grow">
-          Nombre final acordado (obligatorio, con su numeral; puede diferir del solicitado)
-          <input type="text" value=${nombreFinal} placeholder=${valorSolicitado || ''} onInput=${(e) => setNombreFinal(e.target.value)} disabled=${busy} />
-        </label>`}
-        <label class="grow">
-          Comentario
-          <input type="text" value=${comentario} onInput=${(e) => setComentario(e.target.value)} disabled=${busy} />
-        </label>
-        <button class="btn" disabled=${busy || faltaNombre} title=${faltaNombre ? 'Fija el nombre final (con su numeral) para poder aprobar' : ''} onClick=${() => onConfirmar({ nombreFinal, comentario })}>Confirmar aprobacion</button>
-        <button class="btn secondary dark-on-light" disabled=${busy} onClick=${onCancelar}>Cancelar</button>
-      </div>
-    </td>
-  </tr>`
-}
-
-// Linea de metadatos de aprobacion (nombre final acordado + comentario).
+// Linea de metadatos de aprobacion (nombre final acordado + comentario), si los
+// hay (solicitudes aprobadas antes del cambio de flujo, o anotadas por Cowork).
 function MetaAprobacion({ item, mostrarNombre }) {
   return html`
     ${mostrarNombre && item.nombreFinal && item.nombreFinal !== item.ruta &&
@@ -224,108 +310,40 @@ function MetaAprobacion({ item, mostrarNombre }) {
   `
 }
 
-function FilaCarpeta({ c, ctx }) {
-  const { structure, run, nombreSitio } = ctx
-  const [aprobando, setAprobando] = useState(false)
-  const conNombreFinal = c.tipo === 'crear'
-
-  const confirmar = ({ nombreFinal, comentario }) =>
-    run(async () => {
-      await setCambioEstado(structure, c.id, 'aprobado', {
-        nombreFinal: conNombreFinal ? nombreFinal : undefined,
-        comentario
-      })
-      setAprobando(false)
-    })
-
-  return html`<${Fragment}>
-    <tr>
-      <td>
-        <a class="back-link" href=${`/sitio/${c.slug}`} onClick=${(e) => (e.preventDefault(), route(`/sitio/${c.slug}`))}>${nombreSitio(c.slug)}</a>
-      </td>
-      <td>${c.tipo === 'crear' ? 'Crear' : 'Sobrante'}</td>
-      <td>
-        <code>${c.ruta}</code>
-        <${MetaAprobacion} item=${c} mostrarNombre=${conNombreFinal} />
-      </td>
-      <td>${c.clasificacion || '—'}</td>
-      <td>${c.creadoPor || '—'}</td>
-      <td><span class=${`estado-tag ${tagClase(c.estado)}`}>${estadoLabel(c.estado, c.tipo)}</span></td>
-      <td>
-        <${Acciones}
-          item=${c}
-          tipo=${c.tipo}
-          ctx=${ctx}
-          aprobando=${aprobando}
-          setAprobando=${setAprobando}
-          onAplicar=${() => run(async () => {
-            await setCambioEstado(structure, c.id, 'aplicado')
-            // La carpeta ya existe en SharePoint: refrescar el estado real para
-            // que el arbol y las metricas la detecten sin esperar al TTL.
-            if (c.tipo === 'crear') await loadMigrationState(structure, { force: true })
-          })}
-          onDescartar=${() => run(() => setCambioEstado(structure, c.id, 'descartado'))}
-        />
-      </td>
-    </tr>
-    ${aprobando &&
-    html`<${FormAprobar}
-      ctx=${ctx}
-      colSpan=${7}
-      conNombreFinal=${conNombreFinal}
-      valorNombre=${c.nombreFinal || ''}
-      valorSolicitado=${c.ruta || ''}
-      valorComentario=${c.comentario || ''}
-      onConfirmar=${confirmar}
-      onCancelar=${() => setAprobando(false)}
-    />`}
-  <//>`
+function FilaCarpeta({ c, ctx, sel, setSel, onEstado }) {
+  const { nombreSitio } = ctx
+  return html`<tr>
+    <td><${CheckFila} item=${c} sel=${sel} setSel=${setSel} /></td>
+    <td>
+      <a class="back-link" href=${`/sitio/${c.slug}`} onClick=${(e) => (e.preventDefault(), route(`/sitio/${c.slug}`))}>${nombreSitio(c.slug)}</a>
+    </td>
+    <td>${c.tipo === 'crear' ? 'Crear' : 'Sobrante'}</td>
+    <td>
+      <code>${c.ruta}</code>
+      <${MetaAprobacion} item=${c} mostrarNombre=${c.tipo === 'crear'} />
+    </td>
+    <td>${c.clasificacion || '—'}</td>
+    <td>${c.creadoPor || '—'}</td>
+    <td><span class=${`estado-tag ${tagClase(c.estado)}`}>${estadoLabel(c.estado, c.tipo)}</span></td>
+    <td><${Acciones} item=${c} tipo=${c.tipo} onEstado=${onEstado} /></td>
+  </tr>`
 }
 
-function FilaPermiso({ p, ctx }) {
-  const { structure, run, nombreSitio } = ctx
-  const [aprobando, setAprobando] = useState(false)
-
-  const confirmar = ({ comentario }) =>
-    run(async () => {
-      await setSolicitudPermisoEstado(structure, p.id, 'aprobado', { comentario })
-      setAprobando(false)
-    })
-
-  return html`<${Fragment}>
-    <tr>
-      <td>
-        <a class="back-link" href=${`/sitio/${p.slug}`} onClick=${(e) => (e.preventDefault(), route(`/sitio/${p.slug}`))}>${nombreSitio(p.slug)}</a>
-      </td>
-      <td>${p.tipo === 'agregar' ? 'Agregar' : 'Quitar'}</td>
-      <td>
-        ${p.persona}
-        <${MetaAprobacion} item=${p} mostrarNombre=${false} />
-      </td>
-      <td>${p.rol}</td>
-      <td>${p.creadoPor || '—'}</td>
-      <td><span class=${`estado-tag ${tagClase(p.estado)}`}>${estadoLabel(p.estado, p.tipo)}</span></td>
-      <td>
-        <${Acciones}
-          item=${p}
-          tipo=${p.tipo}
-          ctx=${ctx}
-          aprobando=${aprobando}
-          setAprobando=${setAprobando}
-          onAplicar=${() => run(() => setSolicitudPermisoEstado(structure, p.id, 'aplicado'))}
-          onDescartar=${() => run(() => setSolicitudPermisoEstado(structure, p.id, 'descartado'))}
-        />
-      </td>
-    </tr>
-    ${aprobando &&
-    html`<${FormAprobar}
-      ctx=${ctx}
-      colSpan=${7}
-      conNombreFinal=${false}
-      valorNombre=""
-      valorComentario=${p.comentario || ''}
-      onConfirmar=${confirmar}
-      onCancelar=${() => setAprobando(false)}
-    />`}
-  <//>`
+function FilaPermiso({ p, ctx, sel, setSel, onEstado }) {
+  const { nombreSitio } = ctx
+  return html`<tr>
+    <td><${CheckFila} item=${p} sel=${sel} setSel=${setSel} /></td>
+    <td>
+      <a class="back-link" href=${`/sitio/${p.slug}`} onClick=${(e) => (e.preventDefault(), route(`/sitio/${p.slug}`))}>${nombreSitio(p.slug)}</a>
+    </td>
+    <td>${p.tipo === 'agregar' ? 'Agregar' : 'Quitar'}</td>
+    <td>
+      ${p.persona}
+      <${MetaAprobacion} item=${p} mostrarNombre=${false} />
+    </td>
+    <td>${p.rol}</td>
+    <td>${p.creadoPor || '—'}</td>
+    <td><span class=${`estado-tag ${tagClase(p.estado)}`}>${estadoLabel(p.estado, p.tipo)}</span></td>
+    <td><${Acciones} item=${p} tipo=${p.tipo} onEstado=${onEstado} /></td>
+  </tr>`
 }

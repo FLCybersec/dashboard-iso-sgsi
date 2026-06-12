@@ -5,6 +5,51 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Aprobaciones: marcado instantaneo, acciones por lote y aprobar sin "nombre final" (2026-06-12)
+
+**Estado:** Code-complete. 22/22 E2E; captura visual verificada.
+
+Tres cambios pedidos por Franco sobre la bandeja de Aprobaciones:
+
+1. **Marcado instantaneo (optimista).** Al marcar "Creada/Aplicada" ya NO se
+   dispara `loadMigrationState({ force: true })` (releia los 12 sitios por Graph
+   de forma bloqueante; era la causa de la lentitud). Ahora toda accion
+   (aprobar / marcar / descartar) cambia el estado del item en memoria y la UI
+   al instante, y la escritura del seguimiento corre en segundo plano (la cola
+   por sitio serializa acciones rapidas consecutivas). Si la escritura falla, se
+   revierte el estado visible y se muestra el error. El arbol y las metricas se
+   reconcilian con el TTL de 2 min o con el boton "Actualizar".
+2. **Acciones por lote.** Checkbox por fila (solo solicitudes abiertas) +
+   "seleccionar todas" en la cabecera de cada tabla (carpetas Y permisos), con
+   barra de lote: "Aprobar seleccionadas (n)" (pendientes) y "Marcar
+   creadas/aplicadas seleccionadas (n)" (aprobadas). Cada item del lote se
+   escribe en segundo plano con el mismo flujo optimista.
+3. **Aprobar sin "nombre final".** Se revierte la obligatoriedad del 2026-06-10:
+   `seguimiento-store.js > setCambioEstado` ya no lanza error por `nombreFinal`
+   ausente en `crear`, y en `AprobacionesView` desaparecio el formulario de
+   aprobacion: aprobar es UN clic que solo cambia el estado a "aprobado". El
+   nombre canonico (numeral / acentos / mayusculas) lo fija Cowork al generar el
+   PnP y actualizar el maestro. `nombreFinal`/`comentario` se conservan como
+   datos opcionales y se siguen mostrando si existen (solicitudes historicas).
+   La clasificacion OBLIGATORIA al solicitar la creacion NO cambia (Bug #2).
+
+**Archivos:** `AprobacionesView.js` (reescrita: optimista + lote + sin
+`FormAprobar`), `seguimiento-store.js` (sin throw de nombre final),
+`components.css` (`.lote-bar` reemplaza `.aprobar-row`).
+
+**Tests:** `aprobaciones.spec.js` reescrito — (a) aprobar es un clic, persiste
+`aprobado` sin `nombreFinal`, y "Marcar creada" NO genera ningun GET de
+`children` (sin relectura de estructura); (b) lote completo: aprobar y marcar en
+bloque carpetas y permisos. `concurrencia.spec.js` ajustado al flujo sin
+formulario (la fusion anti lost-update sigue cubierta y en verde).
+
+**Nota UX menor:** en lotes grandes sobre el mismo sitio, mientras las
+escrituras en cola terminan, una fila puede mostrar por un momento su estado del
+servidor (la fusion releida pisa lo optimista hasta que llega su turno de
+escritura); converge solo, sin perdida de datos.
+
+---
+
 ## Fix — Bug #2 (QA Carmen): clasificacion OBLIGATORIA al crear carpeta (2026-06-10)
 
 **Reporte (crodriguez@, severidad/prioridad Alta):** el portal permitia

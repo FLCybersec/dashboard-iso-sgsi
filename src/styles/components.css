@@ -1297,10 +1297,12 @@
 .nodo-nombre {
   font-weight: 500;
 }
-/* Fila de formulario de aprobacion (nombre final + comentario) embebida en la tabla */
-.aprobar-row td {
-  background: #f7f9fb;
-  padding: 10px 12px;
+/* Barra de acciones por lote sobre la seleccion (Aprobaciones) */
+.lote-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
 }
 
 .nodo-line2 {

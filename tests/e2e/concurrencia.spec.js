@@ -54,11 +54,8 @@ test('aprobar con copia vieja NO borra la subcarpeta propuesta por otra sesion',
     { padre, hijo }
   )
 
-  // El admin aprueba el padre desde su copia vieja.
+  // El admin aprueba el padre desde su copia vieja (un clic, sin formulario).
   await filaPadre.getByRole('button', { name: 'Aprobar' }).click()
-  const fAprobar = page.getByTestId('aprobar-form')
-  await fAprobar.locator('input').nth(0).fill('99 Padre Final')
-  await fAprobar.getByRole('button', { name: 'Confirmar aprobacion' }).click()
 
   // El ultimo PUT conserva la subcarpeta del area Y aprueba el padre.
   await expect.poll(() => {

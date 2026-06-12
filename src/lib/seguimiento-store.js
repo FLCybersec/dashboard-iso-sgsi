@@ -695,6 +695,10 @@ function aplicarMetaEstado(item, estado, extra = {}) {
   }
 }
 
+// Aprobar solo cambia el estado: el "nombre final" YA NO se exige aqui. El
+// nombre canonico (numeral, acentos, mayusculas) lo fija Cowork al generar el
+// PnP y actualizar el maestro; si se pasa en `extra` se conserva como dato
+// opcional. La clasificacion sigue siendo obligatoria al SOLICITAR (addCambioEstructura).
 export async function setCambioEstado(structure, id, estado, extra = {}) {
   if (!cargado) await loadSeguimiento(structure)
   const found = localizar('cambios_estructura', id)
@@ -702,13 +706,6 @@ export async function setCambioEstado(structure, id, estado, extra = {}) {
   return escribirSitio(found.item.slug || found.slug, (seg) => {
     const item = seg.cambios_estructura.find((x) => x.id === id)
     if (!item) throw new Error('Cambio no encontrado')
-    // Una carpeta nueva no se aprueba sin "nombre final" acordado: es el momento en
-    // que el SGSI fija el nombre/numeral coherente (el dashboard solo registra; la
-    // creacion real la hace PnP con ese nombre).
-    if (estado === 'aprobado' && item.tipo === 'crear') {
-      const nombre = ((extra.nombreFinal !== undefined ? extra.nombreFinal : item.nombreFinal) || '').trim()
-      if (!nombre) throw new Error('Para aprobar una carpeta nueva debes fijar el "nombre final" (con su numeral).')
-    }
     if (ESTADOS_CAMBIO.includes(estado)) item.estado = estado
     aplicarMetaEstado(item, estado, extra)
     return item
