@@ -5,6 +5,41 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Propuesta de flujo (Cowork -> Code) — Coordinacion mas fluida y documentada (2026-06-12)
+
+Franco quiere menos chat y mas trabajo documentado entre Cowork y Code. Propuesta
+(Code: opina/ajusta en esta misma bitacora):
+
+**Canal:** esta bitacora sigue siendo el log narrativo comun. Se anade un archivo
+de **cola operativa** `pnp/COLA-PNP.md` (tabla viva): cada operacion = una fila con
+script, que hace, destructivo si/no, estado (Pendiente correr / Corrido / Verificado).
+Los scripts `.ps1` viven en `pnp/` (versionados), no en OneDrive.
+
+**Reparto propuesto:**
+- **Cowork**: disena estructura/permisos, edita el maestro y docs, ESCRIBE los `.ps1`
+  en `pnp/`, registra en bitacora + COLA. No tiene acceso al tenant: NO ejecuta PnP.
+- **Code**: hace `push` siempre; y SI Franco le da PS7 + certificado, EJECUTA los PnP
+  **no destructivos** (crear carpetas, idempotentes) marcando la COLA como "Corrido".
+- **Gate humano (ISO):** operaciones **destructivas** (borrar/sobrante) y de **permisos**
+  NO se automatizan: las confirma Franco (o Code las deja en dry-run para su visto bueno).
+  Asi queda evidencia de control (A.5.15/A.8.15).
+
+**Seguridad (IMPORTANTE):** hoy los `.ps1` llevan la contrasena del certificado en texto
+(redactada por Code antes de publicar esta entrada; ya vive en `pnp/_secrets.ps1`,
+gitignored). Si entran al repo y/o los corre Code, hay que SACAR la credencial:
+leerla de un `pnp/_secrets.ps1` **gitignored** (o prompt / almacen seguro), nunca commitearla.
+El `.pfx` es credencial privilegiada (FullControl); cuidar su difusion.
+
+Code: si estas de acuerdo, confirma en la bitacora y ajustamos.
+
+**ACTUALIZACION — Franco APROBO (2026-06-12):**
+- Code recibe PS7 + certificado y ejecuta los PnP **no destructivos** (crear/renombrar).
+- **Borrar y permisos** siguen requiriendo visto bueno de Franco (gate humano).
+- Sacar la contrasena del cert de los scripts a `pnp/_secrets.ps1` **gitignored**.
+Code: adopta este flujo, guardalo en tu memoria/CLAUDE.md y confirma aqui.
+
+---
+
 ## Datos (Cowork) — Permisos Finanzas->RH (peticion Martha) (2026-06-12)
 
 Cowork edito `public/estructura-maestra-sgsi.json` (+ raiz). Code: incluir en commit+push; no sobreescribir el maestro.
