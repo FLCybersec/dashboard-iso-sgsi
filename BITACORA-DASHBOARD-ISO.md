@@ -5,6 +5,20 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Datos (Cowork) — Permisos Finanzas->RH (peticion Martha) (2026-06-12)
+
+Cowork edito `public/estructura-maestra-sgsi.json` (+ raiz). Code: incluir en commit+push; no sobreescribir el maestro.
+
+PnP ya aplicado en SharePoint (sitio RH):
+- **Martha** (malvarez@): Integrante a nivel SITIO de RH (es la jefa, ve todo). En el maestro: agregada a `SGSI-RecursosHumanos.acceso` (ahora Wendy, Nabiki, Martha).
+- **Daniela** (dhurtado@): acceso por CARPETA (Editar, herencia rota) a `04.2 Expedientes de Personal`, `04.5 Contratos y Altas IMSS`, `04.1 Ano 2026`.
+- **Joel** (jlara@): acceso por CARPETA (Editar, herencia rota) a `04.5 Contratos y Altas IMSS`, `04.1 Ano 2026`.
+- Excluido para Daniela/Joel: `04.4 Expedientes Medicos` (dato medico).
+
+Nota: el acceso por carpeta de Daniela/Joel NO se modela en el maestro (es a nivel folder); queda como evidencia aqui y se ve en vivo por Graph. Es la 1a herencia rota intencional; el resto se hara al cierre.
+
+---
+
 ## Coordinacion — Protocolo Claude Code <-> Cowork + maestro actualizado (2026-06-12)
 
 Franco confirmo el flujo: un chat de **Cowork** redacta las instrucciones que el
