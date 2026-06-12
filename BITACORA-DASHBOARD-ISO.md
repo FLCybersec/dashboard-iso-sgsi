@@ -17,9 +17,16 @@ el maestro). Cowork registrara sus cambios tambien en esta bitacora.
   clasificaciones validas, E2E en verde).
 - Se commitea aparte la actualizacion del maestro que Cowork dejo en el arbol
   de trabajo: normalizacion sin acentos (Formacion, Sesion, Bitacoras,
-  Direccion, CyberSec), propietario de SP-Tijuana/Ensenada a "Jorge Alvarez /
-  Nabiki Parada" y Chema agregado a un acceso. Validada: 12 sitios, 209
-  carpetas, 0 errores; 23/23 E2E.
+  Direccion, CyberSec), propietario de SP-Tijuana a "Jorge Alvarez / Nabiki
+  Parada" (Jose Maria pasa a acceso; Ensenada NO cambia — correccion a la
+  redaccion original de esta entrada y del mensaje del commit 2c9eb66) y Chema
+  agregado al acceso del hub. Validada: 12 sitios, 209 carpetas, 0 errores;
+  23/23 E2E.
+- Cowork confirmo despues estos mismos cambios por mensaje (incl. bancos 06.2 y
+  06.8-06.10 movidas desde Gerencia General, ya publicados en 590224b) y pidio
+  no sobrescribir el maestro desde Claude Code: queda asumido, el dashboard lo
+  trata como solo lectura (ya era regla de CLAUDE.md) y sus ediciones se
+  commitean tal cual tras validarlas.
 - Contexto: la actualizacion previa del maestro (bancos en 06.2, nomina a
   Finanzas 06.8-06.10) viajo dentro del commit de UI `590224b` por un
   `git add -A`; este protocolo evita que se repita.
