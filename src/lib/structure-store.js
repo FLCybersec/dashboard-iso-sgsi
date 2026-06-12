@@ -31,6 +31,13 @@ function nodo(slug, sitioNombre, segments, carpeta, biblioteca) {
     rutaEnDrive,
     nombre: carpeta.nombre,
     clasificacion: carpeta.clasificacion || null,
+    // Acceso a nivel CARPETA segun el maestro (lo mantiene Cowork):
+    // `accesoExtra` = personas con permiso adicional en esta carpeta (herencia
+    // rota aditiva); `accesoExcluido` = personas del sitio SIN acceso aqui
+    // (exclusion; opcional, aun no usado). Solo informativo: el dashboard no
+    // cambia permisos reales.
+    accesoExtra: Array.isArray(carpeta.accesoExtra) ? carpeta.accesoExtra : [],
+    accesoExcluido: Array.isArray(carpeta.accesoExcluido) ? carpeta.accesoExcluido : [],
     profundidad: segments.length - 1,
     tipo: 'carpeta'
   }

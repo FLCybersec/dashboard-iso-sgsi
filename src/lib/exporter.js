@@ -307,7 +307,11 @@ export function exportSolicitudesAprobadas() {
     lineas.push(['estructura', c.slug, c.tipo, c.ruta, c.nombreFinal || '', detalle, c.estado, c.creadoPor || ''].map(csvCampo).join(','))
   }
   for (const p of pend.solicitudes_permisos) {
-    const detalle = [`${p.rol}${p.motivo ? ' — ' + p.motivo : ''}`, p.comentario].filter(Boolean).join(' — ')
+    const detalle = [`${p.rol}${p.motivo ? ' — ' + p.motivo : ''}`, p.ruta ? `carpeta: ${p.ruta}` : '', p.comentario]
+      .filter(Boolean)
+      .join(' — ')
+    // `Ruta/Persona` lleva persona; si la solicitud es POR CARPETA (gestion de
+    // herencias) la ruta va en el detalle y en el JSON (campo `ruta`).
     lineas.push(['permiso', p.slug, p.tipo, p.persona, '', detalle, p.estado, p.creadoPor || ''].map(csvCampo).join(','))
   }
   const csv = new Blob(['﻿' + lineas.join('\r\n')], { type: 'text/csv;charset=utf-8' })

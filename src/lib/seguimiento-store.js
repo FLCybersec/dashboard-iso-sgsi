@@ -745,7 +745,10 @@ export function getSolicitudesPermiso(slug) {
   return slug ? todas.filter((s) => s.slug === slug) : todas
 }
 
-export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol, motivo }) {
+// `ruta` (opcional) acota la solicitud a UNA carpeta del sitio: es la pieza
+// para gestionar herencias finas via PnP (p. ej. "quitar a X de 04.4"). Vacia
+// = solicitud a nivel sitio (comportamiento original).
+export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol, motivo, ruta }) {
   if (!cargado) await loadSeguimiento(structure)
   const item = {
     id: nuevoId('perm'),
@@ -754,6 +757,7 @@ export async function addSolicitudPermiso(structure, { slug, tipo, persona, rol,
     persona: persona || '',
     rol: ROLES_PERMISO.includes(rol) ? rol : 'Integrante',
     motivo: motivo || '',
+    ruta: (ruta || '').trim(),
     estado: 'propuesto',
     creado: new Date().toISOString(),
     creadoPor: currentUser().name

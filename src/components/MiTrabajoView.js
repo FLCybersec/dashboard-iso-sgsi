@@ -20,6 +20,7 @@ import {
 import { Avatar } from './Avatar.js'
 import { ArbolCarpetas } from './ArbolCarpetas.js'
 import { BotonActualizar } from './BotonActualizar.js'
+import { CabeceraSitio } from './SitioView.js'
 
 // "Mi trabajo" (landing): mi avance + el arbol de MI(S) area(s) para marcar el
 // estado de migracion de mis carpetas y registrar solicitudes (crear/sobrante/
@@ -85,6 +86,19 @@ export function MiTrabajoView() {
         await setCambioEstado(structure, cambioId, 'descartado')
         rerender()
       },
+      // Gestion de herencias (solo visible si es propietario del area):
+      // registra la solicitud de quitar acceso a UNA carpeta para PnP.
+      onQuitarAcceso: async (ruta, persona) => {
+        await addSolicitudPermiso(structure, {
+          slug,
+          tipo: 'quitar',
+          persona,
+          rol: 'Integrante',
+          motivo: 'Quitar acceso a la carpeta (gestion de herencias)',
+          ruta
+        })
+        rerender()
+      },
       onQuienMigra: async () => {},
       onBloquear: async () => {},
       onDesbloquear: async () => {}
@@ -136,6 +150,7 @@ export function MiTrabajoView() {
               Marca el estado de migracion de tus carpetas. "Agregar" / "sobrante" registran
               solicitudes que aprueba el equipo SGSI.
             </p>
+            <${CabeceraSitio} sitioDef=${sitio} structure=${structure} slug=${sitio.slug} onChange=${rerender} puedeEditar=${false} />
             <${ArbolCarpetas}
               sitioDef=${sitio}
               structure=${structure}

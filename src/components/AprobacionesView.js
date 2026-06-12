@@ -339,9 +339,10 @@ function FilaPermiso({ p, ctx, sel, setSel, onEstado }) {
     <td>
       <a class="back-link" href=${`/sitio/${p.slug}`} onClick=${(e) => (e.preventDefault(), route(`/sitio/${p.slug}`))}>${nombreSitio(p.slug)}</a>
     </td>
-    <td>${p.tipo === 'agregar' ? 'Agregar' : 'Quitar'}</td>
+    <td>${p.tipo === 'agregar' ? 'Agregar' : 'Quitar'}${p.ruta ? ' (carpeta)' : ''}</td>
     <td>
       ${p.persona}
+      ${p.ruta && html`<div class="muted">carpeta: <code>${p.ruta}</code></div>`}
       <${MetaAprobacion} item=${p} mostrarNombre=${false} />
     </td>
     <td>${p.rol}</td>

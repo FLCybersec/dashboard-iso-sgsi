@@ -955,6 +955,52 @@
   border-radius: 999px;
   padding: 1px 6px;
 }
+.acceso-pill .temporal.extra {
+  background: var(--jma-azul-claro);
+  text-transform: none;
+  letter-spacing: 0;
+}
+.acceso-pill.excluido {
+  opacity: 0.6;
+}
+.acceso-pill.excluido > :first-child,
+.acceso-pill.excluido {
+  text-decoration: line-through;
+}
+/* Boton "x" para solicitar quitar acceso a la carpeta (gestion de herencias) */
+.pill-quitar {
+  border: none;
+  background: none;
+  color: var(--jma-rojo, #dc2626);
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+  font-weight: 700;
+}
+.pill-quitar:hover {
+  transform: scale(1.2);
+}
+.pill-quitar:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+
+/* Panel "accesos" de una carpeta del arbol */
+.arbol-accesos {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-right: 12px;
+  background: #f7f9fb;
+  border-top: 1px solid #eef0f3;
+}
+.arbol-accesos .accesos-chips {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 4px;
+}
 
 /* ---- Vista por usuario ---- */
 .usuario {

@@ -5,6 +5,9 @@ import {
   getOverride,
   getCambiosEstructura,
   quienMigra as quienMigraDe,
+  accesoTemporalSitio,
+  esPropietarioSitio,
+  limpiarNombre,
   ROSTER
 } from '../lib/seguimiento-store.js'
 import { SelectorMigracion } from './SelectorMigracion.js'
@@ -60,7 +63,7 @@ function construirArbol(sitioDef, structure, migByKey, cambios) {
         ruta, nombre: segs[segs.length - 1], hijos: [], real: false, grupo: false,
         virtual: false, sobrante: false, bloqueada: false, motivo: '', clasificacion: null,
         color: null, existe: false, archivos: undefined, migracionEstado: 'Sin empezar',
-        quienMigra: '', key: null, cambioId: null
+        quienMigra: '', key: null, cambioId: null, accesoExtra: [], accesoExcluido: []
       }
       map.set(ruta, node)
     }
@@ -75,6 +78,7 @@ function construirArbol(sitioDef, structure, migByKey, cambios) {
       key: n.key, nombre: n.nombre, clasificacion: n.clasificacion,
       color: n.clasificacion ? colorClasificacion(structure, n.clasificacion) : null,
       real: true, existe: mig?.existe || false, archivos: mig?.archivos,
+      accesoExtra: n.accesoExtra || [], accesoExcluido: n.accesoExcluido || [],
       migracionEstado: ov?.migracionEstado || 'Sin empezar',
       quienMigra: quienMigraDe(n.key),
       bloqueada: ov?.estado === 'Bloqueada',
@@ -132,7 +136,7 @@ export function ArbolCarpetas({ sitioDef, structure, sitioMig, acciones, admin =
     s.has(ruta) ? s.delete(ruta) : s.add(ruta)
     setColapsados(s)
   }
-  const ctx = { colapsados, toggle, niveles, acciones, rerender, admin, miNombre, esPropietario }
+  const ctx = { colapsados, toggle, niveles, acciones, rerender, admin, miNombre, esPropietario, sitioDef }
 
   return html`
     <div class="arbol-toolbar">
@@ -141,9 +145,78 @@ export function ArbolCarpetas({ sitioDef, structure, sitioMig, acciones, admin =
       <${AgregarRaiz} ctx=${ctx} />
     </div>
     <div class="arbol">
-      ${roots.map((n) => html`<${ArbolNodo} key=${n.ruta} node=${n} nivel=${0} ctx=${ctx} />`)}
+      ${roots.map((n) => html`<${ArbolNodo} key=${n.ruta} node=${n} nivel=${0} ctx=${ctx} extraHeredado=${[]} />`)}
     </div>
   `
+}
+
+// Acceso efectivo de una carpeta segun el maestro: propietario + acceso del
+// sitio (herencia) + equipo de migracion temporal + accesoExtra de la carpeta
+// y de sus ancestros (herencia rota aditiva), menos accesoExcluido. SOLO
+// informativo: los permisos reales los gestiona PnP; "quitar" registra una
+// solicitud que aprueba el SGSI y autoriza Franco.
+function accesoEfectivo(sitioDef, node, extraHeredado) {
+  const excluidos = new Set((node.accesoExcluido || []).map((p) => limpiarNombre(p)))
+  const vistos = new Set()
+  const out = []
+  const push = (persona, tipo, desde) => {
+    const p = limpiarNombre(persona)
+    if (!p || vistos.has(p.toLowerCase())) return
+    vistos.add(p.toLowerCase())
+    out.push({ persona: p, tipo, desde: desde || '', excluido: excluidos.has(p) })
+  }
+  if (sitioDef.propietario) push(sitioDef.propietario, 'propietario')
+  // El acceso del sitio suele repetir al propietario con nombre corto
+  // ("Wendy" vs "Wendy Rodriguez"): se omite para no duplicar el chip.
+  for (const p of sitioDef.acceso || []) {
+    if (!esPropietarioSitio(p, sitioDef)) push(p, 'sitio')
+  }
+  for (const p of accesoTemporalSitio(sitioDef)) push(p, 'temporal')
+  for (const e of extraHeredado || []) push(e.persona, 'extra', e.desde)
+  for (const p of node.accesoExtra || []) push(p, 'extra')
+  return out
+}
+
+// Linea de chips con el acceso de la carpeta + boton de quitar (solicitud PnP).
+function PanelAccesos({ node, nivel, ctx, extraHeredado }) {
+  const [busy, setBusy] = useState(false)
+  const [msg, setMsg] = useState(null)
+  const puedeQuitar = (ctx.admin || ctx.esPropietario) && typeof ctx.acciones?.onQuitarAcceso === 'function'
+  const lista = accesoEfectivo(ctx.sitioDef, node, extraHeredado)
+
+  async function quitar(persona) {
+    setBusy(true)
+    setMsg(null)
+    try {
+      await ctx.acciones.onQuitarAcceso(node.ruta, persona)
+      setMsg(`Solicitud registrada: quitar a ${persona} de esta carpeta (la aprueba el SGSI; PnP aplica el cambio real).`)
+    } catch (e) {
+      setMsg(`Error: ${e?.message || e}`)
+    } finally {
+      setBusy(false)
+    }
+  }
+
+  return html`<div class="arbol-accesos arbol-indent" style=${{ '--nivel': nivel + 1 }} data-testid="panel-accesos">
+    <div class="accesos-chips">
+      <span class="muted">Acceso:</span>
+      ${lista.map(
+        (a) => html`<span class=${`acceso-pill ${a.excluido ? 'excluido' : ''}`} key=${a.persona} title=${a.desde ? `acceso extra desde ${a.desde}` : ''}>
+          ${a.persona}
+          ${a.tipo === 'propietario' && html`<span class="temporal">propietario</span>`}
+          ${a.tipo === 'temporal' && html`<span class="temporal">temporal</span>`}
+          ${a.tipo === 'extra' && html`<span class="temporal extra">carpeta${a.desde ? ` · ${a.desde.split('/').pop()}` : ''}</span>`}
+          ${a.excluido && html`<span class="temporal">sin acceso aqui</span>`}
+          ${puedeQuitar && a.tipo !== 'propietario' && !a.excluido &&
+          html`<button class="pill-quitar" title=${`Solicitar quitar a ${a.persona} de esta carpeta (PnP)`} aria-label=${`Quitar acceso a ${a.persona}`} disabled=${busy} onClick=${() => quitar(a.persona)}>×</button>`}
+        </span>`
+      )}
+    </div>
+    <div class="muted">
+      Segun el maestro; el dashboard no cambia permisos reales.${puedeQuitar ? ' "×" registra una solicitud de quitar acceso a ESTA carpeta para PnP.' : ''}
+    </div>
+    ${msg && html`<div class=${`nodo-status ${msg.startsWith('Error') ? 'err' : 'ok'}`}>${msg}</div>`}
+  </div>`
 }
 
 function todasLasRutas(roots) {
@@ -161,12 +234,13 @@ function AgregarRaiz({ ctx }) {
   return html`<${FormAgregar} ctx=${ctx} parentRuta="" onClose=${() => setAbierto(false)} />`
 }
 
-function ArbolNodo({ node, nivel, ctx }) {
+function ArbolNodo({ node, nivel, ctx, extraHeredado = [] }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState(null)
   const [agregando, setAgregando] = useState(false)
   const [bloqueando, setBloqueando] = useState(false)
   const [confirmandoSobrante, setConfirmandoSobrante] = useState(false)
+  const [verAccesos, setVerAccesos] = useState(false)
   const [motivo, setMotivo] = useState('')
   const expandido = !ctx.colapsados.has(node.ruta)
   const tieneHijos = node.hijos.length > 0
@@ -230,6 +304,10 @@ function ArbolNodo({ node, nivel, ctx }) {
                 ? html`<span class="muted">migra: ${node.quienMigra}</span>`
                 : html`<span class="muted">sin asignar</span>`}
           `}
+          ${node.real &&
+          html`<button class="link-act" data-act="accesos" disabled=${busy} onClick=${() => setVerAccesos(!verAccesos)}>
+            accesos${node.accesoExtra?.length || extraHeredado.length ? ` (+${(node.accesoExtra?.length || 0) + extraHeredado.length})` : ''}
+          </button>`}
           <button class="link-act" data-act="agregar" disabled=${busy} onClick=${() => setAgregando(!agregando)}>+ carpeta</button>
           ${node.real &&
           !node.sobrante &&
@@ -247,6 +325,9 @@ function ArbolNodo({ node, nivel, ctx }) {
       </div>
 
       ${err && html`<div class="nodo-status err arbol-indent" style=${indent}>${err}</div>`}
+
+      ${verAccesos &&
+      html`<${PanelAccesos} node=${node} nivel=${nivel} ctx=${ctx} extraHeredado=${extraHeredado} />`}
 
       ${confirmandoSobrante &&
       html`<div class="arbol-confirm arbol-indent" style=${indentHijo} data-testid="confirm-sobrante">
@@ -269,7 +350,16 @@ function ArbolNodo({ node, nivel, ctx }) {
 
       ${tieneHijos && expandido &&
       html`<div class="arbol-hijos">
-        ${node.hijos.map((h) => html`<${ArbolNodo} key=${h.ruta} node=${h} nivel=${nivel + 1} ctx=${ctx} />`)}
+        ${node.hijos.map((h) => html`<${ArbolNodo}
+          key=${h.ruta}
+          node=${h}
+          nivel=${nivel + 1}
+          ctx=${ctx}
+          extraHeredado=${[
+            ...extraHeredado,
+            ...(node.accesoExtra || []).map((p) => ({ persona: p, desde: node.ruta }))
+          ]}
+        />`)}
       </div>`}
     </div>
   `

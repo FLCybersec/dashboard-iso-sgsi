@@ -5,6 +5,42 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tanda — Transparencia de permisos por carpeta + solicitud "quitar acceso" para PnP (2026-06-12)
+
+**Estado:** Code-complete. 28/28 E2E (3 nuevos en `accesos.spec.js`); build OK;
+capturas escritorio/movil verificadas.
+
+**Pedido de Franco:** (1) en "Mi trabajo" todos ven los permisos del grupo de
+trabajo; (2) en todo arbol de carpetas se ve quien accede a cada carpeta
+individual; (3) boton para QUITAR acceso a una carpeta (gestion de herencias
+via PnP).
+
+**Implementado:**
+- **Equipo del area en "Mi trabajo"** (`MiTrabajoView`): la `CabeceraSitio`
+  (propietario / Apoyo SGSI / acceso con temporales) se muestra por area en
+  solo lectura para TODOS los perfiles.
+- **Panel "accesos" por carpeta** (`ArbolCarpetas`): toggle por fila que
+  muestra el acceso EFECTIVO segun el maestro: propietario + acceso del sitio
+  (sin duplicar al propietario) + equipo de migracion temporal + `accesoExtra`
+  de la carpeta y heredado de ancestros (con marca "carpeta · origen");
+  soporta `accesoExcluido` (opcional, para cuando Cowork modele exclusiones).
+  El contador "accesos (+n)" delata extras. Solo informativo: el dashboard no
+  cambia permisos reales.
+- **Boton "x" (quitar acceso a la carpeta)**: visible para admin/propietario;
+  registra una solicitud de permiso tipo `quitar` con campo nuevo `ruta`
+  (carpeta), que entra a Aprobaciones ("Quitar (carpeta)" + ruta visible), al
+  panel de permisos del sitio y al export PnP (CSV: detalle "carpeta: ...";
+  JSON: campo `ruta`). El gate humano de Franco para permisos NO cambia.
+- **Store**: `addSolicitudPermiso` acepta `ruta` opcional;
+  `structure-store` aplana `accesoExtra`/`accesoExcluido` a los nodos.
+
+**Para Cowork:** el dashboard ya LEE `accesoExtra` (y `accesoExcluido` si lo
+agregas) del maestro y los muestra por carpeta; las solicitudes de quitar
+acceso por carpeta llegan en el export JSON con `ruta` — listas para generar
+el script de herencia rota correspondiente.
+
+---
+
 ## Code CONFIRMA: Acceso-Total-RH.ps1 ejecutado y verificado (2026-06-12)
 
 Primera ejecucion PnP bajo el nuevo flujo (permisos, con autorizacion explicita

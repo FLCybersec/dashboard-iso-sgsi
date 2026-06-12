@@ -91,6 +91,19 @@ export function SitioView({ slug, puedeEditar = true }) {
     onQuitarVirtual: async (cambioId) => {
       await setCambioEstado(structure, cambioId, 'descartado')
       rerender()
+    },
+    // Gestion de herencias: registra la solicitud de quitar acceso a UNA
+    // carpeta (entra a Aprobaciones y al export PnP; no toca permisos reales).
+    onQuitarAcceso: async (ruta, persona) => {
+      await addSolicitudPermiso(structure, {
+        slug,
+        tipo: 'quitar',
+        persona,
+        rol: 'Integrante',
+        motivo: 'Quitar acceso a la carpeta (gestion de herencias)',
+        ruta
+      })
+      rerender()
     }
   }
 
@@ -237,8 +250,11 @@ function PermisosSolicitudPanel({ structure, slug, onChange, puedeEditar = true 
         <tbody>
           ${solicitudes.map(
             (s) => html`<tr key=${s.id}>
-              <td>${s.tipo === 'agregar' ? 'Agregar' : 'Quitar'}</td>
-              <td>${s.persona}</td>
+              <td>${s.tipo === 'agregar' ? 'Agregar' : 'Quitar'}${s.ruta ? ' (carpeta)' : ''}</td>
+              <td>
+                ${s.persona}
+                ${s.ruta && html`<div class="muted">carpeta: <code>${s.ruta}</code></div>`}
+              </td>
               <td>${s.rol}</td>
               <td><span class=${`estado-tag ${s.estado === 'aplicado' ? 'ok' : s.estado === 'descartado' ? 'pend' : 'prog'}`}>${s.estado}</span></td>
               <td>
@@ -257,7 +273,9 @@ function PermisosSolicitudPanel({ structure, slug, onChange, puedeEditar = true 
 }
 
 // Cabecera del sitio: propietario, acceso (con temporal) y Apoyo SGSI editable.
-function CabeceraSitio({ sitioDef, structure, slug, onChange, puedeEditar = true }) {
+// Exportada: "Mi trabajo" la muestra (solo lectura) para que TODO el equipo vea
+// los permisos del grupo de trabajo de su area.
+export function CabeceraSitio({ sitioDef, structure, slug, onChange, puedeEditar = true }) {
   const [apoyo, setApoyo] = useState(getApoyoSitio(slug))
   const [busy, setBusy] = useState(false)
   const acceso = sitioDef.acceso || []
