@@ -5,6 +5,52 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tanda — Movil + fix de carrera en cargas concurrentes + SitioView sin relectura bloqueante (2026-06-12)
+
+**Estado:** Code-complete. 23/23 E2E (incluye nuevo E2E movil); build OK;
+capturas movil y escritorio verificadas.
+
+### 1. Uso desde telefono movil (<=760px)
+
+- `Sidebar.js`: en movil la barra lateral se vuelve **cabecera superior con
+  menu hamburguesa** (`.nav-burger`); el menu y la cuenta (con "Salir") se
+  pliegan y se cierran automaticamente al navegar. En escritorio no cambia nada
+  (el boton se oculta por CSS).
+- `components.css`: se reemplazo la regla movil rota (sidebar de 64px que
+  cortaba las etiquetas) por un bloque completo: layout en columna, tablas con
+  **scroll horizontal interno** (sin scroll lateral del documento), `view-head`
+  apilado, metricas a lo ancho, checkboxes de 18px y botones con mas area
+  tactil, input de "agregar carpeta" fluido.
+- Nuevo `tests/e2e/movil.spec.js` (viewport 390x844): hamburguesa abre/cierra y
+  navega, aprobar en lote operable, sin overflow horizontal del documento.
+
+### 2. Fix — carrera en `loadSeguimiento` (bug real detectado por el E2E movil)
+
+Navegar a Aprobaciones mientras otra vista aun cargaba (p. ej. "Mi trabajo"
+recien abierto) disparaba DOS recorridos concurrentes de `loadSeguimiento`, que
+reasignaban los mapas del modulo a mitad del otro: la bandeja podia renderizar
+**vacia o con datos parciales**. En produccion era alcanzable con red lenta
+(tipico en movil). Fix en `seguimiento-store.js`: las cargas se **serializan**
+(una en curso se espera antes de iniciar otra) y el estado se publica
+**atomico** (mapas locales asignados completos al final). El E2E movil corre
+x5 sin flakes.
+
+### 3. SitioView — marcar "Aplicado" ya no relee los 12 sitios
+
+Mismo patron que se quito de Aprobaciones: `onCreada` ahora reconcilia **solo
+el sitio afectado y en segundo plano** con la nueva
+`migration-store.js > refreshMigrationSite(structure, slug)` (re-detecta un
+sitio, actualiza la cache idb y recalcula agregados). Si falla, el TTL de 2 min
+o "Actualizar" lo reintentan.
+
+### 4. Pulido de Aprobaciones
+
+`BarraLote` contaba selecciones de filas ya cerradas (p. ej. seleccionada y
+luego descartada seguia sumando en "n seleccionadas"); ahora cuenta solo
+abiertas y se oculta si no queda ninguna.
+
+---
+
 ## Ajuste — Aprobaciones: marcado instantaneo, acciones por lote y aprobar sin "nombre final" (2026-06-12)
 
 **Estado:** Code-complete. 22/22 E2E; captura visual verificada.

@@ -250,12 +250,32 @@ function escribirSitio(slug, mutar) {
 // Carga el seguimiento de TODOS los sitios accesibles (cada uno de su sitio).
 // Siembra desde el legado del hub los sitios sin archivo propio. Sitios sin
 // acceso quedan vacios sin romper.
+//
+// SERIALIZADA: dos vistas montando a la vez (p. ej. navegar a Aprobaciones
+// mientras "Mi trabajo" aun carga) disparaban dos recorridos simultaneos que
+// reasignaban los mapas del modulo a mitad del otro, y una vista podia
+// renderizar con datos parciales o vacios (carrera detectada con el E2E movil).
+// Ahora una carga en curso se espera antes de iniciar otra, y el estado se
+// publica ATOMICO (mapas locales que se asignan completos al final).
+let cargaEnCurso = null
+
 export async function loadSeguimiento(structure, { force = false } = {}) {
+  while (cargaEnCurso) {
+    await cargaEnCurso.catch(() => {})
+  }
   if (cargado && !force) return getSeguimiento()
+  cargaEnCurso = cargarSeguimiento(structure)
+  try {
+    return await cargaEnCurso
+  } finally {
+    cargaEnCurso = null
+  }
+}
+
+async function cargarSeguimiento(structure) {
   const client = getGraphClient()
-  segPorSitio = new Map()
-  siteIdPorSlug = new Map()
-  hubSlugActual = structure.hubSlug
+  const nuevosSeg = new Map()
+  const nuevosIds = new Map()
 
   const slugs = [structure.hubSlug, ...structure.sitios.map((s) => s.slug).filter((s) => s !== structure.hubSlug)]
   let hubLegacy = null
@@ -267,7 +287,7 @@ export async function loadSeguimiento(structure, { force = false } = {}) {
     } catch {
       siteId = null
     }
-    siteIdPorSlug.set(slug, siteId)
+    nuevosIds.set(slug, siteId)
 
     let archivo = null
     if (siteId) {
@@ -280,15 +300,19 @@ export async function loadSeguimiento(structure, { force = false } = {}) {
 
     if (slug === structure.hubSlug) {
       hubLegacy = archivo ? normalize(archivo) : null
-      segPorSitio.set(slug, hubLegacy || emptySeg())
+      nuevosSeg.set(slug, hubLegacy || emptySeg())
     } else if (archivo) {
-      segPorSitio.set(slug, normalize(archivo))
+      nuevosSeg.set(slug, normalize(archivo))
     } else {
       // Semilla no destructiva desde el legado del hub (persiste a su sitio al escribir).
-      segPorSitio.set(slug, scopeSeg(hubLegacy, slug, structure.hubSlug))
+      nuevosSeg.set(slug, scopeSeg(hubLegacy, slug, structure.hubSlug))
     }
   }
 
+  // Publicacion atomica: las vistas nunca ven un estado a medio poblar.
+  segPorSitio = nuevosSeg
+  siteIdPorSlug = nuevosIds
+  hubSlugActual = structure.hubSlug
   cargado = true
   return getSeguimiento()
 }

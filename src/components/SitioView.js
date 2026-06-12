@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
 import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
-import { loadMigrationState } from '../lib/migration-store.js'
+import { loadMigrationState, refreshMigrationSite } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   refreshSeguimientoSitio,
@@ -148,11 +148,15 @@ export function SitioView({ slug, puedeEditar = true }) {
         slug=${slug}
         onChange=${rerender}
         puedeEditar=${puedeEditar}
-        onCreada=${async () => {
-          // La carpeta ya existe en SharePoint: refrescar el estado real para
-          // que el arbol y las metricas la detecten sin esperar al TTL.
-          const mig = await loadMigrationState(structure, { force: true })
-          setSitioMig(mig.sitios.find((s) => s.slug === slug) || null)
+        onCreada=${() => {
+          // La carpeta ya existe en SharePoint: reconciliar SOLO este sitio y
+          // en segundo plano (sin bloquear el marcado ni releer los 12 sitios).
+          // Si falla, el TTL de 2 min o el boton "Actualizar" lo reintentan.
+          refreshMigrationSite(structure, slug)
+            .then((mig) => {
+              if (mig) setSitioMig(mig.sitios.find((s) => s.slug === slug) || null)
+            })
+            .catch(() => {})
         }}
       />
       <${PermisosSolicitudPanel} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
@@ -355,7 +359,7 @@ function EstructuraEvolutivaPanel({ structure, slug, onChange, puedeEditar = tru
                 ${puedeEditar && (c.estado === 'propuesto' || c.estado === 'aprobado') &&
                 html`<button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(async () => {
                     await setCambioEstado(structure, c.id, 'aplicado')
-                    if (c.tipo === 'crear' && onCreada) await onCreada()
+                    if (c.tipo === 'crear' && onCreada) onCreada()
                   })}>Aplicado</button>
                   <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => run(() => setCambioEstado(structure, c.id, 'descartado'))}>Descartar</button>`}
               </td>

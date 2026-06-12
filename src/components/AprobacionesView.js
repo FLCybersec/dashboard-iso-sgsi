@@ -266,13 +266,16 @@ function CheckFila({ item, sel, setSel }) {
   />`
 }
 
-// Barra de acciones por lote sobre la seleccion de una tabla.
+// Barra de acciones por lote sobre la seleccion de una tabla. Cuenta SOLO las
+// seleccionadas que siguen abiertas: una fila que se cerro (p. ej. descartada)
+// despues de seleccionarla ya no tiene acciones y no debe sumar.
 function BarraLote({ items, sel, labelAplicar, onAprobar, onAplicar }) {
-  const nAprobar = items.filter((x) => sel.has(x.id) && x.estado === 'propuesto').length
-  const nAplicar = items.filter((x) => sel.has(x.id) && x.estado === 'aprobado').length
-  if (sel.size === 0) return null
+  const abiertas = items.filter((x) => sel.has(x.id) && ABIERTOS.has(x.estado))
+  const nAprobar = abiertas.filter((x) => x.estado === 'propuesto').length
+  const nAplicar = abiertas.filter((x) => x.estado === 'aprobado').length
+  if (abiertas.length === 0) return null
   return html`<div class="lote-bar" data-testid="lote-bar">
-    <span class="muted">${sel.size} seleccionada${sel.size === 1 ? '' : 's'}</span>
+    <span class="muted">${abiertas.length} seleccionada${abiertas.length === 1 ? '' : 's'}</span>
     <button class="btn" disabled=${nAprobar === 0} onClick=${onAprobar}>
       Aprobar seleccionadas${nAprobar ? ` (${nAprobar})` : ''}
     </button>

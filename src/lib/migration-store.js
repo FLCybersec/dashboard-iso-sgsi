@@ -119,6 +119,23 @@ export async function loadMigrationState(structure, { force = false } = {}) {
   return result
 }
 
+// Re-detecta SOLO un sitio (1-2 llamadas Graph) y actualiza la cache global
+// recalculando los agregados. Para reconciliar en segundo plano tras marcar una
+// carpeta como creada, sin relectura completa bloqueante de los 12 sitios.
+// Devuelve el estado completo actualizado, o null si no hay cache previa (el
+// proximo loadMigrationState la construira entera).
+export async function refreshMigrationSite(structure, slug) {
+  const sitioDef = structure.sitios.find((s) => s.slug === slug)
+  if (!sitioDef) return null
+  const detectado = await detectSite(getGraphClient(), sitioDef)
+  const cached = await cacheGet(CACHE_KEY)
+  if (!cached) return null
+  const sitios = cached.sitios.map((s) => (s.slug === slug ? detectado : s))
+  const result = { ...cached, sitios, ...computeGlobal(sitios), fromCache: false }
+  await cacheSet(CACHE_KEY, result)
+  return result
+}
+
 export async function clearMigrationCache() {
   return cacheDelete(CACHE_KEY)
 }
