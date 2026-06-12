@@ -702,6 +702,20 @@ export async function addCambioEstructura(structure, { slug, tipo, ruta, clasifi
     creadoPor: currentUser().name
   }
   return escribirSitio(slug, (seg) => {
+    // Anti-duplicados (chequeo sobre la copia recien fundida con el servidor):
+    // un doble clic o dos personas pidiendo la misma carpeta creaban dos
+    // solicitudes con la misma ruta, y la carpeta virtual "no se podia quitar"
+    // (quitar descartaba solo una). No se registra otra si ya hay una abierta.
+    const dup = seg.cambios_estructura.find(
+      (c) => c.tipo === item.tipo && c.ruta === item.ruta && (c.estado === 'propuesto' || c.estado === 'aprobado')
+    )
+    if (dup) {
+      throw new Error(
+        item.tipo === 'crear'
+          ? `Ya hay una solicitud abierta para crear "${item.ruta}" (de ${dup.creadoPor || 'alguien del equipo'}). No se registra duplicada.`
+          : `Ya hay una solicitud abierta para marcar "${item.ruta}" como sobrante. No se registra duplicada.`
+      )
+    }
     seg.cambios_estructura.push(item)
     return item
   })

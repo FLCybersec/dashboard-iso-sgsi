@@ -5,6 +5,40 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Fix — Carpetas "Año" en Facturacion (Finanzas) que "no se podian quitar" (2026-06-12)
+
+**Reporte de Franco:** en 06.1 Facturacion (Emitidas-Recibidas) habia una
+carpeta suelta "Año" con un ano dentro que no se podia quitar; pidio borrarlas.
+
+**Diagnostico:** las carpetas "Año" NUNCA existieron en SharePoint ni en el
+maestro: eran solicitudes 'crear' de Martha en el seguimiento de Finanzas, y
+TODAS ya estaban descartadas en los datos (verificado en los 12 sitios). Se
+veian por sesion de navegador vieja + un BUG real que explica el "no se puede
+quitar": el doble clic al registrar creaba DOS solicitudes con la misma ruta
+(p. ej. K9/2022 y Ciberseguidad/2026 estaban duplicadas), el arbol las pinta
+como UNA carpeta virtual, y "quitar" descartaba solo una copia: la carpeta
+"revivia" en el siguiente render.
+
+**Fix (doble defensa):**
+- `ArbolCarpetas`: cada carpeta virtual acumula TODOS los ids de solicitudes
+  abiertas de su ruta y "quitar" los descarta todos.
+- `seguimiento-store.addCambioEstructura`: rechaza registrar un cambio si ya
+  hay una solicitud ABIERTA (propuesta/aprobada) del mismo tipo y ruta, con
+  aviso claro de quien la tiene abierta. El chequeo corre sobre la copia
+  recien fundida con el servidor (atrapa duplicados entre sesiones).
+
+**Limpieza de datos (Code, via PnP):** en el seguimiento de Finanzas se
+descartaron las 2 duplicadas abiertas que quedaban, conservando la mas
+antigua de cada ruta: `cam-1781297029617` (Ciberseguidad/2026) y
+`cam-1781296959720` (K9/2022), con comentario de limpieza. Las "Año"
+descartadas se conservan como tombstones (evitan que sesiones viejas las
+resuciten en la fusion por id).
+
+**Para Franco:** recarga el navegador y las "Año" desaparecen (ya estaban
+descartadas). 2 E2E nuevos (`duplicados.spec.js`); 28/28 en verde.
+
+---
+
 ## Tanda — Rendimiento: lecturas Graph en paralelo (los tiempos "enormes") + quitar "bloquear" (2026-06-12)
 
 **Estado:** Code-complete. 26/26 E2E; build OK; mejora medida con latencia

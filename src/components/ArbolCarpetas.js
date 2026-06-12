@@ -63,7 +63,7 @@ function construirArbol(sitioDef, structure, migByKey, cambios) {
         ruta, nombre: segs[segs.length - 1], hijos: [], real: false, grupo: false,
         virtual: false, sobrante: false, bloqueada: false, motivo: '', clasificacion: null,
         color: null, existe: false, archivos: undefined, migracionEstado: 'Sin empezar',
-        quienMigra: '', key: null, cambioId: null, accesoExtra: [], accesoExcluido: []
+        quienMigra: '', key: null, cambioIds: [], accesoExtra: [], accesoExcluido: []
       }
       map.set(ruta, node)
     }
@@ -92,12 +92,17 @@ function construirArbol(sitioDef, structure, migByKey, cambios) {
       const node = map.get(c.ruta)
       if (node) node.sobrante = true
     } else if (c.tipo === 'crear') {
-      ensure(c.ruta, {
+      // Una misma ruta puede tener VARIAS solicitudes abiertas (doble clic al
+      // registrar, o dos personas pidiendo lo mismo): se acumulan los ids para
+      // que "quitar" las descarte TODAS (antes solo descartaba una y la
+      // carpeta virtual "no se podia quitar").
+      const node = ensure(c.ruta, {
         nombre: c.ruta.split('/').pop(),
         clasificacion: c.clasificacion || null,
         color: c.clasificacion ? colorClasificacion(structure, c.clasificacion) : null,
-        virtual: true, cambioId: c.id
+        virtual: true
       })
+      node.cambioIds = [...(node.cambioIds || []), c.id]
     }
   }
 
@@ -317,7 +322,9 @@ function ArbolNodo({ node, nivel, ctx, extraHeredado = [] }) {
           ctx.admin &&
           node.bloqueada &&
           html`<button class="link-act" disabled=${busy} onClick=${() => run(() => ctx.acciones.onDesbloquear(node.key))}>desbloquear</button>`}
-          ${node.virtual && html`<button class="link-act" disabled=${busy} onClick=${() => run(() => ctx.acciones.onQuitarVirtual(node.cambioId))}>quitar</button>`}
+          ${node.virtual && html`<button class="link-act" disabled=${busy} onClick=${() => run(async () => {
+            for (const id of node.cambioIds || []) await ctx.acciones.onQuitarVirtual(id)
+          })}>quitar</button>`}
         </span>
       </div>
 
