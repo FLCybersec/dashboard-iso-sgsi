@@ -10,6 +10,10 @@ $base = "https://jmaseguridad.sharepoint.com/sites"
 $lib  = "Documentos compartidos"
 
 $ConfirmarBorrado = $false   # <-- $true SOLO tras revisar el reporte
+# CORRIDO 2026-06-12 por Code con $ConfirmarBorrado=$true, autorizado por Franco en
+# chat (borrar directo). Ambas carpetas estaban vacias; a papelera. RecycleBinItemId:
+#   Finanzas 06.5: d6e6e6f9-5ac1-4461-81da-33b2035b3eeb
+#   RH 04.1.4:     c89c5d46-90b0-4732-b3b9-b64d76d38996
 
 function Borrar-CarpetaSegura($slug, $parent, $name) {
   $rel = "$parent/$name"

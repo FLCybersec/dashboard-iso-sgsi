@@ -5,6 +5,23 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Corrido Borrar-Aprobados-2026-06-12b, AUTORIZADO por Franco (2026-06-12)
+
+Primer destructivo bajo el flujo nuevo. Franco autorizo en el chat "borrar
+directo" (sin dry-run previo). Resultado:
+
+- Finanzas `06.5 Egresos por Cliente`: VACIA, borrada a papelera
+  (RecycleBinItemId d6e6e6f9-5ac1-4461-81da-33b2035b3eeb).
+- RH `04.1 Ano 2026/04.1.4 Documentos generales del personal contratado`:
+  VACIA, borrada a papelera (RecycleBinItemId c89c5d46-90b0-4732-b3b9-b64d76d38996).
+
+Ambas recuperables desde la papelera del sitio. El script quedo de nuevo con
+`$ConfirmarBorrado=$false` (salvaguarda) y con el registro de la corrida en
+comentario. Maestro actualizado: quitados los 2 nodos borrados (raiz + public,
+840 nodos, validaciones y E2E 28/28 en verde). Cola marcada como Corrido.
+
+---
+
 ## Cambio de flujo PnP (Franco, 2026-06-12) — destructivos los corre Code con autorizacion en chat
 
 Franco actualizo el gate: los scripts destructivos y de permisos ya NO los corre

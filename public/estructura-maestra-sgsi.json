@@ -276,10 +276,6 @@
               ]
             },
             {
-              "nombre": "04.1.4 Documentos generales del personal contratado",
-              "clasificacion": "Restringida"
-            },
-            {
               "nombre": "04.1.5 Documentos y permisos para el area medica",
               "clasificacion": "Restringida"
             },
@@ -3363,10 +3359,6 @@
         },
         {
           "nombre": "06.4 Cuentas por Pagar",
-          "clasificacion": "Confidencial"
-        },
-        {
-          "nombre": "06.5 Egresos por Cliente",
           "clasificacion": "Confidencial"
         },
         {

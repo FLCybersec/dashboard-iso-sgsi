@@ -21,7 +21,7 @@ las ejecutan y actualizan el estado. Detalle narrativo en `../BITACORA-DASHBOARD
 | 2026-06-12 | Permisos-Finanzas-en-RH.ps1 | Martha sitio RH; Daniela/Joel por carpeta (herencia rota) | Si (permisos) | Verificado | Franco |
 | 2026-06-12 | pnp/Acceso-Total-RH.ps1 | Acceso nivel SITIO a RH (Integrante) para Jorge, Rita, Miguel, Nabiki, Joel, Daniela, Martha | Si (permisos, AUTORIZADO por Franco) | Corrido | Code |
 | 2026-06-12b | pnp/Crear-Aprobados-2026-06-12b.ps1 | Finanzas 06.1 (SEGURIDAD/K9/CIBERSEGURIDAD x anio x 12 meses x clientes) + 06.2 EGRESOS/SEGURIDAD PRIVADA + RH (JMA SEGURIDAD/{TIJUANA,ENSENADA,K9}, FINIQUITOS RESPALDOS). ~490 carpetas, MAYUSCULAS sin numeral | No | Corrido (497 creadas, 0 errores) | Code |
-| 2026-06-12b | pnp/Borrar-Aprobados-2026-06-12b.ps1 | Borrar 06.5 Egresos por Cliente (Finanzas) y 04.1.4 Documentos generales... (RH) | Si (borrar) | Pendiente — autorizacion de Franco en chat | Code |
+| 2026-06-12b | pnp/Borrar-Aprobados-2026-06-12b.ps1 | Borrar 06.5 Egresos por Cliente (Finanzas) y 04.1.4 Documentos generales... (RH) | Si (borrar, AUTORIZADO por Franco en chat) | Corrido (2 vacias a papelera, 0 errores) | Code |
 
 > Nota: los `.ps1` arriba viven hoy en la carpeta de trabajo de Franco (OneDrive
 > "Migracion ISO"). Migrarlos a `pnp/` (sin credenciales) esta pendiente de la
