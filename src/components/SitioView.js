@@ -43,8 +43,8 @@ export function SitioView({ slug, puedeEditar = true }) {
     try {
       const st = await loadStructure()
       setStructure(st)
-      const mig = await loadMigrationState(st)
-      await loadSeguimiento(st)
+      // Migracion y seguimiento en paralelo: son lecturas independientes.
+      const [mig] = await Promise.all([loadMigrationState(st), loadSeguimiento(st)])
       // Refrescar ESTE sitio desde SharePoint: otras sesiones (el area o el
       // admin) pueden haber agregado/aprobado solicitudes desde que cargamos.
       await refreshSeguimientoSitio(st, slug)
@@ -71,10 +71,8 @@ export function SitioView({ slug, puedeEditar = true }) {
       await updateNodo(structure, { key, quienMigra: nombre })
       rerender()
     },
-    onBloquear: async (key, motivo) => {
-      await updateNodo(structure, { key, estado: 'Bloqueada', notas: motivo, nota: `Bloqueada: ${motivo}` })
-      rerender()
-    },
+    // "Bloquear" se retiro de la UI (2026-06-12, pedido de Franco); solo queda
+    // "desbloquear" para limpiar bloqueos historicos que sigan registrados.
     onDesbloquear: async (key) => {
       await updateNodo(structure, { key, estado: 'Pendiente', nota: 'Desbloqueada' })
       rerender()

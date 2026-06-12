@@ -12,6 +12,7 @@ import {
   collectFolderPaths
 } from '../graph/sharepoint-reader.js'
 import { cacheGet, cacheSet, cacheDelete } from './db.js'
+import { enParalelo } from './concurrencia.js'
 
 const CACHE_KEY = 'migration-state'
 const TTL_MS = 2 * 60 * 1000 // 2 minutos
@@ -108,11 +109,10 @@ export async function loadMigrationState(structure, { force = false } = {}) {
   }
 
   const client = getGraphClient()
-  const sitios = []
-  // Secuencial para no saturar Graph; el volumen (12 sitios) lo permite.
-  for (const s of structure.sitios) {
-    sitios.push(await detectSite(client, s))
-  }
+  // Sitios en PARALELO (limite 4): antes era secuencial y el tiempo total era
+  // la SUMA de los 12 recorridos. El limite evita provocar throttling de
+  // Graph; el SDK ademas reintenta los 429 con Retry-After.
+  const sitios = await enParalelo(structure.sitios, 4, (s) => detectSite(client, s))
 
   const result = { fetchedAt: Date.now(), sitios, ...computeGlobal(sitios), fromCache: false }
   await cacheSet(CACHE_KEY, result)

@@ -238,10 +238,8 @@ function ArbolNodo({ node, nivel, ctx, extraHeredado = [] }) {
   const [busy, setBusy] = useState(false)
   const [err, setErr] = useState(null)
   const [agregando, setAgregando] = useState(false)
-  const [bloqueando, setBloqueando] = useState(false)
   const [confirmandoSobrante, setConfirmandoSobrante] = useState(false)
   const [verAccesos, setVerAccesos] = useState(false)
-  const [motivo, setMotivo] = useState('')
   const expandido = !ctx.colapsados.has(node.ruta)
   const tieneHijos = node.hijos.length > 0
   // Sangria por nivel via variable CSS (.arbol-indent): en escritorio son 18px
@@ -317,9 +315,8 @@ function ArbolNodo({ node, nivel, ctx, extraHeredado = [] }) {
               : run(() => ctx.acciones.onSobrante(node.ruta))}>sobrante</button>`}
           ${node.real &&
           ctx.admin &&
-          (node.bloqueada
-            ? html`<button class="link-act" disabled=${busy} onClick=${() => run(() => ctx.acciones.onDesbloquear(node.key))}>desbloquear</button>`
-            : html`<button class="link-act" disabled=${busy} onClick=${() => setBloqueando(!bloqueando)}>bloquear</button>`)}
+          node.bloqueada &&
+          html`<button class="link-act" disabled=${busy} onClick=${() => run(() => ctx.acciones.onDesbloquear(node.key))}>desbloquear</button>`}
           ${node.virtual && html`<button class="link-act" disabled=${busy} onClick=${() => run(() => ctx.acciones.onQuitarVirtual(node.cambioId))}>quitar</button>`}
         </span>
       </div>
@@ -334,13 +331,6 @@ function ArbolNodo({ node, nivel, ctx, extraHeredado = [] }) {
         <span class="warn-text">Esta carpeta tiene <strong>${node.archivos}</strong> archivo(s). Marcarla como sobrante propone ELIMINARLA en SharePoint (lo aplica PnP). ¿Confirmar?</span>
         <button class="btn" disabled=${busy} onClick=${() => run(async () => { await ctx.acciones.onSobrante(node.ruta); setConfirmandoSobrante(false) })}>Confirmar sobrante</button>
         <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => setConfirmandoSobrante(false)}>Cancelar</button>
-      </div>`}
-
-      ${bloqueando &&
-      html`<div class="arbol-agregar arbol-indent" style=${indentHijo}>
-        <input class="arbol-nuevo-nombre" type="text" value=${motivo} placeholder="Motivo del bloqueo" onInput=${(e) => setMotivo(e.target.value)} disabled=${busy} />
-        <button class="btn" disabled=${busy || !motivo.trim()} onClick=${() => run(async () => { await ctx.acciones.onBloquear(node.key, motivo.trim()); setBloqueando(false); setMotivo('') })}>Bloquear</button>
-        <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => setBloqueando(false)}>Cancelar</button>
       </div>`}
 
       ${agregando &&

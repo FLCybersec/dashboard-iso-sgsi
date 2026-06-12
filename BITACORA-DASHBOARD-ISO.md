@@ -5,6 +5,47 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tanda — Rendimiento: lecturas Graph en paralelo (los tiempos "enormes") + quitar "bloquear" (2026-06-12)
+
+**Estado:** Code-complete. 26/26 E2E; build OK; mejora medida con latencia
+simulada de 150ms/peticion: Resumen 7.6s (equivalente secuencial) -> 2.0s, y
+en el tenant real la diferencia es mucho mayor (ver causa).
+
+**Reporte de Franco:** tiempos de carga enormes; quiere algo cercano a "tiempo
+real". Ademas: quitar el boton "bloquear" (no lo ve necesario) y confirmar que
+los cambios se ven bien en telefono.
+
+**Causa raiz de la lentitud — TRES niveles de secuencialidad encadenados:**
+1. `collectFolderPaths` recorria el arbol de cada sitio CARPETA POR CARPETA
+   (~45 viajes seriales solo CyberSec).
+2. `loadMigrationState` detectaba los 12 sitios UNO TRAS OTRO (el total era la
+   SUMA de los 12 recorridos: minutos con red real).
+3. `loadSeguimiento` repetia el patron (12 x resolver siteId + descargar = 24
+   viajes seriales), y las vistas cargaban migracion y seguimiento en serie.
+
+**Fix:**
+- Recorrido de carpetas con hermanas en PARALELO: O(profundidad) niveles en
+  vez de O(n carpetas) viajes (`sharepoint-reader.js`).
+- Sitios en paralelo con limite 4 en migracion (`migration-store`) y limite 6
+  en seguimiento (hub primero, es la semilla) (`seguimiento-store`); helper
+  compartido `lib/concurrencia.js`. El SDK de Graph reintenta 429 con
+  Retry-After; los limites evitan provocarlo.
+- Cache PERSISTENTE de siteIds (idb, 24h): son estables; ademas se deduplican
+  resoluciones en vuelo (migracion y seguimiento pedian los mismos slugs a la
+  vez). Sitios inexistentes (null) NO se cachean.
+- Vistas (Resumen, Mi trabajo, Sitio): migracion y seguimiento ahora cargan en
+  paralelo entre si.
+- El TTL de 2 min + boton "Actualizar" + refresh por sitio quedan igual: con
+  el refresh ahora rapido, la reconciliacion se siente cercana a tiempo real.
+
+**UI:** se retiro el boton "bloquear" del arbol (marcaba una carpeta como
+"Bloqueada" con motivo, para senalar "no migrar hasta resolver X"; Franco no lo
+ve necesario). Queda "desbloquear" SOLO en carpetas ya bloqueadas (limpieza de
+historicos) y la etiqueta "Bloqueada" si hay datos. Beneficio extra: filas mas
+compactas en movil (verificado con captura 390px).
+
+---
+
 ## Tanda — Transparencia de permisos por carpeta + solicitud "quitar acceso" para PnP (2026-06-12)
 
 **Estado:** Code-complete. 28/28 E2E (3 nuevos en `accesos.spec.js`); build OK;

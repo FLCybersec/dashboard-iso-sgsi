@@ -49,9 +49,9 @@ export function MiTrabajoView() {
       try {
         const st = await loadStructure()
         setStructure(st)
-        const m = await loadMigrationState(st)
+        // Migracion y seguimiento en paralelo: son lecturas independientes.
+        const [m] = await Promise.all([loadMigrationState(st), loadSeguimiento(st)])
         setMig(m)
-        await loadSeguimiento(st)
         // Refrescar mis areas desde SharePoint: las aprobaciones del admin se
         // escriben desde OTRA sesion y no estarian en la cache de esta.
         await Promise.all(misSitios(st, currentUser()).map((s) => refreshSeguimientoSitio(st, s.slug)))
@@ -100,7 +100,6 @@ export function MiTrabajoView() {
         rerender()
       },
       onQuienMigra: async () => {},
-      onBloquear: async () => {},
       onDesbloquear: async () => {}
     }
   }

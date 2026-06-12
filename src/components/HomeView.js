@@ -37,8 +37,8 @@ export function HomeView() {
     setError(null)
     try {
       const st = await loadStructure()
-      const mig = await loadMigrationState(st, { force })
-      await loadSeguimiento(st, { force })
+      // Migracion y seguimiento en paralelo: son lecturas independientes.
+      const [mig] = await Promise.all([loadMigrationState(st, { force }), loadSeguimiento(st, { force })])
       setData(build(st, mig))
     } catch (e) {
       setError(e?.message || String(e))

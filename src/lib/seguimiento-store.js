@@ -12,6 +12,7 @@
 
 import { getGraphClient } from '../graph/graph-client.js'
 import { resolveSiteId } from '../graph/sharepoint-reader.js'
+import { enParalelo } from './concurrencia.js'
 import { downloadSeguimiento, uploadSeguimiento } from '../graph/seguimiento-graph.js'
 import { currentUser } from '../auth/auth-provider.js'
 import { esAdmin } from '../auth/allowed-users.js'
@@ -277,18 +278,13 @@ async function cargarSeguimiento(structure) {
   const nuevosSeg = new Map()
   const nuevosIds = new Map()
 
-  const slugs = [structure.hubSlug, ...structure.sitios.map((s) => s.slug).filter((s) => s !== structure.hubSlug)]
-  let hubLegacy = null
-
-  for (const slug of slugs) {
+  const cargarSitio = async (slug) => {
     let siteId = null
     try {
       siteId = await resolveSiteId(client, slug)
     } catch {
       siteId = null
     }
-    nuevosIds.set(slug, siteId)
-
     let archivo = null
     if (siteId) {
       try {
@@ -297,17 +293,29 @@ async function cargarSeguimiento(structure) {
         archivo = null
       }
     }
+    return { siteId, archivo }
+  }
 
-    if (slug === structure.hubSlug) {
-      hubLegacy = archivo ? normalize(archivo) : null
-      nuevosSeg.set(slug, hubLegacy || emptySeg())
-    } else if (archivo) {
+  // El hub va PRIMERO (su archivo legado es la semilla de los sitios sin
+  // archivo propio); el resto en paralelo (antes era secuencial: 12 sitios x
+  // 2 viajes = la mayor parte de la espera de las vistas).
+  const hub = await cargarSitio(structure.hubSlug)
+  const hubLegacy = hub.archivo ? normalize(hub.archivo) : null
+  nuevosIds.set(structure.hubSlug, hub.siteId)
+  nuevosSeg.set(structure.hubSlug, hubLegacy || emptySeg())
+
+  const otros = structure.sitios.map((s) => s.slug).filter((s) => s !== structure.hubSlug)
+  const resultados = await enParalelo(otros, 6, cargarSitio)
+  otros.forEach((slug, i) => {
+    const { siteId, archivo } = resultados[i]
+    nuevosIds.set(slug, siteId)
+    if (archivo) {
       nuevosSeg.set(slug, normalize(archivo))
     } else {
       // Semilla no destructiva desde el legado del hub (persiste a su sitio al escribir).
       nuevosSeg.set(slug, scopeSeg(hubLegacy, slug, structure.hubSlug))
     }
-  }
+  })
 
   // Publicacion atomica: las vistas nunca ven un estado a medio poblar.
   segPorSitio = nuevosSeg
