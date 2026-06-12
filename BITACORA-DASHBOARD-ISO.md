@@ -5,6 +5,25 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Corrido Crear-Aprobados-2026-06-12b (2026-06-12)
+
+Ejecutado `pnp/Crear-Aprobados-2026-06-12b.ps1` (no destructivo, flujo PnP aprobado):
+
+- 06.1/SEGURIDAD: 420 creadas, 0 errores
+- 06.1/K9: 60 creadas, 0 errores
+- 06.1/CIBERSEGURIDAD: 12 creadas, 0 errores
+- 06.2/EGRESOS: 1 creada, 0 errores
+- RH (expedientes JMA SEGURIDAD x3 + FINIQUITOS RESPALDOS): 4 creadas, 0 errores
+
+Total: 497 carpetas, 0 errores. Maestro validado antes del commit (JSON parsea,
+raiz == public, 842 nodos, 0 rutas duplicadas, clasificaciones validas) y suite
+E2E en verde (28/28). Cola marcada como Corrido.
+
+`pnp/Borrar-Aprobados-2026-06-12b.ps1` NO se ejecuto: destructivo, queda en
+gate de Franco (arranca en modo revision; borrado a papelera).
+
+---
+
 ## Tarea para Code — Aplicar aprobados 06.1/06.2/RH + convencion MAYUSCULAS (2026-06-12b)
 
 Franco reviso lo aprobado en el dashboard y decidio. Cowork ya genero scripts y
