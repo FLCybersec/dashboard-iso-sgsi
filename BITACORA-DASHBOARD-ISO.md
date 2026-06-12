@@ -5,6 +5,37 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Ajuste — Movil: arbol con subcarpetas legible + fix de cascada CSS (2026-06-12)
+
+**Estado:** Code-complete. 23/23 E2E; build OK; revision visual en 320/360/390/430px
+(arbol profundo de CyberSec, Resumen, Sitios, Personas, Evidencia, Aprobaciones).
+
+**Reporte de Franco:** en telefonos distintos algunas cosas se descuadran y el
+arbol con muchas subcarpetas se ve mal.
+
+**Causa 1 — cascada CSS:** el bloque `@media (max-width: 760px)` habia quedado a
+MITAD de `components.css`; reglas base definidas despues (`.view-head`,
+`.arbol-indent`...) lo pisaban por orden de cascada con la misma especificidad.
+Sintomas visibles: titulos de vista centrados solo en algunas vistas, sangria
+del arbol sin reducir. Fix: el bloque movil se movio AL FINAL del archivo (con
+comentario de advertencia para no moverlo de vuelta).
+
+**Causa 2 — arbol en movil:** las filas (caret + nombre + badge + chips +
+2 selects + 3 enlaces) se rompian en 3-4 lineas desordenadas, los enlaces
+"+ carpeta"/"sobrante" se cortaban en el borde y la jerarquia era ilegible
+porque la sangria de 18px/nivel se perdia al envolver. Fix:
+- La sangria por nivel paso de estilo inline a variable CSS `--nivel` con clase
+  `.arbol-indent` (ArbolCarpetas.js), lo que permite adaptarla por media query.
+- En movil: sangria minima (8px) + **lineas guia verticales** por nivel
+  (`.arbol-hijos` con margen y borde izquierdo), las **acciones en su propia
+  linea** (`.arbol-acciones` a ancho completo con wrap), nombres con
+  `overflow-wrap`, descripciones secundarias ocultas y el chip de estado de
+  migracion omitido (duplica el valor del selector de al lado; se detecta con
+  `:has(.ico-estado)`, degradacion benigna en navegadores viejos).
+- Escritorio: sin cambios (18px/nivel, mismo aspecto).
+
+---
+
 ## Tanda — Movil + fix de carrera en cargas concurrentes + SitioView sin relectura bloqueante (2026-06-12)
 
 **Estado:** Code-complete. 23/23 E2E (incluye nuevo E2E movil); build OK;

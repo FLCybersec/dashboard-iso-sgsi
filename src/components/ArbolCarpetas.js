@@ -170,7 +170,10 @@ function ArbolNodo({ node, nivel, ctx }) {
   const [motivo, setMotivo] = useState('')
   const expandido = !ctx.colapsados.has(node.ruta)
   const tieneHijos = node.hijos.length > 0
-  const indent = { paddingLeft: `${nivel * 18 + 4}px` }
+  // Sangria por nivel via variable CSS (.arbol-indent): en escritorio son 18px
+  // por nivel; en movil el CSS la reduce y dibuja la jerarquia con lineas guia.
+  const indent = { '--nivel': nivel }
+  const indentHijo = { '--nivel': nivel + 1 }
 
   async function run(fn) {
     setBusy(true)
@@ -190,7 +193,7 @@ function ArbolNodo({ node, nivel, ctx }) {
 
   return html`
     <div class=${clase}>
-      <div class="arbol-row" style=${indent}>
+      <div class="arbol-row arbol-indent" style=${indent}>
         <span class="arbol-caret" onClick=${() => tieneHijos && ctx.toggle(node.ruta)}>${tieneHijos ? (expandido ? '▾' : '▸') : ''}</span>
         ${icono(node.virtual)}
         <span class="arbol-nombre" title=${desc || node.nombre}>${node.nombre}</span>
@@ -243,24 +246,24 @@ function ArbolNodo({ node, nivel, ctx }) {
         </span>
       </div>
 
-      ${err && html`<div class="nodo-status err" style=${indent}>${err}</div>`}
+      ${err && html`<div class="nodo-status err arbol-indent" style=${indent}>${err}</div>`}
 
       ${confirmandoSobrante &&
-      html`<div class="arbol-confirm" style=${{ paddingLeft: `${(nivel + 1) * 18 + 4}px` }} data-testid="confirm-sobrante">
+      html`<div class="arbol-confirm arbol-indent" style=${indentHijo} data-testid="confirm-sobrante">
         <span class="warn-text">Esta carpeta tiene <strong>${node.archivos}</strong> archivo(s). Marcarla como sobrante propone ELIMINARLA en SharePoint (lo aplica PnP). ¿Confirmar?</span>
         <button class="btn" disabled=${busy} onClick=${() => run(async () => { await ctx.acciones.onSobrante(node.ruta); setConfirmandoSobrante(false) })}>Confirmar sobrante</button>
         <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => setConfirmandoSobrante(false)}>Cancelar</button>
       </div>`}
 
       ${bloqueando &&
-      html`<div class="arbol-agregar" style=${{ paddingLeft: `${(nivel + 1) * 18 + 4}px` }}>
+      html`<div class="arbol-agregar arbol-indent" style=${indentHijo}>
         <input class="arbol-nuevo-nombre" type="text" value=${motivo} placeholder="Motivo del bloqueo" onInput=${(e) => setMotivo(e.target.value)} disabled=${busy} />
         <button class="btn" disabled=${busy || !motivo.trim()} onClick=${() => run(async () => { await ctx.acciones.onBloquear(node.key, motivo.trim()); setBloqueando(false); setMotivo('') })}>Bloquear</button>
         <button class="btn secondary dark-on-light" disabled=${busy} onClick=${() => setBloqueando(false)}>Cancelar</button>
       </div>`}
 
       ${agregando &&
-      html`<div style=${{ paddingLeft: `${(nivel + 1) * 18 + 4}px` }}>
+      html`<div class="arbol-indent" style=${indentHijo}>
         <${FormAgregar} ctx=${ctx} parentRuta=${node.ruta} onClose=${() => setAgregando(false)} />
       </div>`}
 

@@ -191,10 +191,6 @@
               "clasificacion": "Interna"
             },
             {
-              "nombre": "03.3 Nomina y Compensaciones",
-              "clasificacion": "Restringida"
-            },
-            {
               "nombre": "03.4 Gastos por Plaza",
               "clasificacion": "Confidencial"
             },
@@ -205,14 +201,6 @@
             {
               "nombre": "03.6 Expedientes de Empleados",
               "clasificacion": "Restringida"
-            },
-            {
-              "nombre": "03.7 Finiquitos",
-              "clasificacion": "Confidencial"
-            },
-            {
-              "nombre": "03.8 Vacaciones",
-              "clasificacion": "Interna"
             }
           ]
         }
@@ -436,12 +424,96 @@
           "clasificacion": "Restringida",
           "hijos": [
             {
-              "nombre": "06.2.1 Santander",
-              "clasificacion": "Restringida"
+              "nombre": "Santander",
+              "clasificacion": "Restringida",
+              "hijos": [
+                {
+                  "nombre": "2023",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2024",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2025",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2026",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                }
+              ]
             },
             {
-              "nombre": "06.2.2 Bancomer",
-              "clasificacion": "Restringida"
+              "nombre": "Banorte",
+              "clasificacion": "Restringida",
+              "hijos": [
+                {
+                  "nombre": "2023",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2024",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2025",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                },
+                {
+                  "nombre": "2026",
+                  "clasificacion": "Restringida",
+                  "hijos": [
+                    {
+                      "nombre": "Estados de Cuenta",
+                      "clasificacion": "Restringida"
+                    }
+                  ]
+                }
+              ]
             }
           ]
         },
@@ -478,6 +550,18 @@
               "clasificacion": "Confidencial"
             }
           ]
+        },
+        {
+          "nombre": "06.8 Nomina y Compensaciones",
+          "clasificacion": "Restringida"
+        },
+        {
+          "nombre": "06.9 Finiquitos",
+          "clasificacion": "Confidencial"
+        },
+        {
+          "nombre": "06.10 Vacaciones",
+          "clasificacion": "Interna"
         },
         {
           "nombre": "_Plantillas",

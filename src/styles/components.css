@@ -169,97 +169,6 @@
   gap: var(--gap);
   margin-top: 24px;
 }
-/* ---- Movil (<=760px): la barra lateral se vuelve cabecera con hamburguesa,
-   las tablas hacen scroll horizontal y el encabezado de vista se apila. ---- */
-@media (max-width: 760px) {
-  .paneles-2 {
-    grid-template-columns: 1fr;
-  }
-  .app-shell {
-    flex-direction: column;
-  }
-  .sidebar {
-    width: 100%;
-    height: auto;
-    border-right: none;
-    border-bottom: 1px solid var(--jma-gris-borde);
-    z-index: 40;
-  }
-  .sidebar-brand {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 10px;
-    padding: 10px 14px;
-    border-bottom: none;
-  }
-  .nav-burger {
-    display: inline-flex;
-  }
-  /* Menu y cuenta plegados tras la hamburguesa; se cierran al navegar (JS). */
-  .side-nav,
-  .sidebar-cuenta {
-    display: none;
-  }
-  .sidebar.abierta .side-nav {
-    display: flex;
-    border-top: 1px solid var(--jma-gris-borde);
-  }
-  .sidebar.abierta .sidebar-cuenta {
-    display: flex;
-  }
-  .side-link {
-    padding: 12px 18px;
-  }
-  .app-shell .main {
-    padding: 18px 14px 48px;
-  }
-  .view-head {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  .head-derecha {
-    align-items: stretch;
-  }
-  .sitio-metricas {
-    flex-wrap: wrap;
-  }
-  .sitio-metricas .card {
-    flex: 1;
-  }
-  /* Tablas: scroll horizontal en vez de columnas aplastadas. */
-  .tabla {
-    display: block;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-  }
-  .tabla th,
-  .tabla td {
-    white-space: nowrap;
-  }
-  .lote-bar {
-    flex-wrap: wrap;
-  }
-  /* Objetivos tactiles comodos. */
-  input[type='checkbox'] {
-    width: 18px;
-    height: 18px;
-  }
-  .btn {
-    padding: 10px 16px;
-  }
-  .tabs {
-    overflow-x: auto;
-  }
-  .arbol-nuevo-nombre {
-    min-width: 0;
-    flex: 1;
-  }
-  .fases-head {
-    flex-wrap: wrap;
-    gap: 4px;
-  }
-}
 .aten-resumen {
   margin: 8px 0 0;
   padding-left: 18px;
@@ -851,6 +760,11 @@
   padding: 8px 12px;
   background: #fff7ed;
   border-top: 1px solid #fed7aa;
+}
+/* Sangria por nivel del arbol (variable --nivel puesta por el componente).
+   En movil se reduce y la jerarquia se dibuja con lineas guia (.arbol-hijos). */
+.arbol-indent {
+  padding-left: calc(var(--nivel, 0) * 18px + 4px);
 }
 .rol-badge {
   font-size: var(--fs-xs);
@@ -1547,4 +1461,136 @@
   font-size: var(--fs-sm);
   padding: 0 24px;
   line-height: 1.5;
+}
+
+/* ---- Movil (<=760px) ----
+   AL FINAL DEL ARCHIVO A PROPOSITO: estas reglas comparten especificidad con
+   las base y la cascada resuelve por orden; si el bloque queda antes de una
+   regla base (p. ej. .view-head), la base lo pisa y el layout movil se
+   descuadra de forma silenciosa. No mover hacia arriba.
+   La barra lateral se vuelve cabecera con hamburguesa, las tablas hacen scroll
+   horizontal y el encabezado de vista se apila. */
+@media (max-width: 760px) {
+  .paneles-2 {
+    grid-template-columns: 1fr;
+  }
+  .app-shell {
+    flex-direction: column;
+  }
+  .sidebar {
+    width: 100%;
+    height: auto;
+    border-right: none;
+    border-bottom: 1px solid var(--jma-gris-borde);
+    z-index: 40;
+  }
+  .sidebar-brand {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: none;
+  }
+  .nav-burger {
+    display: inline-flex;
+  }
+  /* Menu y cuenta plegados tras la hamburguesa; se cierran al navegar (JS). */
+  .side-nav,
+  .sidebar-cuenta {
+    display: none;
+  }
+  .sidebar.abierta .side-nav {
+    display: flex;
+    border-top: 1px solid var(--jma-gris-borde);
+  }
+  .sidebar.abierta .sidebar-cuenta {
+    display: flex;
+  }
+  .side-link {
+    padding: 12px 18px;
+  }
+  .app-shell .main {
+    padding: 18px 14px 48px;
+  }
+  .view-head {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .head-derecha {
+    align-items: stretch;
+  }
+  .sitio-metricas {
+    flex-wrap: wrap;
+  }
+  .sitio-metricas .card {
+    flex: 1;
+  }
+  /* Tablas: scroll horizontal en vez de columnas aplastadas. */
+  .tabla {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  .tabla th,
+  .tabla td {
+    white-space: nowrap;
+  }
+  .lote-bar {
+    flex-wrap: wrap;
+  }
+  /* Objetivos tactiles comodos. */
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+  }
+  .btn {
+    padding: 10px 16px;
+  }
+  .tabs {
+    overflow-x: auto;
+  }
+  .arbol-nuevo-nombre {
+    min-width: 0;
+    flex: 1;
+  }
+  .fases-head {
+    flex-wrap: wrap;
+    gap: 4px;
+  }
+  /* Arbol en movil: sangria minima + lineas guia por nivel, y las acciones
+     (selects y enlaces) en su PROPIA linea para que la fila no se rompa
+     desordenada. Las descripciones secundarias se ocultan. */
+  .arbol-indent {
+    padding-left: 8px;
+  }
+  .arbol-hijos {
+    margin-left: 12px;
+    border-left: 2px solid #e8ebef;
+  }
+  .arbol-row {
+    padding-top: 8px;
+    padding-bottom: 8px;
+    row-gap: 6px;
+  }
+  .arbol-nombre {
+    overflow-wrap: anywhere;
+  }
+  .carpeta-desc {
+    display: none;
+  }
+  .arbol-acciones {
+    flex-basis: 100%;
+    margin-left: 0;
+    flex-wrap: wrap;
+    row-gap: 6px;
+  }
+  .link-act {
+    padding: 4px 6px;
+  }
+  /* El chip de estado de migracion duplica el valor del selector de al lado
+     (es el unico estado-tag del arbol con .ico-estado); en movil se omite. */
+  .arbol-row .estado-tag:has(.ico-estado) {
+    display: none;
+  }
 }
