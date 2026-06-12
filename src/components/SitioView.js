@@ -147,6 +147,12 @@ export function SitioView({ slug, puedeEditar = true }) {
         El sitio aun no existe en SharePoint (estructura pendiente). Aun asi puedes
         registrar el avance de migracion por carpeta y planear carpetas nuevas.
       </div>`}
+      ${sitioMig?.warning &&
+      html`<div class="alert warn">
+        No se pudo leer el estado real del sitio; las carpetas se muestran como
+        "Pendiente" pero pueden existir. Usa "Actualizar" para reintentar.
+        <span class="muted"> Detalle: ${sitioMig.warning}</span>
+      </div>`}
       ${sitioDef.nota && html`<div class="alert info">${sitioDef.nota}</div>`}
 
       <h2 style="margin-top:16px">Carpetas (arbol)</h2>

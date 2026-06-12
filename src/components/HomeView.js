@@ -119,7 +119,10 @@ function Resumen({ data }) {
                 <span class="muted">${m.migradas}/${m.total}</span>
               </td>
               <td>${m.pct}%</td>
-              <td class="col-sec muted">${estr ? `${estr.pct}% (${estr.creadas}/${estr.total})` : '—'}</td>
+              <td class="col-sec muted">
+                ${estr ? `${estr.pct}% (${estr.creadas}/${estr.total})` : '—'}
+                ${estr?.warning && html`<span class="estado-tag err" title=${estr.warning}>sin lectura</span>`}
+              </td>
             </tr>
           `
         })}

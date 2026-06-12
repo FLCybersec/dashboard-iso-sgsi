@@ -5,6 +5,30 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Fix — Sitios enteros "Pendiente" tras el lote 2026-06-12b (throttling Graph)
+
+**Reporte de Franco (con captura):** en "Mi trabajo" y "Sitio", carpetas que llevan
+semanas creadas (06.3, 06.4, 06.6... de Finanzas) aparecian con "○ Pendiente".
+
+**Causa:** el recorrido de carpetas (`collectFolderPaths`) lanzaba TODAS las
+hermanas de un nivel en paralelo sin limite. Tras el lote 2026-06-12b (~500
+carpetas nuevas), el nivel de clientes de 06.1 disparaba ~420 llamadas Graph
+simultaneas; SharePoint respondia 429 hasta agotar los 3 reintentos del SDK, la
+lectura del sitio fallaba y TODOS sus nodos quedaban `existe=false`. Ademas el
+`warning` del sitio no se mostraba en ninguna vista: fallo silencioso.
+
+**Fix:**
+- `sharepoint-reader.js`: BFS por niveles con concurrencia acotada (`enParalelo`,
+  limite 8 por drive). Se verifico contra SharePoint real que las 497 carpetas
+  existen con los nombres exactos del maestro (lectura PnP).
+- Warning visible: banner en Sitio y Mi trabajo ("No se pudo leer el estado
+  real...") y tag "sin lectura" en la tabla del Resumen.
+
+E2E 28/28 en verde. Nota operativa: las solicitudes aprobadas de este lote siguen
+abiertas; falta "Marcar creada" en lote desde Aprobaciones (paso manual por diseno).
+
+---
+
 ## Code — Corrido Borrar-Aprobados-2026-06-12b, AUTORIZADO por Franco (2026-06-12)
 
 Primer destructivo bajo el flujo nuevo. Franco autorizo en el chat "borrar

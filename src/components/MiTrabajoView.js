@@ -150,6 +150,11 @@ export function MiTrabajoView() {
               solicitudes que aprueba el equipo SGSI.
             </p>
             <${CabeceraSitio} sitioDef=${sitio} structure=${structure} slug=${sitio.slug} onChange=${rerender} puedeEditar=${false} />
+            ${sm?.warning &&
+            html`<div class="alert warn">
+              No se pudo leer el estado real del area; las carpetas se muestran como
+              "Pendiente" pero pueden existir. Usa "Actualizar" para reintentar.
+            </div>`}
             <${ArbolCarpetas}
               sitioDef=${sitio}
               structure=${structure}

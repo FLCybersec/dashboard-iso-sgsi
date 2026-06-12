@@ -8,6 +8,7 @@
 
 import { encodePath, getAllPages } from './graph-client.js'
 import { cacheGet, cacheSet } from '../lib/db.js'
+import { enParalelo } from '../lib/concurrencia.js'
 
 const TENANT_HOST = 'jmaseguridad.sharepoint.com'
 
@@ -70,6 +71,12 @@ export async function listDrives(client, siteId) {
 //   - files:   Map ruta-carpeta -> nº de archivos directos en esa carpeta
 // Solo entra a carpetas que existen, asi que en sitios poco migrados el costo es
 // bajo. El conteo de archivos es señal de avance de la migracion de contenido.
+// Limite de llamadas Graph simultaneas por drive durante el recorrido. Con el
+// lote 2026-06-12b (~500 carpetas nuevas) el Promise.all por nivel llegaba a
+// cientos de llamadas a la vez y SharePoint respondia 429 hasta agotar los
+// reintentos del SDK: el sitio entero quedaba "Pendiente".
+const LIMITE_RECORRIDO = 8
+
 export async function collectFolderPaths(client, driveId) {
   const folders = new Set()
   const files = new Map()
@@ -81,25 +88,26 @@ export async function collectFolderPaths(client, driveId) {
     return getAllPages(client, base, (req) => req.select('name,folder,file').top(999))
   }
 
-  async function recurse(rel) {
-    const items = await children(rel)
-    let nArchivos = 0
-    const subcarpetas = []
-    for (const it of items) {
-      if (it.folder) {
-        const childRel = rel ? `${rel}/${it.name}` : it.name
-        folders.add(childRel.toLowerCase())
-        subcarpetas.push(childRel)
-      } else {
-        nArchivos++
+  // BFS por niveles con concurrencia acotada: paralelo dentro del nivel (el
+  // cuello sigue siendo O(profundidad) niveles) pero sin disparar el burst.
+  let nivel = ['']
+  while (nivel.length) {
+    const porCarpeta = await enParalelo(nivel, LIMITE_RECORRIDO, (rel) => children(rel))
+    const siguiente = []
+    nivel.forEach((rel, i) => {
+      let nArchivos = 0
+      for (const it of porCarpeta[i]) {
+        if (it.folder) {
+          const childRel = rel ? `${rel}/${it.name}` : it.name
+          folders.add(childRel.toLowerCase())
+          siguiente.push(childRel)
+        } else {
+          nArchivos++
+        }
       }
-    }
-    files.set(rel.toLowerCase(), nArchivos)
-    // Hermanas en PARALELO: el tiempo del recorrido pasa de O(n carpetas)
-    // viajes seriales a O(profundidad) niveles (el cuello de la lentitud).
-    await Promise.all(subcarpetas.map(recurse))
+      files.set(rel.toLowerCase(), nArchivos)
+    })
+    nivel = siguiente
   }
-
-  await recurse('')
   return { folders, files }
 }
