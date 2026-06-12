@@ -229,7 +229,12 @@
       "acceso": [
         "Wendy",
         "Nabiki",
-        "Martha"
+        "Martha",
+        "Jorge",
+        "Rita",
+        "Miguel",
+        "Joel",
+        "Daniela"
       ],
       "nota": "Area 04. La sub-area 04-B Medica NO se publica (Cara B, local).",
       "biblioteca": "Documents",
@@ -300,11 +305,18 @@
                 }
               ]
             }
+          ],
+          "accesoExtra": [
+            "Daniela",
+            "Joel"
           ]
         },
         {
           "nombre": "04.2 Expedientes de Personal",
-          "clasificacion": "Restringida"
+          "clasificacion": "Restringida",
+          "accesoExtra": [
+            "Daniela"
+          ]
         },
         {
           "nombre": "04.3 Reclutamiento y Seleccion",
@@ -316,7 +328,11 @@
         },
         {
           "nombre": "04.5 Contratos y Altas IMSS",
-          "clasificacion": "Confidencial"
+          "clasificacion": "Confidencial",
+          "accesoExtra": [
+            "Daniela",
+            "Joel"
+          ]
         },
         {
           "nombre": "04.7 Evaluaciones de Desempeno",

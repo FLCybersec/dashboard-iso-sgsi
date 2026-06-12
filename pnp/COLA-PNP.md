@@ -18,6 +18,7 @@ las ejecutan y actualizan el estado. Detalle narrativo en `../BITACORA-DASHBOARD
 | 2026-06-12 | Mover-Nomina-Finiquitos-Vacaciones-a-Finanzas.ps1 | Mover 3 carpetas a Finanzas 06.8-06.10 | Si (borrar origen) | Verificado | Franco |
 | 2026-06-12 | Quitar-Acentos-Carpetas.ps1 | Renombrar 11 carpetas sin acentos + Cybersec->CyberSec | No (rename) | Verificado | Franco |
 | 2026-06-12 | Permisos-Finanzas-en-RH.ps1 | Martha sitio RH; Daniela/Joel por carpeta (herencia rota) | Si (permisos) | Verificado | Franco |
+| 2026-06-12 | pnp/Acceso-Total-RH.ps1 | Acceso nivel SITIO a RH (Integrante) para Jorge, Rita, Miguel, Nabiki, Joel, Daniela, Martha | Si (permisos, AUTORIZADO por Franco) | Pendiente correr | Code |
 
 > Nota: los `.ps1` arriba viven hoy en la carpeta de trabajo de Franco (OneDrive
 > "Migracion ISO"). Migrarlos a `pnp/` (sin credenciales) esta pendiente de la

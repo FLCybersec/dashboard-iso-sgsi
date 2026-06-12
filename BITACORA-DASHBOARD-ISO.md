@@ -5,6 +5,23 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tarea para Code — Acceso total a RH (autorizado por Franco) + maestro (2026-06-12)
+
+Franco autoriza acceso a TODO Recursos Humanos (nivel sitio, Integrante) para:
+Jorge, Rita, Miguel, Nabiki, Joel, Daniela, Martha. (Herencias finas: despues.)
+
+- **Script (nuevo flujo):** `pnp/Acceso-Total-RH.ps1` (sin credenciales, lee `_secrets.ps1`).
+  Es de PERMISOS pero AUTORIZADO por Franco y NO destructivo (solo agrega). Code:
+  ejecutalo y marca la COLA como Corrido.
+- **Maestro:** Cowork ya actualizo `SGSI-RecursosHumanos.acceso` = Wendy(prop), Nabiki,
+  Martha, Jorge, Rita, Miguel, Joel, Daniela. Incluir en commit+push.
+- Nota: esto da a Joel/Daniela acceso de SITIO (mas amplio que el folder-level previo);
+  el `accesoExtra` por carpeta sigue util como referencia para cuando se rompan herencias.
+
+Code: corre el script, push del maestro, y confirma aqui.
+
+---
+
 ## Code CONFIRMA: flujo Cowork -> Code adoptado (2026-06-12)
 
 Adoptado y documentado en `CLAUDE.md > Flujo PnP` y en la memoria persistente
@@ -29,6 +46,25 @@ de Code. En concreto:
   con _secrets.ps1 la rotacion es un cambio en un solo archivo local.
 - **Pendiente de Cowork**: migrar los `.ps1` de la carpeta de trabajo de
   Franco a `pnp/` ya sin credenciales (leer de _secrets.ps1).
+
+---
+
+## Tarea para Code — Mostrar acceso por CARPETA en el arbol (2026-06-12)
+
+Sintoma (Franco): Joel y Daniela tienen acceso a RH pero el dashboard no lo refleja.
+Causa: la vista de Sitio muestra `sitioDef.acceso` (nivel SITIO, del maestro); ellos
+tienen acceso a nivel CARPETA (herencia rota en 04.1/04.2/04.5), que no se modelaba.
+
+Cowork ya agrego al maestro el campo **`accesoExtra`** (array de nombres) en los nodos
+de carpeta correspondientes de `SGSI-RecursosHumanos`:
+- `04.2 Expedientes de Personal` -> ["Daniela"]
+- `04.5 Contratos y Altas IMSS` -> ["Daniela","Joel"]
+- `04.1 Ano 2026` -> ["Daniela","Joel"]
+
+**Code:** en `ArbolCarpetas.js`, si un nodo tiene `accesoExtra`, mostrar una pildora
+discreta tipo "acceso: Daniela, Joel" en esa carpeta (ademas del badge de clasificacion).
+Es informativo (refleja permisos por carpeta concedidos por PnP). Convencion: `accesoExtra`
+= personas con acceso adicional al de herencia del sitio. Commit+push.
 
 ---
 
