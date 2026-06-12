@@ -5,6 +5,27 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Coordinacion — Protocolo Claude Code <-> Cowork + maestro actualizado (2026-06-12)
+
+Franco confirmo el flujo: un chat de **Cowork** redacta las instrucciones que el
+pega en Claude Code y ademas **edita archivos del repo en paralelo** (sobre todo
+el maestro). Cowork registrara sus cambios tambien en esta bitacora.
+
+- Protocolo documentado en `CLAUDE.md > Coordinacion`: leer bitacora al iniciar,
+  separar en commit propio los archivos no tocados por la sesion, y validar el
+  maestro antes de commitearlo (parseo, raiz == public, sin duplicados,
+  clasificaciones validas, E2E en verde).
+- Se commitea aparte la actualizacion del maestro que Cowork dejo en el arbol
+  de trabajo: normalizacion sin acentos (Formacion, Sesion, Bitacoras,
+  Direccion, CyberSec), propietario de SP-Tijuana/Ensenada a "Jorge Alvarez /
+  Nabiki Parada" y Chema agregado a un acceso. Validada: 12 sitios, 209
+  carpetas, 0 errores; 23/23 E2E.
+- Contexto: la actualizacion previa del maestro (bancos en 06.2, nomina a
+  Finanzas 06.8-06.10) viajo dentro del commit de UI `590224b` por un
+  `git add -A`; este protocolo evita que se repita.
+
+---
+
 ## Ajuste — Movil: arbol con subcarpetas legible + fix de cascada CSS (2026-06-12)
 
 **Estado:** Code-complete. 23/23 E2E; build OK; revision visual en 320/360/390/430px

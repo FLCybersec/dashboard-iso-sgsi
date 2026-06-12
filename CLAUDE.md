@@ -58,6 +58,18 @@ logout local con `clearCache()`.
 `BITACORA-DASHBOARD-ISO.md` se actualiza al cerrar cada tanda. No avanzar de
 tanda sin validacion de Franco.
 
+**Cowork coedita este repo en paralelo**: un chat de Cowork redacta las
+instrucciones que Franco pega aqui y ademas edita archivos directamente
+(sobre todo `estructura-maestra-sgsi.json`, raiz y `public/` en espejo), y
+registra sus cambios en la bitacora. Protocolo para Claude Code:
+
+- Leer la bitacora al iniciar cada tanda (puede haber contexto nuevo de Cowork).
+- Antes de commitear, revisar `git status`: los archivos NO tocados en la
+  sesion van en un commit separado (p. ej. "Maestro (via Cowork): ..."),
+  nunca mezclados con los cambios propios.
+- Antes de commitear el maestro, validarlo: JSON parsea, raiz == public, sin
+  rutas duplicadas, clasificaciones validas y suite E2E en verde.
+
 ## Plan de tandas
 
 1. **Bootstrap** — Vite + MSAL + login + lista blanca + carga del maestro. ← actual
