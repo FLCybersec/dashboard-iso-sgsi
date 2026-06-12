@@ -5,8 +5,9 @@ las ejecutan y actualizan el estado. Detalle narrativo en `../BITACORA-DASHBOARD
 
 **Reglas**
 - Cowork no ejecuta PnP (sin acceso al tenant): solo escribe scripts y documenta.
-- No destructivo (crear carpetas) -> lo puede correr Code (si tiene PS7+cert).
-- Destructivo (borrar/sobrante) y permisos -> requieren visto bueno de Franco.
+- No destructivo (crear carpetas) -> lo corre Code directo.
+- Destructivo (borrar/sobrante) y permisos -> los corre Code, pero SOLO tras
+  autorizacion explicita de Franco en el chat (dry-run previo recomendado).
 - Los `.ps1` NO deben contener la contrasena del cert: leerla de `pnp/_secrets.ps1` (gitignored).
 
 **Estados:** Pendiente correr · Corrido · Verificado · Descartado
@@ -20,7 +21,7 @@ las ejecutan y actualizan el estado. Detalle narrativo en `../BITACORA-DASHBOARD
 | 2026-06-12 | Permisos-Finanzas-en-RH.ps1 | Martha sitio RH; Daniela/Joel por carpeta (herencia rota) | Si (permisos) | Verificado | Franco |
 | 2026-06-12 | pnp/Acceso-Total-RH.ps1 | Acceso nivel SITIO a RH (Integrante) para Jorge, Rita, Miguel, Nabiki, Joel, Daniela, Martha | Si (permisos, AUTORIZADO por Franco) | Corrido | Code |
 | 2026-06-12b | pnp/Crear-Aprobados-2026-06-12b.ps1 | Finanzas 06.1 (SEGURIDAD/K9/CIBERSEGURIDAD x anio x 12 meses x clientes) + 06.2 EGRESOS/SEGURIDAD PRIVADA + RH (JMA SEGURIDAD/{TIJUANA,ENSENADA,K9}, FINIQUITOS RESPALDOS). ~490 carpetas, MAYUSCULAS sin numeral | No | Corrido (497 creadas, 0 errores) | Code |
-| 2026-06-12b | pnp/Borrar-Aprobados-2026-06-12b.ps1 | Borrar 06.5 Egresos por Cliente (Finanzas) y 04.1.4 Documentos generales... (RH) | Si (borrar) | Pendiente — GATE Franco (dry-run) | Franco |
+| 2026-06-12b | pnp/Borrar-Aprobados-2026-06-12b.ps1 | Borrar 06.5 Egresos por Cliente (Finanzas) y 04.1.4 Documentos generales... (RH) | Si (borrar) | Pendiente — autorizacion de Franco en chat | Code |
 
 > Nota: los `.ps1` arriba viven hoy en la carpeta de trabajo de Franco (OneDrive
 > "Migracion ISO"). Migrarlos a `pnp/` (sin credenciales) esta pendiente de la

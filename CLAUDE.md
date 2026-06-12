@@ -77,11 +77,13 @@ registra sus cambios en la bitacora. Protocolo para Claude Code:
   Revisarla al iniciar cada tanda, junto con la bitacora.
 - **Reparto**: Cowork escribe los `.ps1` en `pnp/` (sin credenciales) y
   documenta; no ejecuta (sin acceso al tenant). Claude Code hace push siempre
-  y EJECUTA los PnP **no destructivos** (crear/renombrar carpetas,
-  idempotentes), marcando la cola como "Corrido".
-- **Gate humano (A.5.15/A.8.15)**: lo **destructivo** (borrar/sobrante) y los
-  **permisos** NO se ejecutan en automatico: los autoriza Franco. Se pueden
-  dejar en dry-run para su visto bueno.
+  y EJECUTA todos los PnP, marcando la cola como "Corrido". Los **no
+  destructivos** (crear/renombrar carpetas, idempotentes) los corre directo.
+- **Gate humano (A.5.15/A.8.15, actualizado 2026-06-12)**: lo **destructivo**
+  (borrar/sobrante) y los **permisos** tambien los ejecuta Claude Code, pero
+  SOLO tras pedirle a Franco autorizacion explicita en el chat para ese script
+  concreto (idealmente con dry-run previo y reporte). Franco no corre scripts;
+  su autorizacion queda registrada en bitacora y cola como evidencia.
 - **Seguridad**: la contrasena del certificado vive SOLO en `pnp/_secrets.ps1`
   (gitignored; los scripts lo cargan con `. "$PSScriptRoot\_secrets.ps1"`).
   Nunca commitear contrasenas ni `.pfx` (ambos en .gitignore). El certificado

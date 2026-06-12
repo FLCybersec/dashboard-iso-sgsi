@@ -5,6 +5,16 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cambio de flujo PnP (Franco, 2026-06-12) — destructivos los corre Code con autorizacion en chat
+
+Franco actualizo el gate: los scripts destructivos y de permisos ya NO los corre
+el mismo; los ejecuta Claude Code, pero SOLO tras pedirle autorizacion explicita
+en el chat para cada script (dry-run previo y reporte recomendados). La
+autorizacion queda registrada en bitacora y cola como evidencia (A.5.15/A.8.15).
+Actualizados CLAUDE.md y las reglas de COLA-PNP.md.
+
+---
+
 ## Code — Corrido Crear-Aprobados-2026-06-12b (2026-06-12)
 
 Ejecutado `pnp/Crear-Aprobados-2026-06-12b.ps1` (no destructivo, flujo PnP aprobado):
