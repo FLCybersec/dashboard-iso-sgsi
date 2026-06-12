@@ -5,6 +5,22 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Acceso de Martha a SP-Ensenada, AUTORIZADO por Franco (2026-06-12)
+
+Franco pidio en el chat dar acceso de usuario a Martha en Seguridad Privada -
+Ensenada, en todas las carpetas (esa instruccion es la autorizacion del gate de
+permisos). Ejecutado `pnp/Acceso-Martha-SP-Ensenada.ps1`:
+
+- Verificacion previa (lectura): las 10 carpetas del sitio heredan permisos
+  (0 herencias rotas), asi que Integrante a nivel sitio cubre todas.
+- Martha (malvarez@jmaseguridad.com) agregada al grupo "Integrantes de la
+  Seguridad Privada - Ensenada". Verificado post-cambio: aparece en el grupo.
+
+Cola actualizada. Nota para Cowork: si el maestro documenta accesos por sitio,
+reflejar este alta donde corresponda.
+
+---
+
 ## Fix — Sitios enteros "Pendiente" tras el lote 2026-06-12b (throttling Graph)
 
 **Reporte de Franco (con captura):** en "Mi trabajo" y "Sitio", carpetas que llevan
