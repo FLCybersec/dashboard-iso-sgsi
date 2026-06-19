@@ -5,6 +5,31 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cowork — PREPARADO en paralelo: clasificacion semilla + color principales (2026-06-19)
+
+Mientras Code optimiza tiempos de carga, Cowork dejo listo (NO ejecutado aun; espera
+que Code termine + visto bueno de Franco):
+
+- **Clasificacion semilla** poblada en `public/clasificaciones-sgsi.json`: niveles
+  PROPUESTOS para las carpetas nuevas/renombradas (RH 04.6/04.8-04.14, K9 10.1-10.13
+  excepto SEUDOS, Admin 07.7/07.8). Pendiente visto bueno de Franco. Code: al hacer
+  push, el dashboard ya las mostrara (semilla del repo).
+- **Color de principales** -> `pnp/Colorear-Principales-Morado.ps1`: pinta de MORADO
+  las carpetas top-level de cada sitio (para que destaquen en el acceso directo a
+  OneDrive). Metodo verificado (2 fuentes): `Set-PnPPropertyBagValue -Folder
+  "Documentos compartidos/<carpeta>" -Key "vti_colorhex" -Value 6` (clave interna fija,
+  valor numero 0-15; morado=6). No destructivo. Esquema decidido por Franco:
+  principales=morado, resto por clasificacion. Correrlo cuando Code cierre la
+  optimizacion (sugerido: probar 1 sitio primero). Lo corre Code.
+- Pendiente futuro: color POR CLASIFICACION en subcarpetas, conforme Cowork clasifique
+  niveles mas profundos (ahora solo hay clasificadas carpetas top-level, que van en morado).
+
+Tabla de color SharePoint para referencia: verde oscuro=3, azul oscuro=5, naranja
+oscuro=2, rojo oscuro=1, morado oscuro=6 (mapeo Publica/Interna/Confidencial/Restringida
++ morado para principales).
+
+---
+
 ## Code — FIX del bug de carga: vistas globales NO bloquean en el crawl (2026-06-19)
 
 Corregida la regresion. Las vistas globales (Sitios/Resumen/Ejecutivo/Apoyo/
