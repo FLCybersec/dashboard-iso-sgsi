@@ -3,6 +3,7 @@ import { useState, useEffect } from 'preact/hooks'
 import { route } from 'preact-router'
 import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
+import { loadMigrationState } from '../lib/migration-store.js'
 import { loadSeguimiento, statsMigracionPorApoyo } from '../lib/seguimiento-store.js'
 
 // Vista "Por apoyo": para cada Apoyo SGSI (Carmen, Ezequiel, Chema), los sitios
@@ -19,8 +20,8 @@ export function ApoyoView({ embedded = false } = {}) {
       setError(null)
       try {
         const st = await loadStructure()
-        await loadSeguimiento(st)
-        setApoyos(statsMigracionPorApoyo(st))
+        const [mig] = await Promise.all([loadMigrationState(st), loadSeguimiento(st)])
+        setApoyos(statsMigracionPorApoyo(st, mig))
       } catch (e) {
         setError(e?.message || String(e))
       } finally {

@@ -5,6 +5,65 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — TANDA D cerrada: metricas sobre arbol vivo + estructura secundaria + huerfanos + ESPEC (2026-06-19) — REVISAR
+
+Cierra el plan A->D. **Para revision de Franco.** Las metricas ya no se calculan
+sobre el maestro sino sobre la estructura REAL, la aprobacion de estructura pasa a
+secundaria, se surfacean huerfanos y se actualizo la ESPECIFICACION.
+
+**Metricas sobre el arbol vivo:**
+- `migration-store` deja de cruzar contra el maestro: recorre el drive de cada
+  sitio (vistas globales) y devuelve `totalCarpetas` (carpetas reales),
+  `existeSitio`, y los conjuntos `folders`/`itemIds` (para huerfanos). Desaparece
+  el "% estructura (creadas/total)".
+- `statsMigracionSitio/Global` ahora: numerador = entradas de seguimiento
+  Migrada/Verificada; **denominador = nº de carpetas reales** (del inventario
+  vivo). `statsMigracionPorPersona` y `misSitios` se calculan sobre las ENTRADAS
+  de seguimiento (no el maestro). Sin lectura viva, caen a "tracked" (no rompen).
+- Vistas actualizadas: Resumen (HomeView, sin bloque "% estructura", quita
+  AvanceChart), Resumen ejecutivo, Sitios, Evidencia, Por apoyo, Mi trabajo
+  (deja de cargar migration-store; "Actualizar" acotado + recargarToken del arbol).
+
+**Aprobacion de estructura -> secundaria:** en Aprobaciones, **Permisos** es la via
+principal (accesos / romper herencias); **Carpetas (estructura)** baja a una
+seccion "secundaria / opcional" con nota del flujo inverso. El arbol no depende de
+esa aprobacion.
+
+**Barrido de huerfanos (read-only):** entradas de seguimiento con avance/
+clasificacion cuya carpeta ya no existe viva (ni por ruta ni por itemId) se
+surfacean en "Requiere atencion" (Resumen/Ejecutivo) y en el export (columna
+"Existe (Graph)" = "No (huerfana)"). **No se borra nada**: revision humana. Sitios
+sin lectura fiable (warning) no marcan huerfanos.
+
+**Export ISO:** hoja "Resumen" con carpetas reales (sin %/creadas de estructura);
+hoja "Carpetas" enumera carpetas con seguimiento o clasificacion (override ??
+semilla), por clave `${slug}::${ruta}`, marcando si siguen vivas.
+
+**ESPECIFICACION:** actualizada a **v2.0** (nota de flujo inverso + §4 datos, §6
+vistas, §7 flujos, §10 delta, §12 numeracion: el dashboard ya no se rompe ante
+renombres por el anclaje itemId).
+
+**Archivos:** `graph/sharepoint-reader.js` (collectFolderPaths devuelve itemIds),
+`lib/migration-store.js` (reescrito), `lib/seguimiento-store.js` (stats +
+`huerfanosSeguimiento`), `lib/exporter.js`, `components/{HomeView,EjecutivoView,
+SitiosView,EvidenciaView,ApoyoView,MiTrabajoView,AprobacionesView}.js`,
+`AvanceChart.js` eliminado, `ESPECIFICACION-Dashboard-SGSI.md`.
+
+**Tests:** suite **32/32 en verde** (build OK). Nuevo `huerfanos.spec.js`
+(surfaceo en Requiere atencion); `resumen.spec.js` ajustado (sin bloque estructura).
+
+**Pendiente / notas:**
+- El denominador de "Migracion %" depende del recorrido vivo (vistas globales);
+  la vista de UN sitio muestra el % sobre entradas (no hace crawl propio por el
+  lazy-load). Si se quisiera el % exacto por sitio sin abrir el Resumen, habria
+  que un conteo por sitio en segundo plano (no incluido; bajo impacto).
+- Huerfanos: deteccion read-only. Una accion de "archivar/limpiar huerfano" desde
+  el dashboard queda como mejora futura si Franco la pide.
+
+Plan A->D COMPLETO. Pendiente solo la validacion de Franco de esta tanda.
+
+---
+
 ## Code — TANDA C cerrada: anclaje por itemId + reconciliacion de renombres (2026-06-19) — REVISAR
 
 Implementada la Tanda C. **Para revision de Franco antes de la Tanda D.** Resuelve

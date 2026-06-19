@@ -1,9 +1,12 @@
-// Estado de migracion (estado real detectado via Graph) + cache idb.
+// Inventario EN VIVO de la estructura real por sitio (via Graph) + cache idb.
 //
-// Por cada sitio del maestro: resuelve siteId, enumera sus drives y marca cada
-// nodo como existente o pendiente. Si el sitio no existe, todos sus nodos
-// quedan "Pendiente" sin romper. Tanda 2 solo detecta existencia; el override
-// manual (seguimiento) llega en la Tanda 3.
+// Tras el flujo inverso (el equipo crea/renombra/borra carpetas directo), el
+// dashboard ya NO compara contra el maestro: para las metricas GLOBALES recorre
+// el drive de cada sitio y cuenta sus carpetas REALES (denominador de la
+// migracion) y expone el conjunto de rutas/itemIds vivos (para detectar
+// huerfanos del seguimiento). El arbol por sitio se lee aparte y de forma lazy
+// (live-tree-store); aqui el recorrido completo solo lo piden las vistas
+// globales (Resumen, Sitios, Evidencia), igual que antes.
 
 import { getGraphClient } from '../graph/graph-client.js'
 import {
@@ -17,69 +20,42 @@ import { enParalelo } from './concurrencia.js'
 const CACHE_KEY = 'migration-state'
 const TTL_MS = 2 * 60 * 1000 // 2 minutos
 
-// Detecta el estado de un sitio. Nunca lanza por sitio inexistente; los errores
-// de red/permisos se reportan en `warning` y dejan los nodos como pendientes.
+const EMPTY = { folders: new Set(), itemIds: new Set(), files: new Map() }
+
+// Detecta el estado real de un sitio: existencia + nº de carpetas reales +
+// conjuntos de rutas/itemIds vivos. Nunca lanza por sitio inexistente.
 async function detectSite(client, sitio) {
-  const base = {
-    slug: sitio.slug,
-    nombre: sitio.nombre,
-    tipo: sitio.tipo,
-    piloto: sitio.piloto
-  }
+  const base = { slug: sitio.slug, nombre: sitio.nombre, tipo: sitio.tipo, piloto: sitio.piloto }
 
   let siteId = null
   try {
     siteId = await resolveSiteId(client, sitio.slug)
   } catch (err) {
-    return finalizar(base, sitio, false, () => false, `Error al resolver el sitio: ${msg(err)}`)
+    return finalizar(base, false, EMPTY, `Error al resolver el sitio: ${msg(err)}`)
   }
+  if (!siteId) return finalizar(base, false, EMPTY, null) // aun no creado (esperado)
 
-  if (!siteId) {
-    // Sitio aun no creado: todo pendiente, sin warning (es estado esperado).
-    return finalizar(base, sitio, false, () => false, null)
-  }
-
-  // Todo vive en el drive por defecto ("Documentos compartidos"). En sitios
-  // multi-biblioteca, las "bibliotecas" del JSON se aprovisionaron como CARPETAS
-  // dentro de ese drive, asi que no se buscan drives separados: se usa la ruta
-  // completa (rutaEnDrive ya incluye el nombre de la biblioteca como 1a carpeta).
   let warning = null
   let data = EMPTY
   try {
-    const defaultDriveId = await getDefaultDriveId(client, siteId)
-    data = await collectFolderPaths(client, defaultDriveId)
+    const driveId = await getDefaultDriveId(client, siteId)
+    data = await collectFolderPaths(client, driveId)
   } catch (err) {
     warning = `Error al leer la biblioteca del sitio: ${msg(err)}`
   }
-
-  const existe = (n) => data.folders.has(n.rutaEnDrive.toLowerCase())
-  const archivosDe = (n) => data.files.get(n.rutaEnDrive.toLowerCase())
-
-  return finalizar(base, sitio, true, existe, warning, archivosDe)
+  return finalizar(base, true, data, warning)
 }
 
-const EMPTY = { folders: new Set(), files: new Map() }
-
-// Construye el resultado de un sitio aplicando el predicado de existencia.
-function finalizar(base, sitio, existeSitio, existe, warning, archivosDe = null) {
-  const nodos = sitio.nodos.map((n) => {
-    const ex = existeSitio ? !!existe(n) : false
-    const archivos = existeSitio && ex && archivosDe ? archivosDe(n) : undefined
-    return {
-      key: n.key,
-      ruta: n.ruta,
-      nombre: n.nombre,
-      clasificacion: n.clasificacion,
-      biblioteca: n.biblioteca,
-      profundidad: n.profundidad,
-      existe: ex,
-      archivos: typeof archivos === 'number' ? archivos : undefined
-    }
-  })
-  const total = nodos.length
-  const creadas = nodos.reduce((a, n) => a + (n.existe ? 1 : 0), 0)
-  const pct = total ? Math.round((creadas / total) * 100) : 0
-  return { ...base, existeSitio, total, creadas, pendientes: total - creadas, pct, warning, nodos }
+function finalizar(base, existeSitio, data, warning) {
+  const folders = data.folders || new Set()
+  return {
+    ...base,
+    existeSitio,
+    totalCarpetas: folders.size,
+    folders,
+    itemIds: data.itemIds || new Set(),
+    warning
+  }
 }
 
 function msg(err) {
@@ -87,19 +63,14 @@ function msg(err) {
 }
 
 function computeGlobal(sitios) {
-  const total = sitios.reduce((a, s) => a + s.total, 0)
-  const creadas = sitios.reduce((a, s) => a + s.creadas, 0)
   return {
-    totalCarpetas: total,
-    carpetasCreadas: creadas,
-    carpetasPendientes: total - creadas,
-    pctGlobal: total ? Math.round((creadas / total) * 100) : 0,
-    sitiosCreados: sitios.filter((s) => s.existeSitio).length,
-    totalSitios: sitios.length
+    totalCarpetas: sitios.reduce((a, s) => a + (s.totalCarpetas || 0), 0),
+    totalSitios: sitios.length,
+    sitiosCreados: sitios.filter((s) => s.existeSitio).length
   }
 }
 
-// Carga el estado de migracion. Usa cache idb (TTL 2 min) salvo `force`.
+// Carga el inventario vivo de los 12 sitios. Usa cache idb (TTL 2 min) salvo `force`.
 export async function loadMigrationState(structure, { force = false } = {}) {
   if (!force) {
     const cached = await cacheGet(CACHE_KEY)
@@ -109,9 +80,7 @@ export async function loadMigrationState(structure, { force = false } = {}) {
   }
 
   const client = getGraphClient()
-  // Sitios en PARALELO (limite 4): antes era secuencial y el tiempo total era
-  // la SUMA de los 12 recorridos. El limite evita provocar throttling de
-  // Graph; el SDK ademas reintenta los 429 con Retry-After.
+  // Sitios en PARALELO (limite 4) para no provocar throttling de Graph.
   const sitios = await enParalelo(structure.sitios, 4, (s) => detectSite(client, s))
 
   const result = { fetchedAt: Date.now(), sitios, ...computeGlobal(sitios), fromCache: false }
@@ -119,11 +88,8 @@ export async function loadMigrationState(structure, { force = false } = {}) {
   return result
 }
 
-// Re-detecta SOLO un sitio (1-2 llamadas Graph) y actualiza la cache global
-// recalculando los agregados. Para reconciliar en segundo plano tras marcar una
-// carpeta como creada, sin relectura completa bloqueante de los 12 sitios.
-// Devuelve el estado completo actualizado, o null si no hay cache previa (el
-// proximo loadMigrationState la construira entera).
+// Re-detecta SOLO un sitio y actualiza la cache global. Devuelve el estado
+// completo actualizado, o null si no hay cache previa.
 export async function refreshMigrationSite(structure, slug) {
   const sitioDef = structure.sitios.find((s) => s.slug === slug)
   if (!sitioDef) return null

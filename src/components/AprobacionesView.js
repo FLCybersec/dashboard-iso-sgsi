@@ -171,37 +171,10 @@ export function AprobacionesView() {
 
     ${error && html`<div class="alert error">${error}</div>`}
 
-    <h2 style="margin-top:16px">Carpetas (cambios de estructura)</h2>
-    ${carpetas.length === 0
-      ? html`<div class="muted">No hay solicitudes de carpetas.</div>`
-      : html`
-        <${BarraLote}
-          items=${carpetas}
-          sel=${selCarpetas}
-          labelAplicar="Marcar creadas/aplicadas seleccionadas"
-          onAprobar=${() => lote(carpetas, selCarpetas, setSelCarpetas, 'propuesto', 'aprobado', persistirCarpeta)}
-          onAplicar=${() => lote(carpetas, selCarpetas, setSelCarpetas, 'aprobado', 'aplicado', persistirCarpeta)}
-        />
-        <table class="tabla" data-testid="tabla-carpetas">
-        <thead>
-          <tr>
-            <th><${CheckTodas} items=${carpetas} sel=${selCarpetas} setSel=${setSelCarpetas} /></th>
-            <th>Sitio</th><th>Tipo</th><th>Ruta / nombre final</th><th>Clasif.</th><th>Solicita</th><th>Estado</th><th></th>
-          </tr>
-        </thead>
-        <tbody>
-          ${carpetas.map((c) => html`<${FilaCarpeta}
-            key=${c.id}
-            c=${c}
-            ctx=${ctx}
-            sel=${selCarpetas}
-            setSel=${setSelCarpetas}
-            onEstado=${(estado) => aplicarOptimista(c, estado, () => persistirCarpeta(c, estado))}
-          />`)}
-        </tbody>
-      </table>`}
-
-    <h2 style="margin-top:28px">Permisos (accesos a sitios)</h2>
+    <h2 style="margin-top:16px">Permisos (accesos a sitios)</h2>
+    <div class="muted" style="margin-top:-6px">
+      Via principal del dashboard: gestionar accesos y romper herencias por carpeta.
+    </div>
     ${permisos.length === 0
       ? html`<div class="muted">No hay solicitudes de permisos.</div>`
       : html`
@@ -227,6 +200,41 @@ export function AprobacionesView() {
             sel=${selPermisos}
             setSel=${setSelPermisos}
             onEstado=${(estado) => aplicarOptimista(p, estado, () => persistirPermiso(p, estado))}
+          />`)}
+        </tbody>
+      </table>`}
+
+    <h2 style="margin-top:28px">Carpetas (cambios de estructura) <span class="muted" style="font-weight:normal;font-size:0.8em">— secundario / opcional</span></h2>
+    <div class="muted" style="margin-top:-6px">
+      Flujo inverso: el equipo crea y renombra carpetas directo en SharePoint, asi
+      que esta cola es OPCIONAL (solicitudes puntuales). El arbol ya no depende de
+      su aprobacion.
+    </div>
+    ${carpetas.length === 0
+      ? html`<div class="muted">No hay solicitudes de carpetas.</div>`
+      : html`
+        <${BarraLote}
+          items=${carpetas}
+          sel=${selCarpetas}
+          labelAplicar="Marcar creadas/aplicadas seleccionadas"
+          onAprobar=${() => lote(carpetas, selCarpetas, setSelCarpetas, 'propuesto', 'aprobado', persistirCarpeta)}
+          onAplicar=${() => lote(carpetas, selCarpetas, setSelCarpetas, 'aprobado', 'aplicado', persistirCarpeta)}
+        />
+        <table class="tabla" data-testid="tabla-carpetas">
+        <thead>
+          <tr>
+            <th><${CheckTodas} items=${carpetas} sel=${selCarpetas} setSel=${setSelCarpetas} /></th>
+            <th>Sitio</th><th>Tipo</th><th>Ruta / nombre final</th><th>Clasif.</th><th>Solicita</th><th>Estado</th><th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${carpetas.map((c) => html`<${FilaCarpeta}
+            key=${c.id}
+            c=${c}
+            ctx=${ctx}
+            sel=${selCarpetas}
+            setSel=${setSelCarpetas}
+            onEstado=${(estado) => aplicarOptimista(c, estado, () => persistirCarpeta(c, estado))}
           />`)}
         </tbody>
       </table>`}

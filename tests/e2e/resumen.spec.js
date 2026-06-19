@@ -12,9 +12,10 @@ test('Resumen carga avance global y sitios (Graph mockeado)', async ({ page }) =
   await page.goto('/resumen?e2e=1')
 
   await expect(page.getByRole('heading', { name: 'Resumen' })).toBeVisible()
-  // Encabeza la migracion; la estructura queda como bloque secundario.
+  // Encabeza la migracion de contenido sobre la estructura REAL (arbol vivo). El
+  // estado de estructura "Pendiente/Creada" ya no existe (Tanda D).
   await expect(page.locator('.progress-global.destacado', { hasText: 'Avance de migracion de contenido' })).toBeVisible()
-  await expect(page.locator('.estructura-sec', { hasText: 'Estructura (carpetas creadas)' })).toBeVisible()
+  await expect(page.locator('.progress-global.destacado', { hasText: 'carpetas reales' })).toBeVisible()
 
   // La tabla de sitios debe mostrar el concentrador (hub).
   await expect(page.getByText('Concentrador Documental SGSI')).toBeVisible()

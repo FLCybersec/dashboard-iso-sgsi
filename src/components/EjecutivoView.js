@@ -26,10 +26,11 @@ export function EjecutivoView() {
         await loadSeguimiento(st)
         const aten = requiereAtencion(st, mig)
         setData({
-          global: statsMigracionGlobal(st),
-          sitios: st.sitios.map((s) => ({ nombre: s.nombre, ...statsMigracionSitio(s) })),
+          global: statsMigracionGlobal(st, mig),
+          sitios: st.sitios.map((s) => ({ nombre: s.nombre, ...statsMigracionSitio(s, mig.sitios.find((x) => x.slug === s.slug)) })),
           atencion:
-            aten.sinQuien.length + aten.restringidasVacias.length + aten.bloqueadas.length + aten.sitiosEstancados.length,
+            aten.sinQuien.length + aten.restringidasVacias.length + aten.bloqueadas.length +
+            aten.sitiosEstancados.length + aten.huerfanos.length,
           sitiosEstancados: aten.sitiosEstancados
         })
       } catch (e) {

@@ -22,14 +22,17 @@ export function SitiosView() {
         const mig = await loadMigrationState(st)
         await loadSeguimiento(st)
         setData({
-          sitios: st.sitios.map((s) => ({
-            slug: s.slug,
-            nombre: s.nombre,
-            propietario: s.propietario,
-            apoyo: getApoyoSitio(s.slug),
-            mig: statsMigracionSitio(s),
-            estr: mig.sitios.find((x) => x.slug === s.slug)
-          }))
+          sitios: st.sitios.map((s) => {
+            const estr = mig.sitios.find((x) => x.slug === s.slug)
+            return {
+              slug: s.slug,
+              nombre: s.nombre,
+              propietario: s.propietario,
+              apoyo: getApoyoSitio(s.slug),
+              mig: statsMigracionSitio(s, estr),
+              existeSitio: !!estr?.existeSitio
+            }
+          })
         })
       } catch (e) {
         setError(e?.message || String(e))
@@ -57,7 +60,7 @@ export function SitiosView() {
           </div>
           <div class="bar bar-sm"><div class="bar-fill alt" style=${`width:${s.mig.pct}%`}></div></div>
           <div class="muted">
-            Migracion ${s.mig.migradas}/${s.mig.total} · Estructura ${s.estr ? `${s.estr.pct}%` : '—'}
+            Migracion ${s.mig.migradas}/${s.mig.total} carpetas${!s.existeSitio ? ' · sitio no creado' : ''}
           </div>
           <div class="muted">${s.propietario || '—'}${s.apoyo ? ` · apoyo: ${s.apoyo}` : ''}</div>
         </div>`

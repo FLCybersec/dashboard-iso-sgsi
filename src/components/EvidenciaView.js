@@ -98,12 +98,12 @@ export function EvidenciaView() {
 
       <div class="cards">
         <div class="card">
-          <div class="num">${statsMigracionGlobal(data.structure).pct}%</div>
+          <div class="num">${statsMigracionGlobal(data.structure, data.mig).pct}%</div>
           <div class="lbl">Migracion global</div>
         </div>
         <div class="card card-sec">
-          <div class="num sec">${data.mig.pctGlobal}%</div>
-          <div class="lbl">Estructura (carpetas creadas)</div>
+          <div class="num sec">${data.mig.totalCarpetas}</div>
+          <div class="lbl">Carpetas reales (SharePoint)</div>
         </div>
         <div class="card">
           <div class="num">${Object.keys(data.seg?.nodos || {}).length}</div>

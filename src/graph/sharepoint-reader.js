@@ -78,14 +78,15 @@ export async function listDrives(client, siteId) {
 const LIMITE_RECORRIDO = 8
 
 export async function collectFolderPaths(client, driveId) {
-  const folders = new Set()
+  const folders = new Set()      // rutas en minusculas (match case-insensitive)
+  const itemIds = new Set()      // itemId (driveItem) de cada carpeta: ancla estable
   const files = new Map()
 
   async function children(rel) {
     const base = rel
       ? `/drives/${driveId}/root:/${encodePath(rel)}:/children`
       : `/drives/${driveId}/root/children`
-    return getAllPages(client, base, (req) => req.select('name,folder,file').top(999))
+    return getAllPages(client, base, (req) => req.select('name,folder,file,id').top(999))
   }
 
   // BFS por niveles con concurrencia acotada: paralelo dentro del nivel (el
@@ -98,8 +99,10 @@ export async function collectFolderPaths(client, driveId) {
       let nArchivos = 0
       for (const it of porCarpeta[i]) {
         if (it.folder) {
+          if (it.name === '_seguimiento') continue // carpeta de control del dashboard
           const childRel = rel ? `${rel}/${it.name}` : it.name
           folders.add(childRel.toLowerCase())
+          if (it.id) itemIds.add(it.id)
           siguiente.push(childRel)
         } else {
           nArchivos++
@@ -109,5 +112,5 @@ export async function collectFolderPaths(client, driveId) {
     })
     nivel = siguiente
   }
-  return { folders, files }
+  return { folders, itemIds, files }
 }

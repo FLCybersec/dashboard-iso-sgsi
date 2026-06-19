@@ -3,7 +3,6 @@
 // Fases. Cliente-only: arma el buffer y dispara la descarga.
 
 import {
-  estadoEfectivo,
   statsMigracionSitio,
   statsMigracionGlobal,
   statsMigracionPorPersona,
@@ -45,16 +44,13 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
   wb.creator = 'Dashboard SGSI JMA'
   wb.created = new Date()
 
-  // Indice rapido de existencia por clave de nodo (Graph).
-  const existePorKey = new Map()
-  for (const s of mig?.sitios || []) {
-    for (const n of s.nodos) existePorKey.set(n.key, n.existe)
-  }
+  // Inventario vivo por sitio (rutas reales en minusculas para match) y nombre.
+  const migPorSlug = new Map((mig?.sitios || []).map((s) => [s.slug, s]))
+  const nombrePorSlug = new Map(structure.sitios.map((s) => [s.slug, s.nombre]))
 
   // ---- Resumen ----
-  // Lidera con la MIGRACION de contenido (el eje del seguimiento); la estructura
-  // (carpetas creadas via Graph) queda como dato secundario, etiquetada aparte
-  // para no confundir un % con el otro.
+  // Migracion de contenido sobre la estructura REAL: el denominador es el nº de
+  // carpetas reales de cada sitio (lectura en vivo via Graph).
   const rRes = wb.addWorksheet('Resumen')
   addHeader(rRes, [
     { header: 'Sitio', key: 'nombre', width: 34 },
@@ -63,15 +59,12 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
     { header: 'Sitio creado', key: 'existe', width: 14 },
     { header: '% migracion contenido', key: 'pctMig', width: 20 },
     { header: 'Carpetas migradas', key: 'migradas', width: 18 },
-    { header: 'Carpetas (total)', key: 'totalMig', width: 16 },
-    { header: '% estructura (carpetas creadas)', key: 'pctEstr', width: 28 },
-    { header: 'Carpetas creadas', key: 'creadas', width: 16 },
+    { header: 'Carpetas reales (total)', key: 'totalMig', width: 20 },
     { header: 'Ultima actualizacion', key: 'ultima', width: 22 }
   ])
-  const estructuraPorSlug = new Map((mig?.sitios || []).map((s) => [s.slug, s]))
   for (const sitio of structure.sitios) {
-    const m = statsMigracionSitio(sitio)
-    const e = estructuraPorSlug.get(sitio.slug)
+    const e = migPorSlug.get(sitio.slug)
+    const m = statsMigracionSitio(sitio, e)
     rRes.addRow({
       nombre: sitio.nombre,
       slug: sitio.slug,
@@ -80,13 +73,11 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
       pctMig: m.pct / 100,
       migradas: m.migradas,
       totalMig: m.total,
-      pctEstr: (e?.pct ?? 0) / 100,
-      creadas: e?.creadas ?? 0,
       ultima: m.ultima || ''
     })
   }
   // Fila de total global (migracion de contenido).
-  const g = statsMigracionGlobal(structure)
+  const g = statsMigracionGlobal(structure, mig)
   const fila = rRes.addRow({
     nombre: 'TOTAL',
     pctMig: g.pct / 100,
@@ -95,9 +86,11 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
   })
   fila.font = { bold: true }
   rRes.getColumn('pctMig').numFmt = '0%'
-  rRes.getColumn('pctEstr').numFmt = '0%'
 
-  // ---- Carpetas (migracion + estructura) ----
+  // ---- Carpetas (seguimiento + clasificacion efectiva) ----
+  // Filas = carpetas con SEGUIMIENTO (avance/quien migra) o con CLASIFICACION
+  // (override del sitio o semilla del repo), por clave `${slug}::${ruta}`. Se
+  // marca si la carpeta existe HOY viva (deteccion de huerfanos: "No (huerfana)").
   const rCar = wb.addWorksheet('Carpetas')
   addHeader(rCar, [
     { header: 'Sitio', key: 'sitio', width: 22 },
@@ -106,36 +99,47 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
     { header: 'Clasificacion', key: 'clasificacion', width: 14 },
     { header: 'Migracion', key: 'migracion', width: 14 },
     { header: 'Quien migra', key: 'responsable', width: 22 },
-    { header: 'Existe (Graph)', key: 'existe', width: 14 },
-    { header: 'Estructura', key: 'estado', width: 16 },
+    { header: 'Existe (Graph)', key: 'existe', width: 16 },
     { header: 'Notas', key: 'notas', width: 40 },
     { header: 'Ultima modif.', key: 'ultima', width: 20 },
     { header: 'Modificado por', key: 'por', width: 22 }
   ])
-  // Clasificacion EFECTIVA por carpeta: override del sitio (seg) ?? semilla
-  // (maestro + repo, ya combinada en structure.clasificacionSeed).
+  // Clasificacion EFECTIVA: override del sitio (seg) ?? semilla (maestro + repo).
   const clasifEfectiva = (key) =>
     seg?.clasificaciones?.[key] || structure?.clasificacionSeed?.[key] || ''
-  for (const sitio of structure.sitios) {
-    for (const n of sitio.nodos) {
-      const existe = existePorKey.get(n.key) || false
-      const ov = seg?.nodos?.[n.key] || null
-      const ef = estadoEfectivo(existe, ov)
-      rCar.addRow({
-        sitio: sitio.nombre,
-        ruta: n.ruta,
-        nombre: n.nombre,
-        clasificacion: clasifEfectiva(n.key),
-        migracion: ov?.migracionEstado || 'Sin empezar',
-        responsable: quienMigra(n.key),
-        existe: existe ? 'Si' : 'No',
-        estado: ef.estado,
-        notas: ov?.notas || '',
-        ultima: ov?.ultimaModificacion || '',
-        por: ov?.modificadoPor || ''
-      })
+  const claves = new Set([
+    ...Object.keys(seg?.nodos || {}),
+    ...Object.keys(seg?.clasificaciones || {}),
+    ...Object.keys(structure?.clasificacionSeed || {})
+  ])
+  const filasCarpeta = []
+  for (const key of claves) {
+    const sep = key.indexOf('::')
+    if (sep === -1) continue
+    const slug = key.slice(0, sep)
+    const ruta = key.slice(sep + 2)
+    const ov = seg?.nodos?.[key] || null
+    const e = migPorSlug.get(slug)
+    let existe = '—'
+    if (e?.existeSitio && !e.warning) {
+      const viva = (e.folders instanceof Set ? e.folders : new Set(e.folders || [])).has(ruta.toLowerCase())
+      existe = viva ? 'Si' : 'No (huerfana)'
     }
+    filasCarpeta.push({
+      sitio: nombrePorSlug.get(slug) || slug,
+      ruta,
+      nombre: ruta.split('/').pop(),
+      clasificacion: clasifEfectiva(key),
+      migracion: ov?.migracionEstado || 'Sin empezar',
+      responsable: quienMigra(key),
+      existe,
+      notas: ov?.notas || '',
+      ultima: ov?.ultimaModificacion || '',
+      por: ov?.modificadoPor || ''
+    })
   }
+  filasCarpeta.sort((a, b) => a.sitio.localeCompare(b.sitio) || a.ruta.localeCompare(b.ruta))
+  for (const f of filasCarpeta) rCar.addRow(f)
 
   // ---- Historial ----
   const rHis = wb.addWorksheet('Historial')

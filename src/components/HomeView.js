@@ -12,12 +12,11 @@ import {
   requiereAtencion,
   actividadReciente
 } from '../lib/seguimiento-store.js'
-import { AvanceChart } from './AvanceChart.js'
 import { Avatar } from './Avatar.js'
 import { BotonActualizar } from './BotonActualizar.js'
 
-// Vista Resumen (Tanda 7): encabeza con el avance de MIGRACION (global y por
-// persona). La estructura (carpetas creadas) queda como bloque secundario.
+// Vista Resumen: avance de MIGRACION (global y por persona) sobre la estructura
+// REAL de SharePoint (carpetas vivas como denominador; arbol en vivo).
 export function HomeView() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
@@ -26,7 +25,7 @@ export function HomeView() {
   const build = (st, mig) => ({
     st,
     mig,
-    migGlobal: statsMigracionGlobal(st),
+    migGlobal: statsMigracionGlobal(st, mig),
     personas: statsMigracionPorPersona(st),
     atencion: requiereAtencion(st, mig),
     actividad: actividadReciente(st, 12)
@@ -69,7 +68,8 @@ export function HomeView() {
 function Resumen({ data }) {
   const { st, mig, migGlobal, personas, atencion, actividad } = data
   const totalAtencion =
-    atencion.sinQuien.length + atencion.restringidasVacias.length + atencion.bloqueadas.length + atencion.sitiosEstancados.length
+    atencion.sinQuien.length + atencion.restringidasVacias.length + atencion.bloqueadas.length +
+    atencion.sitiosEstancados.length + atencion.huerfanos.length
   return html`
     <div class="progress-global destacado">
       <div class="progress-global-top">
@@ -77,7 +77,7 @@ function Resumen({ data }) {
         <span>${migGlobal.pct}%</span>
       </div>
       <div class="bar bar-lg"><div class="bar-fill alt" style=${`width:${migGlobal.pct}%`}></div></div>
-      <div class="muted">${migGlobal.migradas} de ${migGlobal.total} carpetas migradas (derivado de los estados por carpeta)</div>
+      <div class="muted">${migGlobal.migradas} de ${migGlobal.total} carpetas reales migradas · ${mig.totalCarpetas} carpetas en ${mig.sitiosCreados}/${mig.totalSitios} sitios (lectura en vivo)</div>
     </div>
 
     <h2 style="margin-top:24px">Avance por persona</h2>
@@ -102,12 +102,12 @@ function Resumen({ data }) {
     <h2 style="margin-top:24px">Migracion por sitio</h2>
     <table class="tabla">
       <thead>
-        <tr><th>Sitio</th><th>Migracion</th><th>%</th><th class="col-sec">Estructura</th></tr>
+        <tr><th>Sitio</th><th>Migracion</th><th>%</th><th class="col-sec">Carpetas reales</th></tr>
       </thead>
       <tbody>
         ${st.sitios.map((s) => {
-          const m = statsMigracionSitio(s)
           const estr = mig.sitios.find((x) => x.slug === s.slug)
+          const m = statsMigracionSitio(s, estr)
           return html`
             <tr key=${s.slug}>
               <td>
@@ -120,7 +120,7 @@ function Resumen({ data }) {
               </td>
               <td>${m.pct}%</td>
               <td class="col-sec muted">
-                ${estr ? `${estr.pct}% (${estr.creadas}/${estr.total})` : '—'}
+                ${estr ? (estr.existeSitio ? `${estr.totalCarpetas}` : 'sitio no creado') : '—'}
                 ${estr?.warning && html`<span class="estado-tag err" title=${estr.warning}>sin lectura</span>`}
               </td>
             </tr>
@@ -139,6 +139,7 @@ function Resumen({ data }) {
               ${atencion.restringidasVacias.length ? html`<li>${atencion.restringidasVacias.length} Restringida(s) sin migrar</li>` : ''}
               ${atencion.bloqueadas.length ? html`<li>${atencion.bloqueadas.length} bloqueada(s)</li>` : ''}
               ${atencion.sitiosEstancados.length ? html`<li>${atencion.sitiosEstancados.length} sitio(s) sin avance 7+ dias</li>` : ''}
+              ${atencion.huerfanos.length ? html`<li>${atencion.huerfanos.length} con seguimiento sin carpeta viva (¿renombrada/borrada?)</li>` : ''}
             </ul>`}
       </div>
       <div class="card">
@@ -155,22 +156,6 @@ function Resumen({ data }) {
               )}
             </div>`}
       </div>
-    </div>
-
-    <!-- Estructura: bloque secundario -->
-    <div class="estructura-sec">
-      <div class="progress-global-top">
-        <strong class="sec-title">Estructura (carpetas creadas)</strong>
-        <span class="sec-pct">${mig.pctGlobal}%</span>
-      </div>
-      <div class="bar bar-sm"><div class="bar-fill" style=${`width:${mig.pctGlobal}%`}></div></div>
-      <div class="muted">
-        ${mig.carpetasCreadas}/${mig.totalCarpetas} carpetas creadas · ${mig.sitiosCreados}/${mig.totalSitios} sitios · deteccion automatica (Graph)
-      </div>
-      <details style="margin-top:10px">
-        <summary class="muted">Ver detalle de estructura por sitio</summary>
-        <div style="margin-top:12px"><${AvanceChart} sitios=${mig.sitios} /></div>
-      </details>
     </div>
   `
 }

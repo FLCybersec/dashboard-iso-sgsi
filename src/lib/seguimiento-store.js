@@ -583,31 +583,49 @@ export async function updateNodo(
 }
 
 // ---- Migracion derivada ----
+//
+// Modelo (flujo inverso, arbol vivo): el avance se cuenta sobre las CARPETAS
+// REALES del sitio. Numerador = entradas de seguimiento marcadas Migrada/
+// Verificada; denominador = nº de carpetas reales (del inventario vivo de
+// migration-store, pasado como `migSite`). Sin ese dato (vista que no lo cargo)
+// se cae a las carpetas con seguimiento (degradado, no rompe).
 
-export function statsMigracionSitio(sitio) {
+function totalLiveDe(migSite, tracked) {
+  return typeof migSite?.totalCarpetas === 'number' ? migSite.totalCarpetas : tracked
+}
+
+export function statsMigracionSitio(sitio, migSite) {
   const seg = segDe(sitio.slug)
   let migradas = 0
+  let tracked = 0
   let ultima = null
-  for (const n of sitio.nodos) {
-    const ov = seg.nodos[n.key]
+  for (const [key, ov] of Object.entries(seg.nodos)) {
+    if (slugDeKey(key) !== sitio.slug) continue
+    tracked++
     if (MIGRADAS.has(ov?.migracionEstado || 'Sin empezar')) migradas++
     if (ov?.ultimaModificacion && (!ultima || ov.ultimaModificacion > ultima)) ultima = ov.ultimaModificacion
   }
-  const total = sitio.nodos.length
-  return { migradas, total, pct: total ? Math.round((migradas / total) * 100) : 0, ultima }
+  const total = totalLiveDe(migSite, tracked)
+  return { migradas, total, pct: total ? Math.min(100, Math.round((migradas / total) * 100)) : 0, ultima }
 }
 
-export function statsMigracionGlobal(structure) {
+export function statsMigracionGlobal(structure, migState) {
   let migradas = 0
   let total = 0
   for (const sitio of structure.sitios) {
-    const s = statsMigracionSitio(sitio)
+    const s = statsMigracionSitio(sitio, migSiteDe(migState, sitio.slug))
     migradas += s.migradas
     total += s.total
   }
-  return { migradas, total, pct: total ? Math.round((migradas / total) * 100) : 0 }
+  return { migradas, total, pct: total ? Math.min(100, Math.round((migradas / total) * 100)) : 0 }
 }
 
+function migSiteDe(migState, slug) {
+  return migState?.sitios?.find((s) => s.slug === slug) || null
+}
+
+// Avance por persona: sobre las ENTRADAS de seguimiento con "quien migra"
+// (no el maestro): las carpetas asignadas a la persona, vivan donde vivan.
 export function statsMigracionPorPersona(structure) {
   const mapa = new Map()
   const get = (nombre) => {
@@ -616,19 +634,19 @@ export function statsMigracionPorPersona(structure) {
     }
     return mapa.get(nombre)
   }
-  for (const sitio of structure.sitios) {
-    const seg = segDe(sitio.slug)
-    for (const n of sitio.nodos) {
-      const quien = quienMigra(n.key)
-      if (!quien) continue
-      const ov = seg.nodos[n.key]
-      const estado = ov?.migracionEstado || 'Sin empezar'
-      const p = get(quien)
-      p.total++
-      if (MIGRADAS.has(estado)) p.migradas++
-      if (ov?.ultimaModificacion && (!p.ultima || ov.ultimaModificacion > p.ultima)) p.ultima = ov.ultimaModificacion
-      p.carpetas.push({ key: n.key, slug: sitio.slug, sitioNombre: sitio.nombre, ruta: n.ruta, nombre: n.nombre, estado })
-    }
+  const sitioNombre = new Map(structure.sitios.map((s) => [s.slug, s.nombre]))
+  const agg = getSeguimiento()
+  for (const [key, ov] of Object.entries(agg.nodos)) {
+    const quien = (ov.quienMigra || ov.responsable || '').trim()
+    if (!quien) continue
+    const slug = slugDeKey(key)
+    const ruta = key.slice(slug.length + 2)
+    const estado = ov?.migracionEstado || 'Sin empezar'
+    const p = get(quien)
+    p.total++
+    if (MIGRADAS.has(estado)) p.migradas++
+    if (ov?.ultimaModificacion && (!p.ultima || ov.ultimaModificacion > p.ultima)) p.ultima = ov.ultimaModificacion
+    p.carpetas.push({ key, slug, sitioNombre: sitioNombre.get(slug) || slug, ruta, nombre: ruta.split('/').pop(), estado })
   }
   for (const pend of getPendientes()) {
     if (!pend.completado && pend.responsable && pend.responsable.trim()) get(pend.responsable.trim()).pendientes++
@@ -651,8 +669,12 @@ export function misSitios(structure, user) {
   const slugs = new Set()
   for (const sitio of structure.sitios) {
     if (nombre && esMiembroMaestro(nombre, sitio)) slugs.add(sitio.slug)
-    for (const n of sitio.nodos) {
-      if (nombre && quienMigra(n.key) === nombre) slugs.add(sitio.slug)
+  }
+  if (nombre) {
+    // Carpetas asignadas (quien migra) en cualquier sitio -> ese sitio es "mio".
+    const agg = getSeguimiento()
+    for (const [key, ov] of Object.entries(agg.nodos)) {
+      if ((ov.quienMigra || ov.responsable || '').trim() === nombre) slugs.add(slugDeKey(key))
     }
   }
   return structure.sitios.filter((s) => slugs.has(s.slug))
@@ -683,35 +705,79 @@ export function actividadReciente(structure, limite = 40) {
 export function requiereAtencion(structure, migState) {
   const ahora = Date.now()
   const DIA = 86400000
-  const migByKey = new Map()
-  for (const s of migState?.sitios || []) for (const n of s.nodos) migByKey.set(n.key, n)
+  const sitioNombre = new Map(structure.sitios.map((s) => [s.slug, s.nombre]))
+  const agg = getSeguimiento()
+  const rutaDe = (key) => key.slice(slugDeKey(key).length + 2)
 
   const sinQuien = []
-  const restringidasVacias = []
   const bloqueadas = []
-  for (const sitio of structure.sitios) {
-    const seg = segDe(sitio.slug)
-    for (const n of sitio.nodos) {
-      const ov = seg.nodos[n.key]
-      const mn = migByKey.get(n.key)
-      const estadoMig = ov?.migracionEstado || 'Sin empezar'
-      if (!quienMigra(n.key) && !MIGRADAS.has(estadoMig)) sinQuien.push({ slug: sitio.slug, sitio: sitio.nombre, ruta: n.ruta })
-      if (n.clasificacion === 'Restringida' && !MIGRADAS.has(estadoMig)) {
-        restringidasVacias.push({ slug: sitio.slug, sitio: sitio.nombre, ruta: n.ruta, archivos: mn?.archivos })
-      }
-      if (ov?.estado === 'Bloqueada') bloqueadas.push({ slug: sitio.slug, sitio: sitio.nombre, ruta: n.ruta, motivo: ov?.notas || '' })
-    }
+  // Sobre las carpetas con seguimiento (tracked): falta de responsable y bloqueos.
+  for (const [key, ov] of Object.entries(agg.nodos)) {
+    const slug = slugDeKey(key)
+    const ruta = rutaDe(key)
+    const estadoMig = ov?.migracionEstado || 'Sin empezar'
+    const quien = (ov.quienMigra || ov.responsable || '').trim()
+    if (!quien && !MIGRADAS.has(estadoMig)) sinQuien.push({ slug, sitio: sitioNombre.get(slug) || slug, ruta })
+    if (ov?.estado === 'Bloqueada') bloqueadas.push({ slug, sitio: sitioNombre.get(slug) || slug, ruta, motivo: ov?.notas || '' })
+  }
+
+  // Restringidas sin migrar: sobre la clasificacion EFECTIVA (override ?? semilla),
+  // aunque la carpeta no este "tracked".
+  const efectiva = (k) => agg.clasificaciones[k] || structure?.clasificacionSeed?.[k] || null
+  const restringidasVacias = []
+  const clavesClasif = new Set([
+    ...Object.keys(structure?.clasificacionSeed || {}),
+    ...Object.keys(agg.clasificaciones || {})
+  ])
+  for (const k of clavesClasif) {
+    if (efectiva(k) !== 'Restringida') continue
+    const estadoMig = agg.nodos[k]?.migracionEstado || 'Sin empezar'
+    if (MIGRADAS.has(estadoMig)) continue
+    const slug = slugDeKey(k)
+    restringidasVacias.push({ slug, sitio: sitioNombre.get(slug) || slug, ruta: rutaDe(k) })
   }
 
   const sitiosEstancados = []
   for (const sitio of structure.sitios) {
-    const s = statsMigracionSitio(sitio)
+    const s = statsMigracionSitio(sitio, migSiteDe(migState, sitio.slug))
     if (s.pct >= 100) continue
     if (s.ultima && ahora - new Date(s.ultima).getTime() > 7 * DIA) {
       sitiosEstancados.push({ slug: sitio.slug, sitio: sitio.nombre, pct: s.pct, ultima: s.ultima })
     }
   }
-  return { sinQuien, restringidasVacias, bloqueadas, sitiosEstancados }
+
+  const huerfanos = huerfanosSeguimiento(structure, migState)
+  return { sinQuien, restringidasVacias, bloqueadas, sitiosEstancados, huerfanos }
+}
+
+// Barrido de huerfanos: entradas de seguimiento con avance/clasificacion cuya
+// carpeta YA NO existe viva (ni por ruta ni por itemId). Requiere el inventario
+// vivo (migState); sin lectura fiable de un sitio (warning) no se marca nada.
+// SOLO lectura: el dashboard no borra; se surfacean para revision humana.
+export function huerfanosSeguimiento(structure, migState) {
+  if (!migState?.sitios) return []
+  const out = []
+  const sitioNombre = new Map(structure.sitios.map((s) => [s.slug, s.nombre]))
+  for (const ms of migState.sitios) {
+    if (!ms.existeSitio || ms.warning) continue // lectura no fiable: no marcar
+    const live = ms.folders instanceof Set ? ms.folders : new Set(ms.folders || [])
+    const liveIds = ms.itemIds instanceof Set ? ms.itemIds : new Set(ms.itemIds || [])
+    const seg = segDe(ms.slug)
+    const vivo = (ruta, itemId) => live.has((ruta || '').toLowerCase()) || (itemId && liveIds.has(itemId))
+    for (const [key, ov] of Object.entries(seg.nodos || {})) {
+      if (slugDeKey(key) !== ms.slug) continue
+      const tieneAvance = (ov.migracionEstado && ov.migracionEstado !== 'Sin empezar') || (ov.quienMigra || ov.responsable || '').trim()
+      if (!tieneAvance) continue
+      const ruta = key.slice(ms.slug.length + 2)
+      if (!vivo(ruta, ov.itemId)) out.push({ slug: ms.slug, sitio: sitioNombre.get(ms.slug) || ms.slug, ruta, tipo: 'migracion' })
+    }
+    for (const [ruta, e] of Object.entries(seg.clasificaciones || {})) {
+      const nivel = e && typeof e === 'object' ? e.nivel : e
+      if (!nivel) continue
+      if (!vivo(ruta, e?.itemId)) out.push({ slug: ms.slug, sitio: sitioNombre.get(ms.slug) || ms.slug, ruta, tipo: 'clasificacion' })
+    }
+  }
+  return out
 }
 
 // ---- Apoyo SGSI por sitio ----
@@ -729,13 +795,13 @@ export async function setApoyoSitio(structure, slug, apoyo) {
   })
 }
 
-export function statsMigracionPorApoyo(structure) {
+export function statsMigracionPorApoyo(structure, migState) {
   const out = EQUIPO_APOYO.map((nombre) => ({ nombre, sitios: [], migradas: 0, total: 0 }))
   const byName = new Map(out.map((o) => [o.nombre, o]))
   for (const sitio of structure.sitios) {
     const apoyo = getApoyoSitio(sitio.slug)
     if (!apoyo || !byName.has(apoyo)) continue
-    const s = statsMigracionSitio(sitio)
+    const s = statsMigracionSitio(sitio, migSiteDe(migState, sitio.slug))
     const o = byName.get(apoyo)
     o.sitios.push({ slug: sitio.slug, nombre: sitio.nombre, ...s })
     o.migradas += s.migradas

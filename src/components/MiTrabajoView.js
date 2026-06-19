@@ -4,7 +4,6 @@ import { route } from 'preact-router'
 import { Cargando } from './Cargando.js'
 import { currentUser } from '../auth/auth-provider.js'
 import { loadStructure } from '../lib/structure-store.js'
-import { loadMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   refreshSeguimientoSitio,
@@ -27,11 +26,11 @@ import { CabeceraSitio } from './SitioView.js'
 // acceso). No asigno "quien migra" (eso es de admin); solo reporto y solicito.
 export function MiTrabajoView() {
   const [structure, setStructure] = useState(null)
-  const [mig, setMig] = useState(null)
   const [datos, setDatos] = useState(null)
   const [misAreas, setMisAreas] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [recargarToken, setRecargarToken] = useState(0)
   const [, setTick] = useState(0)
   const rerender = () => setTick((t) => t + 1)
   const user = currentUser()
@@ -49,9 +48,9 @@ export function MiTrabajoView() {
       try {
         const st = await loadStructure()
         setStructure(st)
-        // Migracion y seguimiento en paralelo: son lecturas independientes.
-        const [m] = await Promise.all([loadMigrationState(st), loadSeguimiento(st)])
-        setMig(m)
+        // El arbol se lee en vivo (lazy) dentro de ArbolCarpetas; aqui solo el
+        // seguimiento (avance/asignaciones/solicitudes).
+        await loadSeguimiento(st)
         // Refrescar mis areas desde SharePoint: las aprobaciones del admin se
         // escriben desde OTRA sesion y no estarian en la cache de esta.
         await Promise.all(misSitios(st, currentUser()).map((s) => refreshSeguimientoSitio(st, s.slug)))
@@ -64,12 +63,23 @@ export function MiTrabajoView() {
     })()
   }, [recompute])
 
+  // "Actualizar" acotado: re-lee mi seguimiento y fuerza la relectura del arbol
+  // en vivo (recargarToken invalida la cache por nivel en ArbolCarpetas).
+  const refrescar = useCallback(async () => {
+    const st = structure || (await loadStructure())
+    await loadSeguimiento(st, { force: true })
+    await Promise.all(misSitios(st, currentUser()).map((s) => refreshSeguimientoSitio(st, s.slug)))
+    recompute(st)
+    setRecargarToken((t) => t + 1)
+    rerender()
+  }, [structure, recompute])
+
   const miNombre = nombreDesdeUsuario(user)
 
   function accionesDe(slug) {
     return {
-      onMigracion: async (key, estado) => {
-        await updateNodo(structure, { key, migracionEstado: estado })
+      onMigracion: async (key, estado, itemId) => {
+        await updateNodo(structure, { key, migracionEstado: estado, itemId })
         recompute(structure)
         rerender()
       },
@@ -120,7 +130,7 @@ export function MiTrabajoView() {
         </div>
       </div>
       <div class="view-head-actions">
-        <${BotonActualizar} onRefreshed=${({ st, mig }) => { setStructure(st); setMig(mig); recompute(st); rerender() }} />
+        <${BotonActualizar} refrescar=${refrescar} />
       </div>
     </div>
 
@@ -140,7 +150,6 @@ export function MiTrabajoView() {
           avance. Tambien puedes solicitar acceso abajo.
         </div>`
       : misAreas.map((sitio) => {
-          const sm = mig?.sitios.find((s) => s.slug === sitio.slug) || null
           return html`<div class="mi-area" key=${sitio.slug}>
             <h2>
               <a class="site-link" href=${`/sitio/${sitio.slug}`} onClick=${(e) => (e.preventDefault(), route(`/sitio/${sitio.slug}`))}>${sitio.nombre}</a>
@@ -150,19 +159,14 @@ export function MiTrabajoView() {
               solicitudes que aprueba el equipo SGSI.
             </p>
             <${CabeceraSitio} sitioDef=${sitio} structure=${structure} slug=${sitio.slug} onChange=${rerender} puedeEditar=${false} />
-            ${sm?.warning &&
-            html`<div class="alert warn">
-              No se pudo leer el estado real del area; las carpetas se muestran como
-              "Pendiente" pero pueden existir. Usa "Actualizar" para reintentar.
-            </div>`}
             <${ArbolCarpetas}
               sitioDef=${sitio}
               structure=${structure}
-              sitioMig=${sm}
               acciones=${accionesDe(sitio.slug)}
               admin=${false}
               miNombre=${miNombre}
               esPropietario=${esPropietarioSitio(miNombre, sitio)}
+              recargarToken=${recargarToken}
             />
           </div>`
         })}
