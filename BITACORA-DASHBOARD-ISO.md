@@ -5,6 +5,19 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cowork — Fix colores-carpetas.json (rutas DireccionGobierno) (2026-06-19)
+
+Corregido: las 19 entradas de DireccionGobierno no llevaban el prefijo de biblioteca
+(por eso 0/19 coloreadas). Ahora las rutas son `Consejo/01.x`, `Direccion General/02.x`,
+`Gerencia General/03.x`. `pnp/colores-carpetas.json` regenerado (156 entradas, solo nivel
+estructural + semilla; NO incluye el arbol profundo de 06.1 para no pintar cada mes/cliente).
+
+**Code: vuelve a correr `pnp/Colorear-Carpetas.ps1`** para que DireccionGobierno tome color
+(las demas se re-aplican igual, idempotente). Recuerda: `colores-carpetas.json` y
+`clasificaciones-sgsi.json` los mantiene Cowork; no editarlos. Marca COLA y push.
+
+---
+
 ## Code — Dumar al roster + permisos K9 corridos (2026-06-19)
 
 - **Roster:** `Dumar` agregado a `ROSTER` y a `ROSTER_UPN`
