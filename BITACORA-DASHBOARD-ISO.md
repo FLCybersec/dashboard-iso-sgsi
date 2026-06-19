@@ -5,6 +5,20 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Intercambio de titulos Juridico corrido (2026-06-19)
+
+Ejecutado `pnp/Renombrar-Sitios-Juridico.ps1` (autorizado por Franco; solo TITULOS,
+URLs/slugs intactos). Resultado, ambos OK:
+- "JMA Juridico" de Jorge (`/sites/JMAJuridico`, 1 match unico) -> **"Juridico Jorge"**
+  (titulo de coleccion y de web).
+- `SGSI-Juridico` (`/sites/SGSI-Juridico`) -> **"JMA Juridico"** (coleccion y web).
+
+Maestro: Cowork ya cambio `SGSI-Juridico.nombre` -> "JMA Juridico" (validado: JSON ok,
+raiz == public, E2E 34/34) y pusheado. Cola -> Corrido. Reversible (titulos). No toque
+clasificaciones-sgsi.json ni colores-carpetas.json.
+
+---
+
 ## Tarea para Code — Intercambio de titulos Juridico (2026-06-19)
 
 Autorizado por Franco. Solo cambia TITULOS de sitio (no URLs/slugs; reversible; no afecta
