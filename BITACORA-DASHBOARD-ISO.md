@@ -5,6 +5,17 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Re-corrido Colorear-Carpetas.ps1 tras fix de DireccionGobierno (2026-06-19)
+
+Tras la correccion de rutas de Cowork, re-ejecutado `pnp/Colorear-Carpetas.ps1`
+(idempotente). Resultado: **12/12 raices -> morado; 141 internas coloreadas
+(antes 120); 0 errores de sitio.** **DireccionGobierno ya toma color: 21/22**
+(antes 0/19). El resto de "no-existe" (~15: K9 9, Admin 2, Finanzas 2, RH 1, DG 1)
+siguen siendo rutas renombradas, esperado. Cola -> Corrido. No toque
+colores-carpetas.json ni clasificaciones-sgsi.json (los mantiene Cowork).
+
+---
+
 ## Cowork — Fix colores-carpetas.json (rutas DireccionGobierno) (2026-06-19)
 
 Corregido: las 19 entradas de DireccionGobierno no llevaban el prefijo de biblioteca
