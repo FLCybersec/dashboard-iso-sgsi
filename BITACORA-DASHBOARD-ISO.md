@@ -5,6 +5,33 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tarea para Code — Usuario nuevo Dumar + permisos K9 (2026-06-19)
+
+**Usuario nuevo:** Dummar Lopez Quina, `dlopez@jmaseguridad.com` (Arley lo llama "Dumar";
+responsable del centro K9 TIJUANA). Code: agregalo a `ROSTER` en `seguimiento-store.js`
+(nombre "Dumar") y a `ROSTER_UPN` (Dumar -> dlopez@jmaseguridad.com). El dashboard ya deja
+entrar a cualquiera del tenant; esto es para asignaciones/visualizacion.
+
+**Permisos K9 (autorizado por Franco) -> `pnp/Permisos-K9-2026-06-19.ps1` (corre Code):**
+- Jorge (jalvarez) y Jose Maria (jmgonzalez) -> PROPIETARIO de K9. Director Operativo K9 =
+  Jose Arley (ya propietario, no se agrega a nadie).
+- Crear carpeta `10.11 CENTROS ENTRENAMIENTO/TOLUCA`.
+- Centro TIJUANA (`10.11 CENTROS ENTRENAMIENTO/TIJUANA`): Dumar y Samuel con "Editar"
+  (rompe herencia; acceso solo a su centro).
+- Samuel: se QUITA del acceso total del sitio K9 (queda solo en TIJUANA).
+- Es de permisos+1 carpeta nueva; autorizado por Franco. Marca COLA.
+
+**Maestro:** Cowork actualizo K9 acceso de sitio (+Jorge,+Jose Maria, -Samuel). Incluir en push.
+
+**Pendiente (no accionar):** responsables de CHIHUAHUA/CRIANZA/TOLUCA = "quien determine
+JMA"; "personal que dispongan" Jorge/JM. Aparte: rediseno de formatos en `10.12 FORMATOS/CURSO`
+(tarea de CONTENIDO, no permisos).
+
+**Cowork pendiente menor:** corregir rutas de DireccionGobierno en `colores-carpetas.json`
+(quedaron sin prefijo de biblioteca Consejo/Direccion General/Gerencia General -> 0/19 coloreadas).
+
+---
+
 ## Code — Colorear-Carpetas.ps1 corrido en los 12 sitios (2026-06-19)
 
 Franco autorizo en el chat correr `pnp/Colorear-Carpetas.ps1` (raiz morado +
