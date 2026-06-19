@@ -24,6 +24,8 @@ las ejecutan y actualizan el estado. Detalle narrativo en `../BITACORA-DASHBOARD
 | 2026-06-12b | pnp/Borrar-Aprobados-2026-06-12b.ps1 | Borrar 06.5 Egresos por Cliente (Finanzas) y 04.1.4 Documentos generales... (RH) | Si (borrar, AUTORIZADO por Franco en chat) | Corrido (2 vacias a papelera, 0 errores) | Code |
 | 2026-06-12 | pnp/Acceso-Martha-SP-Ensenada.ps1 | Martha (malvarez) Integrante nivel sitio en SP-Ensenada (cubre todas las carpetas; 0 herencias rotas verificado) | Si (permisos, AUTORIZADO por Franco en chat) | Corrido y verificado (en grupo Integrantes) | Code |
 
+| 2026-06-12c | pnp/Inventario-Estructura.ps1 | READ-ONLY: dump de todas las carpetas reales de los 12 sitios -> pnp/inventario.txt (revision Cowork del flujo inverso) | No (lectura) | Corrido (12/12 sitios, 0 errores, 4214 carpetas) | Code |
+
 > Nota: los `.ps1` arriba viven hoy en la carpeta de trabajo de Franco (OneDrive
 > "Migracion ISO"). Migrarlos a `pnp/` (sin credenciales) esta pendiente de la
 > decision de flujo (ver bitacora, entrada "Propuesta de flujo").
