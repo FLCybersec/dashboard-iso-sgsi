@@ -117,7 +117,18 @@ export async function mockGraph(page, opts = {}) {
         const seg = rest.split('/')[0]
         if (seg) seen.add(seg)
       }
-      const value = [...seen].map((name) => ({ name, folder: { childCount: 0 } }))
+      // `childCount` real (nº de hijos inmediatos en la config): habilita el caret
+      // de expansion en el arbol en vivo para las carpetas que tienen contenido.
+      const value = [...seen].map((name) => {
+        const childPrefix = `${prefix}${name}/`
+        const kids = new Set()
+        for (const full of foldersByDrive[driveId] || []) {
+          if (!full.startsWith(childPrefix)) continue
+          const rest = full.slice(childPrefix.length)
+          if (rest) kids.add(rest.split('/')[0])
+        }
+        return { name, id: `item-${childPrefix}`, folder: { childCount: kids.size } }
+      })
       return json(route, { value })
     }
 

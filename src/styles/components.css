@@ -1411,6 +1411,16 @@
   border-radius: var(--radio-sm);
   white-space: nowrap;
 }
+/* Carpeta real sin entrada de clasificacion (semilla del maestro): editable. */
+.badge.sin-clasificar {
+  color: #6b7280;
+  background: #f3f4f6;
+  border: 1px dashed var(--jma-gris-borde);
+  font-style: italic;
+}
+.arbol-cargando {
+  padding: 10px 14px;
+}
 
 /* Etiqueta de estado efectivo */
 .estado-tag {

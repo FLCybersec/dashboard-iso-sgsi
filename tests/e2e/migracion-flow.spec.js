@@ -4,7 +4,9 @@ import { mockGraph } from './_helpers/graph-mock.js'
 // Migracion por CARPETA desde el arbol: cambiar el estado en el selector de una
 // carpeta auto-guarda `migracionEstado` en el nodo del seguimiento (PUT).
 test('migracion por carpeta (arbol) persiste el estado', async ({ page }) => {
-  const graph = await mockGraph(page)
+  const graph = await mockGraph(page, {
+    foldersByDrive: { 'drive-default': ['09.1 Proyectos y Servicios (AFAC y otros)'] }
+  })
 
   await page.goto('/sitio/SGSI-CyberSec?e2e=1')
 

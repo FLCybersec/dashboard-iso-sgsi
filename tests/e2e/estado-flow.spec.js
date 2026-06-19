@@ -4,7 +4,9 @@ import { mockGraph } from './_helpers/graph-mock.js'
 // Marcar "sobrante" una carpeta existente la registra como cambio_estructura
 // (no toca SharePoint real) y la marca en el arbol.
 test('marcar sobrante registra un cambio de estructura', async ({ page }) => {
-  const graph = await mockGraph(page)
+  const graph = await mockGraph(page, {
+    foldersByDrive: { 'drive-default': ['09.1 Proyectos y Servicios (AFAC y otros)'] }
+  })
 
   await page.goto('/sitio/SGSI-CyberSec?e2e=1')
 

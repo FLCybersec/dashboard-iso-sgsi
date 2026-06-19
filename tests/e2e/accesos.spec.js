@@ -8,9 +8,12 @@ import { mockGraph } from './_helpers/graph-mock.js'
 //   (cola de permisos para PnP; el dashboard no toca permisos reales),
 // - en "Mi trabajo" todo el mundo ve el equipo del area (CabeceraSitio).
 test('accesos por carpeta: ver quien accede y solicitar quitar (PnP)', async ({ page }) => {
-  const graph = await mockGraph(page)
+  const graph = await mockGraph(page, {
+    foldersByDrive: { 'drive-default': ['04.2 Expedientes de Personal'] }
+  })
 
-  // RH: el maestro trae accesoExtra en 04.2 (Daniela) y acceso de sitio amplio.
+  // RH: el maestro trae accesoExtra en 04.2 (Daniela) y acceso de sitio amplio
+  // (semilla); la carpeta existe en vivo en SharePoint.
   await page.goto('/sitio/SGSI-RecursosHumanos?e2e=1')
   const fila = page.locator('.arbol-row', { hasText: '04.2 Expedientes de Personal' }).first()
   await expect(fila).toBeVisible()
@@ -87,9 +90,15 @@ test('acceso heredado de un padre con accesoExtra se ve en los hijos', async ({ 
   await page.route('**/estructura-maestra-sgsi.json*', (route) =>
     route.fulfill({ status: 200, contentType: 'application/json', body: JSON.stringify(maestro) })
   )
-  await mockGraph(page)
+  await mockGraph(page, {
+    foldersByDrive: { 'drive-default': ['01 Padre', '01 Padre/01.1 Hijo'] }
+  })
 
   await page.goto('/sitio/SGSI-Test?e2e=1')
+  // El arbol es lazy: expandir el padre para ver el hijo.
+  const filaPadre = page.locator('.arbol-row', { hasText: '01 Padre' }).first()
+  await expect(filaPadre).toBeVisible()
+  await filaPadre.locator('.arbol-caret').click()
   const hijo = page.locator('.arbol-row', { hasText: '01.1 Hijo' }).first()
   await expect(hijo).toBeVisible()
   // El contador del toggle refleja el extra heredado.

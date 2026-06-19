@@ -3,7 +3,6 @@ import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
 import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
-import { loadMigrationState, refreshMigrationSite } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   refreshSeguimientoSitio,
@@ -31,9 +30,12 @@ import { BotonActualizar } from './BotonActualizar.js'
 // avance del sitio DERIVADO. Se mantienen fases y estructura evolutiva.
 export function SitioView({ slug, puedeEditar = true }) {
   const [structure, setStructure] = useState(null)
-  const [sitioMig, setSitioMig] = useState(null)
+  // Existencia del sitio derivada de la lectura EN VIVO del arbol (raiz). El
+  // estado por carpeta "Pendiente/Creada" ya no aplica: si existe, se muestra.
+  const [sitioInfo, setSitioInfo] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [recargarToken, setRecargarToken] = useState(0)
   const [, setTick] = useState(0)
   const rerender = () => setTick((t) => t + 1)
 
@@ -43,12 +45,12 @@ export function SitioView({ slug, puedeEditar = true }) {
     try {
       const st = await loadStructure()
       setStructure(st)
-      // Migracion y seguimiento en paralelo: son lecturas independientes.
-      const [mig] = await Promise.all([loadMigrationState(st), loadSeguimiento(st)])
+      // El seguimiento (migracion/quien migra/solicitudes) sigue siendo la unica
+      // escritura. El arbol se lee en vivo dentro de ArbolCarpetas (lazy).
+      await loadSeguimiento(st)
       // Refrescar ESTE sitio desde SharePoint: otras sesiones (el area o el
       // admin) pueden haber agregado/aprobado solicitudes desde que cargamos.
       await refreshSeguimientoSitio(st, slug)
-      setSitioMig(mig.sitios.find((s) => s.slug === slug) || null)
     } catch (e) {
       setError(e?.message || String(e))
     } finally {
@@ -59,6 +61,17 @@ export function SitioView({ slug, puedeEditar = true }) {
   useEffect(() => {
     cargar()
   }, [cargar])
+
+  // "Actualizar": re-lee el seguimiento de este sitio y fuerza la relectura del
+  // arbol en vivo (el token > 0 invalida la cache por nivel en ArbolCarpetas).
+  const refrescarSitio = useCallback(async () => {
+    if (structure) {
+      await loadSeguimiento(structure, { force: true })
+      await refreshSeguimientoSitio(structure, slug)
+    }
+    setRecargarToken((t) => t + 1)
+    rerender()
+  }, [structure, slug])
 
   const sitioDef = structure?.sitios.find((s) => s.slug === slug)
 
@@ -115,18 +128,13 @@ export function SitioView({ slug, puedeEditar = true }) {
       ${sitioDef &&
       html`<div class="head-derecha">
       <div class="view-head-actions">
-        <${BotonActualizar} onRefreshed=${({ mig }) => { setSitioMig(mig.sitios.find((s) => s.slug === slug) || null); rerender() }} />
+        <${BotonActualizar} refrescar=${refrescarSitio} />
       </div>
       <div class="sitio-metricas">
         <div class="card" style="min-width:150px">
           <div class="num">${statsMigracionSitio(sitioDef).pct}%</div>
           <div class="lbl">Migracion: ${statsMigracionSitio(sitioDef).migradas}/${statsMigracionSitio(sitioDef).total} carpetas</div>
         </div>
-        ${sitioMig &&
-        html`<div class="card card-sec" style="min-width:140px">
-          <div class="num sec">${sitioMig.pct}%</div>
-          <div class="lbl">Estructura: ${sitioMig.creadas}/${sitioMig.total}</div>
-        </div>`}
       </div>
       </div>`}
     </div>
@@ -142,38 +150,34 @@ export function SitioView({ slug, puedeEditar = true }) {
     html`
       <${CabeceraSitio} sitioDef=${sitioDef} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
 
-      ${sitioMig && !sitioMig.existeSitio &&
+      ${sitioInfo && !sitioInfo.existeSitio &&
       html`<div class="alert warn">
-        El sitio aun no existe en SharePoint (estructura pendiente). Aun asi puedes
+        El sitio aun no existe en SharePoint (o no tienes acceso). Aun asi puedes
         registrar el avance de migracion por carpeta y planear carpetas nuevas.
-      </div>`}
-      ${sitioMig?.warning &&
-      html`<div class="alert warn">
-        No se pudo leer el estado real del sitio; las carpetas se muestran como
-        "Pendiente" pero pueden existir. Usa "Actualizar" para reintentar.
-        <span class="muted"> Detalle: ${sitioMig.warning}</span>
       </div>`}
       ${sitioDef.nota && html`<div class="alert info">${sitioDef.nota}</div>`}
 
       <h2 style="margin-top:16px">Carpetas (arbol)</h2>
-      <${ArbolCarpetas} sitioDef=${sitioDef} structure=${structure} sitioMig=${sitioMig} acciones=${acciones} admin=${puedeEditar} />
+      <${ArbolCarpetas}
+        sitioDef=${sitioDef}
+        structure=${structure}
+        acciones=${acciones}
+        admin=${puedeEditar}
+        recargarToken=${recargarToken}
+        onSitioInfo=${setSitioInfo}
+      />
 
       <h2 style="margin-top:28px">Informacion del sitio</h2>
-      <${IndicadorSitio} sitioMig=${sitioMig} />
+      <${IndicadorSitio} existeSitio=${!!sitioInfo?.existeSitio} />
       <${EstructuraEvolutivaPanel}
         structure=${structure}
         slug=${slug}
         onChange=${rerender}
         puedeEditar=${puedeEditar}
         onCreada=${() => {
-          // La carpeta ya existe en SharePoint: reconciliar SOLO este sitio y
-          // en segundo plano (sin bloquear el marcado ni releer los 12 sitios).
-          // Si falla, el TTL de 2 min o el boton "Actualizar" lo reintentan.
-          refreshMigrationSite(structure, slug)
-            .then((mig) => {
-              if (mig) setSitioMig(mig.sitios.find((s) => s.slug === slug) || null)
-            })
-            .catch(() => {})
+          // La carpeta ya existe en SharePoint (PnP la aplico): refrescar el
+          // arbol en vivo para que aparezca. Si falla, "Actualizar" lo reintenta.
+          refrescarSitio().catch(() => {})
         }}
       />
       <${PermisosSolicitudPanel} structure=${structure} slug=${slug} onChange=${rerender} puedeEditar=${puedeEditar} />
@@ -396,8 +400,8 @@ function EstructuraEvolutivaPanel({ structure, slug, onChange, puedeEditar = tru
 // Indicador del sitio (SOLO LECTURA): "Sitio creado" (detectado via Graph) y
 // "Control de versiones" (informativo: SharePoint lo trae activo por defecto en
 // bibliotecas; no es verificable con los scopes actuales). Sin fases a mano.
-function IndicadorSitio({ sitioMig }) {
-  const creado = !!sitioMig?.existeSitio
+function IndicadorSitio({ existeSitio }) {
+  const creado = !!existeSitio
   return html`
     <div class="card">
       <div class="fases-head">

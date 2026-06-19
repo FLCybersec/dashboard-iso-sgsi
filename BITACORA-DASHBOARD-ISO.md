@@ -5,6 +5,57 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — TANDA A cerrada: arbol EN VIVO + lazy-load (2026-06-19) — REVISAR
+
+Implementada la Tanda A del plan validado. **Para revision de Franco antes de
+seguir con la Tanda B** (no avanzo sin OK).
+
+**Que cambia (visible):** la vista de un sitio ya NO arma el arbol del maestro,
+sino de SharePoint EN VIVO. K9 ahora muestra sus carpetas reales (10.1 CANINOS...)
+en vez de la estructura vieja del maestro. Carga LAZY por nivel: cada carpeta se
+expande bajo demanda (no se traen las ~4214 de golpe). Desaparece el estado de
+ESTRUCTURA "Pendiente/Creada" (si la carpeta existe, se ve). El boton "Actualizar"
+del sitio invalida la cache por nivel y re-lee.
+
+**Archivos:**
+- `src/lib/live-tree-store.js` (nuevo): lectura por nivel via Graph
+  (`/drive/root/children` y `/root:/{ruta}:/children`), cache memoria+idb (TTL 2
+  min) e `invalidateSitio`. Conserva ya el `itemId` de cada carpeta (lo usara la
+  Tanda C para reconciliar renombres).
+- `src/components/ArbolCarpetas.js`: reescrito a estado central de niveles
+  (lazy). Nodos REALES (de Graph) + VIRTUALES (solicitudes "crear" sobrepuestas) +
+  marca "sobrante". Migracion/quien-migra/accesos por carpeta intactos (clave
+  `${slug}::${ruta}`). Badge gris "sin clasificar" para carpeta real sin semilla
+  del maestro (preparacion de la Tanda B).
+- `src/components/SitioView.js`: deja de usar `migration-store` para el arbol;
+  `existeSitio` se deriva de la lectura en vivo; se oculta la tarjeta "Estructura
+  %" (ya no aplica). "Actualizar" acotado a este sitio.
+- `src/components/BotonActualizar.js`: prop opcional `refrescar` (relectura
+  acotada del sitio) sin forzar el crawl global de los 12 sitios.
+- `src/styles/components.css`: estilo del badge "sin clasificar".
+
+**Tests:** suite **29/29 en verde** (build Vite OK). Mock de Graph mejorado
+(`childCount` real por carpeta para habilitar el caret). Specs ajustados al arbol
+vivo (estado-flow, asignacion, migracion-flow, accesos, multibiblioteca) +
+**nuevo `arbol-vivo.spec.js`** (lazy-load por nivel + badge "sin clasificar" +
+ausencia del tag Estructura). Verificacion = suite E2E con `?e2e=1` y Graph
+mockeado (el dashboard requiere login MSAL del tenant para un preview real).
+
+**Limitaciones conocidas (deferidas, ya en el plan):**
+- La tarjeta "Migracion %" del sitio y las metricas globales aun cuentan sobre los
+  nodos del MAESTRO; las carpetas vivas que no existen en el maestro (p. ej.
+  renombradas) no entran en ese denominador. Se recalcula en la **Tanda D**.
+- El seguimiento sigue por ruta; si el equipo renombra, el estado ligado a la ruta
+  vieja se huerfana. Lo resuelve la **Tanda C** (anclaje por `itemId`, ya
+  capturado).
+- `migration-store` se mantiene (lo usan Resumen y vistas globales); su rol en la
+  vista de sitio se elimino.
+
+**Siguiente:** Tanda B (clasificacion como mapa: semilla en repo + override por
+sitio, segun la aclaracion de Cowork) cuando Franco valide esta tanda.
+
+---
+
 ## Cowork — VALIDACION de la propuesta + aclaracion de clasificacion (2026-06-19)
 
 Cowork valida (a), (b), (c) y el orden A->D. Arrancar por Tanda A. Una aclaracion
