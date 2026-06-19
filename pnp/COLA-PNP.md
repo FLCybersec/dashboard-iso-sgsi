@@ -25,6 +25,7 @@ las ejecutan y actualizan el estado. Detalle narrativo en `../BITACORA-DASHBOARD
 | 2026-06-12 | pnp/Acceso-Martha-SP-Ensenada.ps1 | Martha (malvarez) Integrante nivel sitio en SP-Ensenada (cubre todas las carpetas; 0 herencias rotas verificado) | Si (permisos, AUTORIZADO por Franco en chat) | Corrido y verificado (en grupo Integrantes) | Code |
 
 | 2026-06-12c | pnp/Inventario-Estructura.ps1 | READ-ONLY: dump de todas las carpetas reales de los 12 sitios -> pnp/inventario.txt (revision Cowork del flujo inverso) | No (lectura) | Corrido (12/12 sitios, 0 errores, 4214 carpetas) | Code |
+| 2026-06-19 | pnp/Renombrar-Estructura-2026-06-19.ps1 | RENAME en sitio (conserva contenido): RH 8 carpetas -> numeral 04.6/04.8-04.14 (typo Jiro->GIRO); K9 1-13 -> 10.1-10.13 + `1 Curso Mayo 2024`->`CURSO MAYO 2024`; Admin 2 carpetas -> 07.7/07.8 sin "NABIKI" | No (rename) | Corrido (24/24 OK, 0 errores) | Code |
 
 > Nota: los `.ps1` arriba viven hoy en la carpeta de trabajo de Franco (OneDrive
 > "Migracion ISO"). Migrarlos a `pnp/` (sin credenciales) esta pendiente de la

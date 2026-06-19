@@ -5,6 +5,44 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Renombrado de estructura corrido (flujo inverso) (2026-06-19)
+
+Ejecutado `pnp/Renombrar-Estructura-2026-06-19.ps1` (RENAME, no destructivo, sin gate).
+Previo al corrido verifique que los 24 nombres origen existieran tal cual en
+`pnp/inventario.txt` (RH 8, K9 14, Admin 2). Resultado: **24/24 OK, 0 errores**.
+
+- RH: 04.6 ALTAS IMSS ENSENADA; 04.8/04.9 BAJAS TIJUANA/ENSENADA; 04.10 CONTRATOS
+  LABORALES...; 04.11 GAFETE FEDERAL (CIP); 04.12 GAFETE SECRETARIA (CUIP);
+  04.13 MODALIDAD... GIRO CIBERSEGURIDAD (typo Jiro->GIRO corregido); 04.14 RELACION
+  SOCIOS Y APODERADOS.
+- K9: 10.1-10.13 (mismos nombres, solo numeral); `1 Curso Mayo 2024` -> `CURSO MAYO 2024`.
+- Admin: 07.7 FORMATOS Y PLANTILLAS; 07.8 JMA FEDERALES (sin "NABIKI").
+
+Contenido y subcarpetas (expedientes, nombres con acentos) intactos: el rename solo
+toca el nombre de la carpeta estructural. Cola -> Corrido. Commit+push.
+
+---
+
+## Tarea para Code — Renombres tras inventario (flujo inverso) (2026-06-19)
+
+Cowork reviso `pnp/inventario.txt`. Franco decidio los renombres (todo RENAME, conserva
+contenido; no destructivo). **Code: corre `pnp/Renombrar-Estructura-2026-06-19.ps1`,
+marca la COLA y haz commit+push.**
+
+- **RH**: 8 carpetas del equipo -> numeral 04.6/04.8-04.14 en MAYUSCULAS (typo Jiro->GIRO).
+- **K9**: esquema 1-13 -> 10.1-10.13 (mismos nombres); `1 Curso Mayo 2024` -> `CURSO MAYO 2024`.
+- **Admin**: `FORMATOS Y PLANTILLAS NABIKI`->`07.7 FORMATOS Y PLANTILLAS`; `JMA FEDERALES NABIKI`->`07.8 JMA FEDERALES`.
+
+Nota: el equipo K9 habia reemplazado la estructura corporativa 10.x por la suya (1-13);
+este renumerado solo alinea el formato. El contenido (expedientes, nombres de empleados con
+acentos, etc.) NO se toca: la convencion sin-acentos es solo para carpetas estructurales.
+
+Maestro: dado el flujo inverso (el equipo crea directo, miles de carpetas), el maestro deja
+de ser espejo completo; Cowork lo mantiene solo a nivel estructural (top-level) cuando
+aplique. Esto NO bloquea el push del renombrado.
+
+---
+
 ## Cambio de FLUJO + tarea inventario (2026-06-12c)
 
 Franco cambio el modelo: el equipo NO tecnico CREA las carpetas directo en SharePoint
