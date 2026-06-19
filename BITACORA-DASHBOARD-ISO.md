@@ -5,6 +5,53 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — TANDA C cerrada: anclaje por itemId + reconciliacion de renombres (2026-06-19) — REVISAR
+
+Implementada la Tanda C. **Para revision de Franco antes de la Tanda D.** Resuelve
+el riesgo del flujo inverso: si el equipo RENOMBRA una carpeta, el avance de
+migracion / quien migra / clasificacion ligados a la ruta vieja ahora SIGUEN a la
+carpeta (anclados al `itemId`, estable ante renombres), en vez de huerfanarse.
+
+**Como funciona:**
+- **Sello de itemId al escribir:** `updateNodo` y `setClasificacion` guardan el
+  `itemId` (driveItem) de la carpeta en la entrada del seguimiento.
+- **Backfill al cargar:** al cargar un nivel del arbol, las entradas previas (sin
+  itemId) que siguen en su ruta original reciben su itemId (protege renombres
+  futuros).
+- **Re-llave por itemId:** si una entrada con itemId X vive en una ruta distinta
+  de donde esta hoy la carpeta X (renombrada), se mueve a la ruta nueva con
+  evidencia en `historial` ("Reconciliada por itemId: ruta A -> B"). Idempotente.
+- Disparo: `reconciliarSitio()` corre al cargar cada nivel (sobre las carpetas ya
+  traidas; sin llamadas Graph extra) y escribe en UN PUT por lote.
+
+**Archivos:**
+- `seguimiento-store.js`: `itemId` en entradas de `nodos` y `clasificaciones`;
+  nueva `reconciliarSitio(structure, slug, foldersVivas)` (re-llave + backfill).
+- `ArbolCarpetas.js`: llama `reconciliarSitio` tras cargar cada nivel; pasa el
+  `itemId` de la carpeta a las acciones.
+- `SitioView.js`: `onMigracion/onQuienMigra/onClasificar` propagan `itemId`.
+
+**Tests:** suite **31/31 en verde** (build OK). Nuevo `reconciliacion.spec.js`:
+con un avance "Migrada" sembrado en la ruta vieja pero con el itemId de la carpeta
+viva (estado tipico tras un renombre), al cargar el avance se mueve a la ruta
+nueva, persiste el re-llave (la vieja desaparece) y queda la evidencia.
+
+**Limitaciones conocidas (deferidas):**
+- **Solo protege renombres cuyo itemId ya se conocia** (sellado en una escritura o
+  backfill previo). Un renombre ocurrido antes de que la entrada tuviera itemId no
+  es reconciliable automaticamente (caso de datos historicos; poco impacto: el
+  avance real estaba sobre rutas del maestro, no sobre las del equipo).
+- **Borrados reales (huerfanos):** no se detectan por nivel (la carga es lazy);
+  requieren un crawl completo. No se borra nada en silencio: las entradas sin
+  carpeta viva persisten (visibles en export/historial). El sweep de huerfanos se
+  evalua en la **Tanda D**.
+
+**Siguiente:** Tanda D (metricas globales sobre el arbol vivo + aprobacion de
+estructura como secundaria + actualizar ESPECIFICACION §4/§6/§7/§10/§12 + posible
+sweep de huerfanos) cuando Franco valide esta tanda.
+
+---
+
 ## Code — TANDA B cerrada: clasificacion como mapa por ruta (2026-06-19) — REVISAR
 
 Implementada la Tanda B segun la aclaracion de Cowork. **Para revision de Franco

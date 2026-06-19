@@ -77,17 +77,17 @@ export function SitioView({ slug, puedeEditar = true }) {
   const sitioDef = structure?.sitios.find((s) => s.slug === slug)
 
   const acciones = {
-    onMigracion: async (key, estado) => {
-      await updateNodo(structure, { key, migracionEstado: estado })
+    onMigracion: async (key, estado, itemId) => {
+      await updateNodo(structure, { key, migracionEstado: estado, itemId })
       rerender()
     },
-    onQuienMigra: async (key, nombre) => {
-      await updateNodo(structure, { key, quienMigra: nombre })
+    onQuienMigra: async (key, nombre, itemId) => {
+      await updateNodo(structure, { key, quienMigra: nombre, itemId })
       rerender()
     },
     // Clasificacion editable por admin: override por sitio (semilla = repo).
-    onClasificar: async (ruta, nivel) => {
-      await setClasificacion(structure, slug, ruta, nivel)
+    onClasificar: async (ruta, nivel, itemId) => {
+      await setClasificacion(structure, slug, ruta, nivel, itemId)
       rerender()
     },
     // "Bloquear" se retiro de la UI (2026-06-12, pedido de Franco); solo queda

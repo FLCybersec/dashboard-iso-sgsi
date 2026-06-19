@@ -10,6 +10,7 @@ import {
   accesoTemporalSitio,
   esPropietarioSitio,
   limpiarNombre,
+  reconciliarSitio,
   ROSTER
 } from '../lib/seguimiento-store.js'
 import { SelectorMigracion } from './SelectorMigracion.js'
@@ -91,6 +92,13 @@ export function ArbolCarpetas({
           return m
         })
         if (ruta === '' && onSitioInfo) onSitioInfo({ existeSitio: data.existeSitio })
+        // Reconciliacion por itemId del nivel recien cargado: re-llave el
+        // seguimiento de carpetas renombradas y sella itemId en las que faltan.
+        if (data.folders?.length) {
+          reconciliarSitio(structure, slug, data.folders)
+            .then((cambio) => { if (cambio) rerender() })
+            .catch(() => {})
+        }
       } catch (e) {
         setNivel((prev) => {
           const m = new Map(prev)
@@ -99,7 +107,7 @@ export function ArbolCarpetas({
         })
       }
     },
-    [slug, onSitioInfo]
+    [slug, onSitioInfo, structure]
   )
 
   // Al montar / cambiar de sitio o al pulsar "Actualizar" (recargarToken): se
@@ -319,6 +327,7 @@ function ArbolNodo({ folder = null, virtual = null, nivel: depth, ctx, extraHere
   const motivo = bloqueada ? ov?.notas || '' : ''
   const sobrante = ctx.sobrantes.has(ruta)
   const childCount = esVirtual ? 0 : folder.childCount
+  const itemId = esVirtual ? null : folder.itemId || null
 
   // Datos del nivel propio (hijos reales) cuando esta expandido.
   const data = ctx.nivel.get(ruta)
@@ -362,7 +371,7 @@ function ArbolNodo({ folder = null, virtual = null, nivel: depth, ctx, extraHere
           ? html`<span class="badge" style=${`background:${color}`}>${clasificacion}</span>`
           : !esVirtual && html`<span class="badge sin-clasificar" title="Sin clasificar (asignar)">sin clasificar</span>`}
         ${!esVirtual && ctx.admin && typeof ctx.acciones?.onClasificar === 'function' &&
-        html`<select class="sel-clasif" disabled=${busy} title="Clasificacion (override del sitio)" onChange=${(e) => run(() => ctx.acciones.onClasificar(ruta, e.target.value))}>
+        html`<select class="sel-clasif" disabled=${busy} title="Clasificacion (override del sitio)" onChange=${(e) => run(() => ctx.acciones.onClasificar(ruta, e.target.value, itemId))}>
           <option value="" selected=${!clasificacion}>sin clasificar</option>
           ${ctx.niveles.map((n) => html`<option value=${n} selected=${n === clasificacion}>${n}</option>`)}
         </select>`}
@@ -383,11 +392,11 @@ function ArbolNodo({ folder = null, virtual = null, nivel: depth, ctx, extraHere
               <${SelectorMigracion}
                 valor=${migracionEstado}
                 disabled=${busy || !(ctx.admin || ctx.esPropietario || (quienMigra && quienMigra === ctx.miNombre))}
-                onCambio=${(v) => run(() => ctx.acciones.onMigracion(key, v))}
+                onCambio=${(v) => run(() => ctx.acciones.onMigracion(key, v, itemId))}
               />
             </span>
             ${ctx.admin
-              ? html`<select class="sel-quien" disabled=${busy} onChange=${(e) => run(() => ctx.acciones.onQuienMigra(key, e.target.value))}>
+              ? html`<select class="sel-quien" disabled=${busy} onChange=${(e) => run(() => ctx.acciones.onQuienMigra(key, e.target.value, itemId))}>
                   <option value="" selected=${!quienMigra}>quien migra...</option>
                   ${ROSTER.map((p) => html`<option value=${p} selected=${p === quienMigra}>${p}</option>`)}
                 </select>`

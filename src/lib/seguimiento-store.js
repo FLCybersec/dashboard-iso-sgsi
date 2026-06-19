@@ -391,7 +391,7 @@ export function getClasifOverride(slug, ruta) {
 // Asigna/quita el override de clasificacion de una carpeta. Solo admin (SGSI).
 // nivel vacio => se quita el override (vuelve a la semilla), conservando la
 // evidencia del cambio en `historial` (A.5.12/A.5.13/A.5.15).
-export async function setClasificacion(structure, slug, ruta, nivel) {
+export async function setClasificacion(structure, slug, ruta, nivel, itemId) {
   if (!cargado) await loadSeguimiento(structure)
   if (!esAdmin(currentUser().email)) {
     throw new Error('Solo un administrador (SGSI) puede cambiar la clasificacion.')
@@ -416,6 +416,8 @@ export async function setClasificacion(structure, slug, ruta, nivel) {
     })
     const entry = {
       nivel: val || null,
+      // itemId ancla el override a la carpeta real (estable ante renombres).
+      itemId: itemId ?? (prev && typeof prev === 'object' ? prev.itemId : null) ?? null,
       modificadoPor: user.name,
       modificadoPorEmail: user.email,
       ultimaModificacion: ahora,
@@ -426,6 +428,103 @@ export async function setClasificacion(structure, slug, ruta, nivel) {
   })
 }
 
+// Reconciliacion por itemId (ancla estable ante renombres). Recibe las carpetas
+// VIVAS de un nivel ya cargado [{ ruta, itemId }] y, para las entradas de
+// seguimiento de ESTE sitio (migracion y clasificacion):
+//   - re-llave: si una entrada con itemId X vive ahora en una ruta distinta a su
+//     clave -> mueve la entrada a la ruta nueva (la carpeta se renombro), dejando
+//     evidencia en historial.
+//   - backfill: si una entrada sin itemId esta en una ruta que SI existe viva,
+//     le sella el itemId (para proteger renombres futuros).
+// Idempotente y acotado a lo cargado (no detecta borrados: eso requiere un crawl
+// completo, deferido). Devuelve true si escribio.
+export async function reconciliarSitio(structure, slug, foldersVivas) {
+  if (!cargado) return false
+  if (!Array.isArray(foldersVivas) || foldersVivas.length === 0) return false
+  const liveById = new Map()
+  const liveByRuta = new Map()
+  for (const f of foldersVivas) {
+    if (f.itemId) liveById.set(f.itemId, f.ruta)
+    liveByRuta.set(f.ruta, f.itemId || null)
+  }
+
+  const seg = segDe(slug)
+  const rekeysNodos = []
+  const backfillNodos = []
+  for (const [key, e] of Object.entries(seg.nodos || {})) {
+    const ruta = key.slice(slug.length + 2) // quita "slug::"
+    const id = e?.itemId
+    if (id && liveById.has(id)) {
+      const nueva = liveById.get(id)
+      if (nueva !== ruta) rekeysNodos.push({ de: ruta, a: nueva })
+    } else if (!id && liveByRuta.get(ruta)) {
+      backfillNodos.push({ ruta, itemId: liveByRuta.get(ruta) })
+    }
+  }
+  const rekeysClasif = []
+  const backfillClasif = []
+  for (const [ruta, e] of Object.entries(seg.clasificaciones || {})) {
+    const id = e && typeof e === 'object' ? e.itemId : null
+    if (id && liveById.has(id)) {
+      const nueva = liveById.get(id)
+      if (nueva !== ruta) rekeysClasif.push({ de: ruta, a: nueva })
+    } else if (!id && liveByRuta.get(ruta)) {
+      backfillClasif.push({ ruta, itemId: liveByRuta.get(ruta) })
+    }
+  }
+
+  if (!rekeysNodos.length && !backfillNodos.length && !rekeysClasif.length && !backfillClasif.length) {
+    return false
+  }
+
+  const user = currentUser()
+  await escribirSitio(slug, (s) => {
+    const ahora = new Date().toISOString()
+    for (const { de, a } of rekeysNodos) {
+      const keyDe = `${slug}::${de}`
+      const keyA = `${slug}::${a}`
+      const entry = s.nodos[keyDe]
+      if (!entry) continue
+      entry.historial = Array.isArray(entry.historial) ? entry.historial : []
+      entry.historial.push({
+        fecha: ahora,
+        nota: `Reconciliada por itemId: ruta "${de}" -> "${a}" (carpeta renombrada en SharePoint)`,
+        modificadoPor: user.name,
+        modificadoPorEmail: user.email
+      })
+      if (!s.nodos[keyA]) s.nodos[keyA] = entry // no pisar un destino ya existente
+      delete s.nodos[keyDe]
+    }
+    for (const { ruta, itemId } of backfillNodos) {
+      const key = `${slug}::${ruta}`
+      if (s.nodos[key] && !s.nodos[key].itemId) s.nodos[key].itemId = itemId
+    }
+    for (const { de, a } of rekeysClasif) {
+      const entry = s.clasificaciones[de]
+      if (!entry) continue
+      if (typeof entry === 'object') {
+        entry.historial = Array.isArray(entry.historial) ? entry.historial : []
+        entry.historial.push({
+          fecha: ahora,
+          nivel_anterior: entry.nivel ?? null,
+          nivel_nuevo: entry.nivel ?? null,
+          nota: `Reconciliada por itemId: ruta "${de}" -> "${a}"`,
+          modificadoPor: user.name,
+          modificadoPorEmail: user.email
+        })
+      }
+      if (!s.clasificaciones[a]) s.clasificaciones[a] = entry
+      delete s.clasificaciones[de]
+    }
+    for (const { ruta, itemId } of backfillClasif) {
+      const e = s.clasificaciones[ruta]
+      if (e && typeof e === 'object' && !e.itemId) e.itemId = itemId
+    }
+    return true
+  })
+  return true
+}
+
 export function migracionDeNodo(key) {
   return segDe(slugDeKey(key)).nodos[key]?.migracionEstado || 'Sin empezar'
 }
@@ -433,7 +532,7 @@ export function migracionDeNodo(key) {
 // Cambios a un nodo. Verificacion controlada: "Verificada" solo Apoyo o Franco.
 export async function updateNodo(
   structure,
-  { key, tipo = 'carpeta', estado, migracionEstado, notas, quienMigra: quien, nota }
+  { key, tipo = 'carpeta', estado, migracionEstado, notas, quienMigra: quien, nota, itemId }
 ) {
   if (!cargado) await loadSeguimiento(structure)
   if (migracionEstado === 'Verificada' && !puedeVerificar()) {
@@ -458,6 +557,9 @@ export async function updateNodo(
       migracionEstado: migNuevo,
       quienMigra: quienNuevo,
       notas: notas !== undefined ? notas : prev?.notas ?? '',
+      // itemId (driveItem) ancla el seguimiento a la carpeta REAL: estable ante
+      // renombres, permite re-llave por itemId (reconciliarSitio).
+      itemId: itemId ?? prev?.itemId ?? null,
       ultimaModificacion: ahora,
       modificadoPor: user.name,
       modificadoPorEmail: user.email,
