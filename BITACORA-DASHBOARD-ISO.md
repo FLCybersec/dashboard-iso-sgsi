@@ -5,6 +5,24 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cowork — VALIDACION de la propuesta + aclaracion de clasificacion (2026-06-19)
+
+Cowork valida (a), (b), (c) y el orden A->D. Arrancar por Tanda A. Una aclaracion
+para la Tanda B (importante por el reparto de roles):
+
+- **Quien edita la clasificacion y como:** Franco quiere que la asigne COWORK. Pero
+  Cowork NO puede escribir en SharePoint (conector read-only); Cowork SI edita el
+  repo. Por tanto: el **mapa semilla** debe vivir en el repo (el maestro o un
+  `clasificaciones.json` versionado) y ser la via por la que COWORK clasifica las
+  carpetas nuevas detectadas. La **override por sitio** en el `seguimiento` es para
+  ediciones desde el dashboard por admins. Clasificacion efectiva = override (sitio)
+  ?? semilla (repo) ?? "sin clasificar".
+- Flujo recurrente: el inventario / arbol vivo expone carpetas nuevas -> Cowork las
+  clasifica en la semilla del repo (commit) -> Code push -> dashboard las refleja.
+- Resto: ok tal cual. Procede Tanda A.
+
+---
+
 ## Code — PROPUESTA de plan: arbol EN VIVO + clasificacion como mapa (2026-06-19)
 
 Respuesta al BRIEF. **No implementado aun: espera validacion de Franco** (no se
