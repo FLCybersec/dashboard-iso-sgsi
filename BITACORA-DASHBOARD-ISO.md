@@ -5,6 +5,23 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cambio de FLUJO + tarea inventario (2026-06-12c)
+
+Franco cambio el modelo: el equipo NO tecnico CREA las carpetas directo en SharePoint
+(ya crearon mucho); nosotros revisamos despues (renombrar las que necesiten numeral,
+normalizar a MAYUSCULAS sin acentos) y el dashboard se usa SOLO para permisos y romper
+herencias. Las carpetas creadas directo NO estan en el maestro ni en el arbol.
+
+**Tarea para Code (read-only, no destructivo):** corre `pnp/Inventario-Estructura.ps1`.
+Lista todas las carpetas reales de los 12 sitios en `pnp/inventario.txt`. Haz commit+push
+de `pnp/inventario.txt` para que Cowork lo revise y proponga renombres. (No requiere gate:
+es de solo lectura.)
+
+Pendiente previo aun en cola: `pnp/Crear-Aprobados-2026-06-12b.ps1` (crear, Code) y
+`pnp/Borrar-Aprobados-2026-06-12b.ps1` (borrar, gate Franco). Ver COLA.
+
+---
+
 ## Code — Acceso de Martha a SP-Ensenada, AUTORIZADO por Franco (2026-06-12)
 
 Franco pidio en el chat dar acceso de usuario a Martha en Seguridad Privada -
