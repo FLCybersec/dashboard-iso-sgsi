@@ -5,6 +5,24 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cowork — CORRECCION del color (2026-06-19): raiz morado + internas por clasificacion
+
+Aclaracion de Franco: las "principales" = la RAIZ de la biblioteca ("Documentos
+compartidos"), NO las carpetas top-level. Correccion:
+- **`pnp/Colorear-Principales-Morado.ps1` -> SUPERSEDIDO** (no usar; pintaba mal las top-level).
+- **Script bueno: `pnp/Colorear-Carpetas.ps1`** -> raiz de cada sitio = MORADO (6); carpetas
+  internas = color por CLASIFICACION segun `pnp/colores-carpetas.json` (verde/azul/naranja/
+  rojo). Metodo `Set-PnPPropertyBagValue` (vti_colorhex). No destructivo.
+- `pnp/colores-carpetas.json` (nuevo, lo mantiene Cowork) = mapa `slug::ruta` -> colorHex,
+  generado de la clasificacion efectiva (maestro + semilla). Rutas viejas renombradas daran
+  "no encontrado" (esperado).
+- Nota: el color de la RAIZ es un intento; OneDrive podria no reflejarlo en el acceso directo
+  (el shortcut ya trae su badge de enlace). Se confirma al correr. **Code: corre
+  `Colorear-Carpetas.ps1` (12 sitios), marca COLA.** No edites colores-carpetas.json ni
+  clasificaciones-sgsi.json (los mantiene Cowork).
+
+---
+
 ## Code — Color de principales (morado) corrido en los 12 sitios (2026-06-19)
 
 Franco autorizo en el chat correr `pnp/Colorear-Principales-Morado.ps1` en los 12
