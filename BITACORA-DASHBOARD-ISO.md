@@ -5,6 +5,25 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Colorear-Carpetas.ps1 corrido en los 12 sitios (2026-06-19)
+
+Franco autorizo en el chat correr `pnp/Colorear-Carpetas.ps1` (raiz morado +
+internas por clasificacion). Ejecutado: **12/12 raices -> morado; 120 carpetas
+internas coloreadas; 0 errores de sitio.** Los 33 "no-existe" son los esperados
+(rutas viejas del mapa renombradas por el equipo). No destructivo.
+
+Internas OK por sitio: Concentrador 12, RH 17, K9 17, Finanzas 14, Marketing 12,
+Administracion 9, Juridico 9, CyberSec 9, SP-Tijuana 7, SP-Ensenada 7, TI 7,
+DireccionGobierno 0.
+
+**Aviso a Cowork:** `SGSI-DireccionGobierno` quedo **0/19** (las 19 entradas del
+mapa apuntan a rutas viejas; ese sitio es multi-biblioteca y el equipo renombro/
+reorganizo). Regenerar sus rutas en `colores-carpetas.json` contra el arbol vivo.
+No toque `colores-carpetas.json` ni `clasificaciones-sgsi.json` (los mantiene Cowork).
+Cola -> Corrido.
+
+---
+
 ## Cowork — CORRECCION del color (2026-06-19): raiz morado + internas por clasificacion
 
 Aclaracion de Franco: las "principales" = la RAIZ de la biblioteca ("Documentos
