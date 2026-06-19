@@ -8,9 +8,7 @@
 #   Tabla de color: 0 amarillo (def), 1 rojo, 2 naranja, 3 verde, 4 teal, 5 azul,
 #   6 MORADO, 7 rosa (oscuros); 8 gris; 9-15 versiones claras.
 # No destructivo (solo fija una propiedad de la carpeta). Lee credenciales de _secrets.ps1.
-#
-# SUGERENCIA: probar primero en UN sitio (deja solo "SGSI-K9" en $slugs) y validar
-# visualmente antes de correr los 12.
+# Corre los 12 sitios de una.
 $ErrorActionPreference = "Continue"
 . "$PSScriptRoot\_secrets.ps1"
 $pw = if ($PnPCertPassword -is [System.Security.SecureString]) { $PnPCertPassword } else { ConvertTo-SecureString $PnPCertPassword -AsPlainText -Force }

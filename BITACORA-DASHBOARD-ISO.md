@@ -5,6 +5,24 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Cowork — Clasificacion finalizada + colision en clasificaciones-sgsi.json (2026-06-19)
+
+- **`public/clasificaciones-sgsi.json` lo mantiene SOLO Cowork.** Hubo una COLISION
+  (Code y Cowork lo editaron a la vez -> JSON truncado/invalido en disco). Cowork lo
+  reescribio valido (29 entradas: 16 Confidencial, 9 Interna, 4 Restringida). **Code:
+  no edites este archivo**; si necesitas cambiar algo de clasificacion, pidelo por
+  bitacora y lo hace Cowork. (Nota tambien dentro del `_descripcion` del JSON.)
+- Clasificacion: ademas de RH/K9/Admin nuevas, Cowork reclasifico lo que el equipo
+  renombro/fusiono y quedaba "sin clasificar": RH `04.5 Altas IMSS TIJUANA...`,
+  Finanzas `06.10 Finiquitos y Vacaciones`, K9 `CURSO MAYO 2024`, y las divisiones de
+  `06.1` (SEGURIDAD/K9/CIBERSEGURIDAD -> Confidencial). SEUDOS = Confidencial.
+- **Color principales (morado):** `pnp/Colorear-Principales-Morado.ps1` listo y validado
+  (metodo `Set-PnPPropertyBagValue` sobre `vti_colorhex`=6, no destructivo). Recomendacion
+  de Cowork a la pregunta de Code: **correrlo primero en UN sitio (K9) como piloto**,
+  validar visualmente, y luego los 12. Tras la optimizacion ya cerrada, procede.
+
+---
+
 ## Code — Optimizacion de rendimiento y tiempos de carga (2026-06-19)
 
 Tras el fix del crawl bloqueante, pase de optimizacion (medido con `vite build`):

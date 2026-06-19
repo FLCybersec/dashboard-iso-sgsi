@@ -1,9 +1,9 @@
 {
-  "_descripcion": "Mapa SEMILLA de clasificacion por carpeta para el dashboard SGSI. Lo mantiene Cowork en el repo (flujo inverso: el equipo crea/renombra carpetas directo en SharePoint; Cowork las clasifica aqui al detectarlas en el arbol vivo / inventario). Clave: '${slug}::${rutaRelativa}'. Valor: nivel de clasificacion ('Publica' | 'Interna' | 'Confidencial' | 'Restringida'). Esta semilla se combina con la del maestro (las entradas de aqui ganan). La clasificacion EFECTIVA que muestra el dashboard = override del sitio (editada por admin desde el dashboard, en el seguimiento) ?? esta semilla ?? 'sin clasificar'. NO inventar clasificaciones: dejar fuera del mapa lo que aun no se decide (saldra como 'sin clasificar').",
+  "_descripcion": "Mapa SEMILLA de clasificacion por carpeta para el dashboard SGSI. Lo mantiene COWORK en el repo (flujo inverso). Clave: '${slug}::${rutaRelativa}'. Valor: Publica|Interna|Confidencial|Restringida. Se combina con la del maestro (estas ganan). Efectiva = override del sitio ?? esta semilla ?? 'sin clasificar'. NOTA: este archivo lo edita SOLO Cowork; Code no debe tocarlo para evitar colisiones.",
   "version": "1.0",
   "actualizado": "2026-06-19",
-  "_nota_cowork": "Niveles PROPUESTOS por Cowork (2026-06-19) para las carpetas nuevas/renombradas del equipo, pendientes de visto bueno de Franco. 'SEUDOS' (K9) se deja fuera a proposito (significado no confirmado -> sale 'sin clasificar').",
   "clasificaciones": {
+    "SGSI-RecursosHumanos::04.5 Altas IMSS TIJUANA, K9, CIBERSEGURIDAD": "Confidencial",
     "SGSI-RecursosHumanos::04.6 ALTAS IMSS ENSENADA": "Confidencial",
     "SGSI-RecursosHumanos::04.8 BAJAS TIJUANA": "Confidencial",
     "SGSI-RecursosHumanos::04.9 BAJAS ENSENADA": "Confidencial",
@@ -20,11 +20,17 @@
     "SGSI-K9::10.6 AEROMEXICO": "Confidencial",
     "SGSI-K9::10.7 PERMISOS AUTORIZACIONES": "Restringida",
     "SGSI-K9::10.8 SANIDAD": "Confidencial",
+    "SGSI-K9::10.9 SEUDOS": "Confidencial",
     "SGSI-K9::10.10 NORMATIVIDAD": "Interna",
     "SGSI-K9::10.11 CENTROS ENTRENAMIENTO": "Interna",
     "SGSI-K9::10.12 FORMATOS": "Interna",
     "SGSI-K9::10.13 SOPORTE FILMICO": "Interna",
+    "SGSI-K9::CURSO MAYO 2024": "Interna",
     "SGSI-Administracion::07.7 FORMATOS Y PLANTILLAS": "Interna",
-    "SGSI-Administracion::07.8 JMA FEDERALES": "Restringida"
+    "SGSI-Administracion::07.8 JMA FEDERALES": "Restringida",
+    "SGSI-Finanzas::06.10 Finiquitos y Vacaciones": "Confidencial",
+    "SGSI-Finanzas::06.1 Facturacion (Emitidas-Recibidas)/SEGURIDAD": "Confidencial",
+    "SGSI-Finanzas::06.1 Facturacion (Emitidas-Recibidas)/K9": "Confidencial",
+    "SGSI-Finanzas::06.1 Facturacion (Emitidas-Recibidas)/CIBERSEGURIDAD": "Confidencial"
   }
 }
