@@ -5,6 +5,53 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — TANDA B cerrada: clasificacion como mapa por ruta (2026-06-19) — REVISAR
+
+Implementada la Tanda B segun la aclaracion de Cowork. **Para revision de Franco
+antes de la Tanda C.** Clasificacion EFECTIVA = override del sitio (seguimiento,
+editable por admin) ?? semilla del repo (maestro + `clasificaciones-sgsi.json`)
+?? "sin clasificar".
+
+**Semilla en repo (la mantiene Cowork):**
+- `public/clasificaciones-sgsi.json` (nuevo): mapa `${slug}::${ruta}` -> nivel.
+  Cowork clasifica aqui las carpetas que detecta en el arbol vivo / inventario y
+  commitea; el dashboard lo lee al cargar. Arranca vacio (no se inventan niveles:
+  lo no decidido sale "sin clasificar"). Se combina con la clasificacion del
+  maestro (las entradas del JSON ganan). **Vive solo en `public/`** (servido); no
+  se replica en raiz como el maestro, para evitar drift entre copias.
+
+**Override por sitio (admin desde el dashboard):**
+- `seguimiento-migracion.json` de cada sitio gana un bloque `clasificaciones`
+  (clave = ruta; valor = { nivel, modificadoPor, ultimaModificacion, historial[] }).
+  Solo admin (SGSI) puede editarlo; cada cambio deja evidencia en historial
+  (A.5.12/A.5.13/A.5.15). nivel null = override quitado (vuelve a la semilla),
+  conservando la evidencia.
+
+**Archivos:**
+- `structure-store.js`: carga `clasificaciones-sgsi.json`, construye
+  `clasificacionSeed` (maestro + repo) y expone `clasificacionSemilla()`.
+- `seguimiento-store.js`: campo `clasificaciones` (emptySeg/normalize/fusion),
+  `getClasifOverride()`, `setClasificacion()` (admin + historial) y agregacion a
+  clave global `${slug}::${ruta}` en `getSeguimiento()`.
+- `ArbolCarpetas.js`: badge muestra la efectiva; el admin tiene un selector
+  `sel-clasif` por carpeta (sin clasificar + niveles) para fijar/quitar el override.
+- `SitioView.js`: accion `onClasificar`.
+- `exporter.js`: la hoja "Carpetas" usa la clasificacion EFECTIVA (override ??
+  semilla) en vez del campo del maestro.
+- `components.css`: estilo de `sel-clasif`.
+
+**Tests:** suite **30/30 en verde** (build OK). Nuevo `clasificacion.spec.js`:
+semilla del maestro visible, carpeta nueva "sin clasificar", admin la fija y
+persiste el override por ruta con su nivel, badge efectivo actualizado.
+
+**Pendiente (en el plan):** Tanda C (anclaje `itemId` ante renombres: hoy el
+override de clasificacion y el seguimiento siguen por ruta) y Tanda D (metricas
+globales sobre el arbol vivo + actualizar ESPECIFICACION §4/§6/§7/§10/§12).
+
+**Siguiente:** Tanda C cuando Franco valide esta tanda.
+
+---
+
 ## Code — TANDA A cerrada: arbol EN VIVO + lazy-load (2026-06-19) — REVISAR
 
 Implementada la Tanda A del plan validado. **Para revision de Franco antes de

@@ -7,6 +7,10 @@
 // que se usara en tandas posteriores.
 
 const MASTER_URL = '/estructura-maestra-sgsi.json'
+// Mapa SEMILLA de clasificacion por carpeta (lo mantiene Cowork en el repo, para
+// el flujo inverso: clasifica las carpetas que detecta en el arbol vivo). Clave
+// `${slug}::${ruta}`. Se combina con la clasificacion del maestro (esta gana).
+const CLASIF_URL = '/clasificaciones-sgsi.json'
 
 let cache = null
 
@@ -90,6 +94,15 @@ export async function loadStructure() {
   }
   const raw = await res.json()
 
+  // Mapa semilla de clasificacion del repo (opcional; ausente -> vacio).
+  let rawClasif = {}
+  try {
+    const rc = await fetch(CLASIF_URL, { cache: 'no-cache' })
+    if (rc.ok) rawClasif = await rc.json()
+  } catch {
+    rawClasif = {}
+  }
+
   const sitios = (raw.sitios || []).map((s) => {
     const nodos = aplanarSitio(s)
     return {
@@ -113,6 +126,17 @@ export async function loadStructure() {
     clasificaciones[c.nivel] = { color: c.color, retencion: c.retencion }
   }
 
+  // Semilla de clasificacion por carpeta `${slug}::${ruta}` -> nivel: primero la
+  // del maestro (por nodo), luego el mapa del repo (gana, para clasificar las
+  // carpetas del flujo inverso que ya no estan en el maestro).
+  const clasificacionSeed = {}
+  for (const n of todosLosNodos) {
+    if (n.clasificacion) clasificacionSeed[n.key] = n.clasificacion
+  }
+  for (const [k, v] of Object.entries(rawClasif.clasificaciones || {})) {
+    if (v) clasificacionSeed[k] = v
+  }
+
   cache = {
     proyecto: raw.proyecto,
     version: raw.version,
@@ -121,6 +145,7 @@ export async function loadStructure() {
     hubSlug: raw.hub_slug,
     reglas: raw.reglas || [],
     clasificaciones,
+    clasificacionSeed,
     sitios,
     nodos: todosLosNodos,
     totales: {
@@ -134,4 +159,10 @@ export async function loadStructure() {
 // Color de una clasificacion segun el JSON (fallback gris si no se reconoce).
 export function colorClasificacion(estructura, nivel) {
   return estructura?.clasificaciones?.[nivel]?.color || '#6b7280'
+}
+
+// Clasificacion SEMILLA de una carpeta (maestro + mapa del repo), o null. El
+// override por sitio (seguimiento) tiene prioridad y se resuelve en quien llama.
+export function clasificacionSemilla(estructura, slug, ruta) {
+  return estructura?.clasificacionSeed?.[`${slug}::${ruta}`] || null
 }

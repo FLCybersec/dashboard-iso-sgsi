@@ -137,7 +137,12 @@ function emptySeg() {
     fases_por_sitio: {},
     migracion_por_sitio: {},
     cambios_estructura: [],
-    solicitudes_permisos: []
+    solicitudes_permisos: [],
+    // Override de clasificacion por carpeta (ruta dentro del sitio) editado por
+    // admins desde el dashboard. Cada entrada: { nivel, modificadoPor, ...,
+    // historial[] } (evidencia A.5.12/A.5.13). nivel null = "sin clasificar"
+    // (se quito el override; vuelve a la semilla del repo).
+    clasificaciones: {}
   }
 }
 
@@ -151,7 +156,8 @@ function normalize(raw) {
     fases_por_sitio: s.fases_por_sitio && typeof s.fases_por_sitio === 'object' ? s.fases_por_sitio : {},
     migracion_por_sitio: s.migracion_por_sitio && typeof s.migracion_por_sitio === 'object' ? s.migracion_por_sitio : {},
     cambios_estructura: Array.isArray(s.cambios_estructura) ? s.cambios_estructura : [],
-    solicitudes_permisos: Array.isArray(s.solicitudes_permisos) ? s.solicitudes_permisos : []
+    solicitudes_permisos: Array.isArray(s.solicitudes_permisos) ? s.solicitudes_permisos : [],
+    clasificaciones: s.clasificaciones && typeof s.clasificaciones === 'object' ? s.clasificaciones : {}
   }
 }
 
@@ -200,6 +206,7 @@ function fusionarConLocal(base, local) {
   for (const [k, v] of Object.entries(local.nodos)) if (!base.nodos[k]) base.nodos[k] = v
   for (const [k, v] of Object.entries(local.fases_por_sitio)) if (!(k in base.fases_por_sitio)) base.fases_por_sitio[k] = v
   for (const [k, v] of Object.entries(local.migracion_por_sitio)) if (!(k in base.migracion_por_sitio)) base.migracion_por_sitio[k] = v
+  for (const [k, v] of Object.entries(local.clasificaciones)) if (!(k in base.clasificaciones)) base.clasificaciones[k] = v
   return base
 }
 
@@ -340,6 +347,12 @@ export function getSeguimiento() {
     Object.assign(agg.fases_por_sitio, part.fases_por_sitio)
     Object.assign(agg.migracion_por_sitio, part.migracion_por_sitio)
     agg.cambios_estructura.push(...part.cambios_estructura)
+    // Clasificaciones: cada sitio las guarda por ruta; se reexponen con clave
+    // global `${slug}::${ruta}` (solo las que tienen nivel; null = sin override).
+    for (const [ruta, e] of Object.entries(s.clasificaciones || {})) {
+      const nivel = e && typeof e === 'object' ? e.nivel : e
+      if (nivel) agg.clasificaciones[`${slug}::${ruta}`] = nivel
+    }
     for (const x of s.solicitudes_permisos || []) {
       if (!solicitudes.has(x.id) || x.slug === slug) solicitudes.set(x.id, x)
     }
@@ -364,6 +377,53 @@ export function estadoEfectivo(existe, override) {
 export function quienMigra(key) {
   const ov = segDe(slugDeKey(key)).nodos[key]
   return (ov?.quienMigra || ov?.responsable || '').trim()
+}
+
+// Override de clasificacion de una carpeta (nivel) o null si no hay. La
+// clasificacion EFECTIVA = este override ?? semilla del repo ?? "sin clasificar"
+// (la semilla la resuelve quien llama, con clasificacionSemilla del structure).
+export function getClasifOverride(slug, ruta) {
+  const e = segDe(slug).clasificaciones?.[ruta]
+  const nivel = e && typeof e === 'object' ? e.nivel : e
+  return nivel || null
+}
+
+// Asigna/quita el override de clasificacion de una carpeta. Solo admin (SGSI).
+// nivel vacio => se quita el override (vuelve a la semilla), conservando la
+// evidencia del cambio en `historial` (A.5.12/A.5.13/A.5.15).
+export async function setClasificacion(structure, slug, ruta, nivel) {
+  if (!cargado) await loadSeguimiento(structure)
+  if (!esAdmin(currentUser().email)) {
+    throw new Error('Solo un administrador (SGSI) puede cambiar la clasificacion.')
+  }
+  const niveles = Object.keys((structure && structure.clasificaciones) || {})
+  const val = (nivel || '').trim()
+  if (val && niveles.length && !niveles.includes(val)) {
+    throw new Error(`Clasificacion no valida: "${val}". Debe ser una de: ${niveles.join(', ')}.`)
+  }
+  const user = currentUser()
+  return escribirSitio(slug, (seg) => {
+    const ahora = new Date().toISOString()
+    const prev = seg.clasificaciones[ruta] || null
+    const anterior = (prev && typeof prev === 'object' ? prev.nivel : prev) || null
+    const historial = Array.isArray(prev?.historial) ? [...prev.historial] : []
+    historial.push({
+      fecha: ahora,
+      nivel_anterior: anterior,
+      nivel_nuevo: val || null,
+      modificadoPor: user.name,
+      modificadoPorEmail: user.email
+    })
+    const entry = {
+      nivel: val || null,
+      modificadoPor: user.name,
+      modificadoPorEmail: user.email,
+      ultimaModificacion: ahora,
+      historial
+    }
+    seg.clasificaciones[ruta] = entry
+    return entry
+  })
 }
 
 export function migracionDeNodo(key) {

@@ -7,6 +7,7 @@ import {
   loadSeguimiento,
   refreshSeguimientoSitio,
   updateNodo,
+  setClasificacion,
   statsMigracionSitio,
   getApoyoSitio,
   setApoyoSitio,
@@ -82,6 +83,11 @@ export function SitioView({ slug, puedeEditar = true }) {
     },
     onQuienMigra: async (key, nombre) => {
       await updateNodo(structure, { key, quienMigra: nombre })
+      rerender()
+    },
+    // Clasificacion editable por admin: override por sitio (semilla = repo).
+    onClasificar: async (ruta, nivel) => {
+      await setClasificacion(structure, slug, ruta, nivel)
       rerender()
     },
     // "Bloquear" se retiro de la UI (2026-06-12, pedido de Franco); solo queda

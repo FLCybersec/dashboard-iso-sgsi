@@ -1,0 +1,6 @@
+{
+  "_descripcion": "Mapa SEMILLA de clasificacion por carpeta para el dashboard SGSI. Lo mantiene Cowork en el repo (flujo inverso: el equipo crea/renombra carpetas directo en SharePoint; Cowork las clasifica aqui al detectarlas en el arbol vivo / inventario). Clave: '${slug}::${rutaRelativa}'. Valor: nivel de clasificacion ('Publica' | 'Interna' | 'Confidencial' | 'Restringida'). Esta semilla se combina con la del maestro (las entradas de aqui ganan). La clasificacion EFECTIVA que muestra el dashboard = override del sitio (editada por admin desde el dashboard, en el seguimiento) ?? esta semilla ?? 'sin clasificar'. NO inventar clasificaciones: dejar fuera del mapa lo que aun no se decide (saldra como 'sin clasificar').",
+  "version": "1.0",
+  "actualizado": "2026-06-19",
+  "clasificaciones": {}
+}

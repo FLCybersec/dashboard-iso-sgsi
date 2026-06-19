@@ -1,9 +1,10 @@
 import { html } from 'htm/preact'
 import { useState, useEffect, useCallback, useMemo } from 'preact/hooks'
-import { colorClasificacion } from '../lib/structure-store.js'
+import { colorClasificacion, clasificacionSemilla } from '../lib/structure-store.js'
 import { getChildren, invalidateSitio } from '../lib/live-tree-store.js'
 import {
   getOverride,
+  getClasifOverride,
   getCambiosEstructura,
   quienMigra as quienMigraDe,
   accesoTemporalSitio,
@@ -304,7 +305,11 @@ function ArbolNodo({ folder = null, virtual = null, nivel: depth, ctx, extraHere
   const seed = ctx.seedPorRuta.get(ruta)
   const ov = getOverride(key)
 
-  const clasificacion = esVirtual ? virtual.clasificacion : seed?.clasificacion || null
+  // Clasificacion EFECTIVA: en virtuales la del cambio; en reales el override del
+  // sitio (seguimiento) y, si no, la semilla del repo (maestro + clasificaciones-sgsi).
+  const clasificacion = esVirtual
+    ? virtual.clasificacion
+    : getClasifOverride(ctx.slug, ruta) || clasificacionSemilla(ctx.structure, ctx.slug, ruta)
   const color = clasificacion ? colorClasificacion(ctx.structure, clasificacion) : null
   const accesoExtra = seed?.accesoExtra || []
   const accesoExcluido = seed?.accesoExcluido || []
@@ -356,6 +361,11 @@ function ArbolNodo({ folder = null, virtual = null, nivel: depth, ctx, extraHere
         ${clasificacion
           ? html`<span class="badge" style=${`background:${color}`}>${clasificacion}</span>`
           : !esVirtual && html`<span class="badge sin-clasificar" title="Sin clasificar (asignar)">sin clasificar</span>`}
+        ${!esVirtual && ctx.admin && typeof ctx.acciones?.onClasificar === 'function' &&
+        html`<select class="sel-clasif" disabled=${busy} title="Clasificacion (override del sitio)" onChange=${(e) => run(() => ctx.acciones.onClasificar(ruta, e.target.value))}>
+          <option value="" selected=${!clasificacion}>sin clasificar</option>
+          ${ctx.niveles.map((n) => html`<option value=${n} selected=${n === clasificacion}>${n}</option>`)}
+        </select>`}
 
         ${esVirtual
           ? html`<span class="estado-tag prog">pendiente de crear</span>`

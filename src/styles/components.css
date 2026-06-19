@@ -497,7 +497,8 @@
 
 /* ---- Selector quien migra en el arbol ---- */
 .sel-quien,
-.sel-mig {
+.sel-mig,
+.sel-clasif {
   font-family: inherit;
   font-size: var(--fs-xs);
   padding: 3px 6px;

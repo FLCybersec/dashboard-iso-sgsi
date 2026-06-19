@@ -112,6 +112,10 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
     { header: 'Ultima modif.', key: 'ultima', width: 20 },
     { header: 'Modificado por', key: 'por', width: 22 }
   ])
+  // Clasificacion EFECTIVA por carpeta: override del sitio (seg) ?? semilla
+  // (maestro + repo, ya combinada en structure.clasificacionSeed).
+  const clasifEfectiva = (key) =>
+    seg?.clasificaciones?.[key] || structure?.clasificacionSeed?.[key] || ''
   for (const sitio of structure.sitios) {
     for (const n of sitio.nodos) {
       const existe = existePorKey.get(n.key) || false
@@ -121,7 +125,7 @@ export async function buildEvidenciaWorkbook({ structure, mig, seg }) {
         sitio: sitio.nombre,
         ruta: n.ruta,
         nombre: n.nombre,
-        clasificacion: n.clasificacion || '',
+        clasificacion: clasifEfectiva(n.key),
         migracion: ov?.migracionEstado || 'Sin empezar',
         responsable: quienMigra(n.key),
         existe: existe ? 'Si' : 'No',
