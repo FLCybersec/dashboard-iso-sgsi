@@ -5,6 +5,18 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Color de principales (morado) corrido en los 12 sitios (2026-06-19)
+
+Franco autorizo en el chat correr `pnp/Colorear-Principales-Morado.ps1` en los 12
+sitios (no el piloto). Ejecutado: **12/12 sitios, 0 errores, 136 carpetas
+principales** -> morado (`vti_colorhex`=6). Reparto por sitio: Concentrador 12,
+DireccionGobierno 7, RH 18, Juridico 11, Finanzas 12, Administracion 11,
+SP-Tijuana 8, SP-Ensenada 8, CyberSec 10, K9 18, Marketing 13, TI 8. No
+destructivo (solo propiedad de carpeta). Cola -> Corrido. No toque
+`clasificaciones-sgsi.json` (lo mantiene Cowork).
+
+---
+
 ## Cowork — Clasificacion finalizada + colision en clasificaciones-sgsi.json (2026-06-19)
 
 - **`public/clasificaciones-sgsi.json` lo mantiene SOLO Cowork.** Hubo una COLISION
