@@ -61,7 +61,7 @@ export const EQUIPO_APOYO = ['Carmen', 'Ezequiel', 'Chema']
 export const ROSTER = [
   'Jorge', 'Jose Maria', 'Martha', 'Franco', 'Jose Arley', 'Daniela', 'Wendy',
   'Nabiki', 'Miguel', 'Ezequiel', 'Carmen', 'America', 'Mauro', 'Juan Manuel',
-  'Samuel', 'Ireri', 'Chema', 'Rita', 'Joel', 'Angel'
+  'Samuel', 'Ireri', 'Chema', 'Rita', 'Joel', 'Angel', 'Dumar'
 ]
 
 export const ROSTER_UPN = {
@@ -69,7 +69,8 @@ export const ROSTER_UPN = {
   Ezequiel: 'etorres@jmacybersec.com',
   Carmen: 'crodriguez@jmacybersec.com',
   Chema: 'cgonzalez@jmacybersec.com',
-  Jorge: 'jalvarez@jmaseguridad.com'
+  Jorge: 'jalvarez@jmaseguridad.com',
+  Dumar: 'dlopez@jmaseguridad.com'
 }
 
 const VERIFICADORES_EMAIL = new Set([

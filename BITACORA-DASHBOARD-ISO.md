@@ -5,6 +5,24 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Dumar al roster + permisos K9 corridos (2026-06-19)
+
+- **Roster:** `Dumar` agregado a `ROSTER` y a `ROSTER_UPN`
+  (`dlopez@jmaseguridad.com`) en `seguimiento-store.js`. (No requiere
+  allowed-users: el dashboard deja entrar a cualquiera del tenant.)
+- **Permisos K9** (`pnp/Permisos-K9-2026-06-19.ps1`, autorizado por Franco):
+  ejecutado, todo OK -> A) Jorge y Jose Maria = Propietario; B) carpeta
+  `10.11 CENTROS ENTRENAMIENTO/TOLUCA` creada; C) TIJUANA -> Dumar y Samuel con
+  "Editar" (herencia rota); D) Samuel quitado de "Integrantes de la JMA K9" (no
+  estaba en Propietarios). Cola -> Corrido.
+- **Maestro:** acceso de sitio de K9 actualizado por Cowork (+Jorge, +Jose Maria,
+  -Samuel); validado (JSON ok, raiz == public, E2E 34/34) y pusheado.
+- Pendientes (no accionados, de la tarea): responsables CHIHUAHUA/CRIANZA/TOLUCA
+  ("quien determine JMA"); rediseno de formatos en 10.12 (contenido, no permisos);
+  Cowork: corregir rutas de DireccionGobierno en colores-carpetas.json.
+
+---
+
 ## Tarea para Code — Usuario nuevo Dumar + permisos K9 (2026-06-19)
 
 **Usuario nuevo:** Dummar Lopez Quina, `dlopez@jmaseguridad.com` (Arley lo llama "Dumar";
