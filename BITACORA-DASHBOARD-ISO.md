@@ -5,6 +5,121 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — PROPUESTA de plan: arbol EN VIVO + clasificacion como mapa (2026-06-19)
+
+Respuesta al BRIEF. **No implementado aun: espera validacion de Franco** (no se
+avanza de tanda sin su OK). Diagnostico del codigo actual y decisiones de diseno
+abajo; al validar, se ejecuta por tandas y se actualiza la ESPECIFICACION.
+
+### Como esta hoy (para entender el delta)
+- El arbol se arma del MAESTRO (`structure.sitios[].nodos`, aplanado en
+  `structure-store.js`), no de SharePoint. Por eso K9 muestra la estructura vieja.
+- `migration-store.js` hace un crawl RECURSIVO COMPLETO del drive
+  (`collectFolderPaths`, BFS de todos los niveles) solo para marcar `existe` y
+  contar archivos cruzando contra los nodos del maestro. Es justo lo que hay que
+  invertir: que el arbol SALGA de ese recorrido, no del maestro.
+- Seguimiento (migracion, fases, cambios, permisos) por sitio en
+  `_seguimiento/seguimiento-migracion.json`, **clave `${slug}::${ruta}`**. La
+  clasificacion hoy es un campo del nodo del maestro (read-only).
+
+### (a) Mapa de clasificacion — DONDE guardarlo
+**Recomendacion: por sitio, dentro del `seguimiento-migracion.json` de cada sitio**
+(nuevo bloque `clasificaciones: { [ruta]: nivel }`), NO un archivo unico.
+- Razon: respeta el modelo actual (cada area escribe donde TIENE permiso via
+  Graph delegado; un archivo unico en el hub seria un cuello de escritura y no
+  todos pueden escribir alli). Reusa `escribirSitio()` + historial = evidencia
+  A.5.12/A.5.13/A.5.15 ya implementada.
+- **Semilla** = la clasificacion del maestro actual (se siembra en memoria al
+  cargar, igual que hoy se siembra el seguimiento legado del hub). Carpeta real
+  sin entrada -> badge gris "sin clasificar", editable por admin/Cowork.
+- El maestro deja de ser espejo y queda como **semilla read-only**; el export ISO
+  lee el mapa (con fallback a la semilla).
+
+### (b) Lazy-load del arbol grande (~4214 carpetas)
+**Recomendacion: carga por NIVEL bajo demanda**, reemplazando el crawl completo.
+- Nuevo `live-tree-store.js`: `GET /drives/{id}/root/children` para la raiz y
+  `/root:/{ruta}:/children` al expandir un nodo. `existe` se vuelve trivial (si
+  esta en el listado, existe) y `archivos` sale del mismo call (items no-carpeta).
+- Cache idb por `${slug}::${ruta}` con TTL + invalidacion; el boton "Actualizar"
+  limpia el nivel. Concurrencia acotada (ya existe `enParalelo`, limite 8).
+- `ArbolCarpetas` se re-arma desde datos vivos, colapsado por defecto, expand-on-
+  demand. **Desaparece el tag ESTRUCTURA "Pendiente/Creada"** (si existe, se ve).
+- Metricas globales: la "Estructura %" (creadas/total vs maestro) pierde sentido.
+  La "Migracion %" necesita denominador = nº de carpetas reales: se obtiene con un
+  conteo por sitio (el crawl actual, ahora explicito/cacheado y NO bloqueante del
+  arbol), o incremental. A definir el detalle en la Tanda B/D.
+
+### (c) Seguimiento por ruta ante renombres — EL punto critico
+Hoy, si el equipo renombra, la `ruta` cambia: el estado/clasificacion ligados a la
+ruta vieja se huerfanan y la nueva no tiene entrada. Dado que el equipo renombra
+mucho, "aceptar re-asignacion" perderia avance. **Recomendacion: anclar al
+`driveItem.id`** (estable ante rename dentro del mismo drive; ahora es viable
+porque el arbol es EN VIVO -> las carpetas existen por definicion, que era la
+objecion original de CLAUDE.md para no usar el id).
+- La clave canonica visible sigue siendo la ruta (legible + semilla del maestro),
+  pero cada entrada de seguimiento/clasificacion **sella `itemId`** cuando se
+  conoce (del arbol vivo). Al cargar: si una ruta no tiene entrada pero existe una
+  entrada con el mismo `itemId` en otra ruta -> se RE-LLAVE (migra) a la ruta
+  nueva y se registra en `historial` (evidencia del movimiento).
+- Huerfanos sin match (carpeta borrada de verdad) NO se borran en silencio: se
+  marcan "para revision" (A.5.15/A.8.15).
+
+### Plan por tandas (al validar Franco)
+- **Tanda A — Arbol en vivo + lazy-load.** `live-tree-store.js`, re-arma
+  `ArbolCarpetas` (expand-on-demand, colapsado), quita tag Estructura, "Actualizar"
+  por nivel. (b)
+- **Tanda B — Clasificacion como mapa por ruta.** Bloque `clasificaciones` por
+  sitio, semilla del maestro, badge "sin clasificar", edicion admin/Cowork +
+  historial, export ISO lee el mapa. (a)
+- **Tanda C — Anclaje `itemId` + reconciliacion de renombres.** Sella itemId,
+  re-llave por itemId, huerfanos a revision. (c)
+- **Tanda D — Aprobacion de estructura -> secundaria + spec + tests.** Degradar la
+  aprobacion de estructura a opcional (mantener permisos y solicitudes puntuales),
+  recalcular metricas globales, actualizar ESPECIFICACION (§4, §6, §7, §10, §12) y
+  suite E2E (mocks de arbol vivo, lazy-load, mapa, reconciliacion).
+
+**Pendiente de Franco:** validar (a)/(b)/(c) y el orden de tandas. Sugiero
+arrancar por A (desbloquea el problema visible de K9). No implemento hasta tu OK.
+
+---
+
+## BRIEF para Code — Dashboard: arbol EN VIVO + clasificacion como mapa (2026-06-19)
+
+Cambio de fondo (decidido por Franco) acorde al flujo inverso. Code: propone plan/tandas
+y confirma en la bitacora antes de avanzar.
+
+**Problema:** el arbol se construye del maestro; con el equipo creando/renombrando/borrando
+directo en SharePoint, el maestro quedo desfasado. Ej.: K9 muestra 10.1 "Binomios y
+Manejadores"... (estructura vieja del maestro, ya inexistente) -> todo "Pendiente"; las
+carpetas reales (10.1 CANINOS...) no aparecen.
+
+**Objetivo:** el arbol debe reflejar la estructura REAL de SharePoint (via Graph),
+detectando automaticamente lo creado/renombrado/borrado. Desaparece el estado de
+ESTRUCTURA "Pendiente/Creada" (ya no aplica: si existe, se muestra; si no, no esta).
+
+**Cambios:**
+1. **Arbol en vivo desde Graph** (carpetas reales por sitio), NO desde el maestro.
+   Lazy-load al expandir (hay ~4214 carpetas; no cargar todo de golpe). Cache + boton
+   Actualizar. Usar `/drive/root` por nivel.
+2. **Clasificacion = mapa editable por ruta** (no existe en SharePoint). Decision de
+   Franco: la asigna Cowork/equipo desde el dashboard y se CONSERVA para reflejarla en la
+   documentacion/export. Guardar `clasificaciones[ruta] = nivel` persistente (semilla = el
+   maestro actual). Carpeta real sin entrada -> badge "sin clasificar" (gris), editable por
+   admin. El export ISO usa este mapa.
+3. **Aprobacion de estructura -> SECUNDARIA** (opcional, "a veces"). El arbol ya no depende
+   de ella. Se mantiene Aprobaciones para PERMISOS (y solicitudes puntuales).
+4. **Migracion (estado por carpeta) y permisos**: siguen. OJO clave-por-ruta: si el equipo
+   renombra una carpeta, el estado/clasificacion ligados a la ruta vieja se desligan;
+   evaluar reconciliacion o aceptar re-asignacion al renombrar.
+
+**Pregunta a Code:** propone (a) como/ donde guardar el mapa de clasificacion (seguimiento
+por sitio vs archivo unico), (b) el lazy-load del arbol grande, (c) que pasa con el
+seguimiento por ruta ante renombres. Actualiza tambien la ESPECIFICACION cuando se acuerde.
+
+**Cowork:** a partir de ahora clasifica las carpetas detectadas y mantiene el mapa.
+
+---
+
 ## Code — Renombrado de estructura corrido (flujo inverso) (2026-06-19)
 
 Ejecutado `pnp/Renombrar-Estructura-2026-06-19.ps1` (RENAME, no destructivo, sin gate).
