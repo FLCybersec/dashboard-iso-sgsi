@@ -3,7 +3,7 @@ import { useState, useEffect, useCallback } from 'preact/hooks'
 import { route } from 'preact-router'
 import { Cargando } from './Cargando.js'
 import { loadStructure } from '../lib/structure-store.js'
-import { loadMigrationState } from '../lib/migration-store.js'
+import { loadMigrationState, peekMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   statsMigracionGlobal,
@@ -21,6 +21,7 @@ export function HomeView() {
   const [data, setData] = useState(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
+  const [revalidando, setRevalidando] = useState(false)
 
   const build = (st, mig) => ({
     st,
@@ -31,17 +32,25 @@ export function HomeView() {
     actividad: actividadReciente(st, 12)
   })
 
+  // Render NO bloqueante: estructura + seguimiento (rapido) + inventario cacheado
+  // (peek). El recorrido vivo de los 12 sitios corre en SEGUNDO PLANO y refresca
+  // las metricas al terminar (stale-while-revalidate); nunca bloquea el render.
   const run = useCallback(async (force) => {
     setLoading(true)
     setError(null)
     try {
       const st = await loadStructure()
-      // Migracion y seguimiento en paralelo: son lecturas independientes.
-      const [mig] = await Promise.all([loadMigrationState(st, { force }), loadSeguimiento(st, { force })])
-      setData(build(st, mig))
+      await loadSeguimiento(st, { force })
+      const cached = force ? null : await peekMigrationState()
+      setData(build(st, cached))
+      setLoading(false)
+      setRevalidando(true)
+      loadMigrationState(st, { force })
+        .then((mig) => setData(build(st, mig)))
+        .catch((e) => setError(e?.message || String(e)))
+        .finally(() => setRevalidando(false))
     } catch (e) {
       setError(e?.message || String(e))
-    } finally {
       setLoading(false)
     }
   }, [])
@@ -50,12 +59,16 @@ export function HomeView() {
     run(false)
   }, [run])
 
+  const tsLabel = data?.mig?.fetchedAt
+    ? `Inventario: ${formatTs(data.mig.fetchedAt)}${data.mig.fromCache ? ' (cache)' : ''}`
+    : 'Inventario: calculando...'
+
   return html`
     <div class="view-head">
       <h1>Resumen</h1>
       <div class="view-head-actions">
-        ${data && html`<span class="muted">Actualizado: ${formatTs(data.mig.fetchedAt)}${data.mig.fromCache ? ' (cache)' : ''}</span>`}
-        <${BotonActualizar} onRefreshed=${({ st, mig }) => setData(build(st, mig))} />
+        ${data && html`<span class="muted">${revalidando ? 'Actualizando inventario...' : tsLabel}</span>`}
+        <${BotonActualizar} refrescar=${() => run(true)} />
       </div>
     </div>
 
@@ -77,7 +90,7 @@ function Resumen({ data }) {
         <span>${migGlobal.pct}%</span>
       </div>
       <div class="bar bar-lg"><div class="bar-fill alt" style=${`width:${migGlobal.pct}%`}></div></div>
-      <div class="muted">${migGlobal.migradas} de ${migGlobal.total} carpetas reales migradas · ${mig.totalCarpetas} carpetas en ${mig.sitiosCreados}/${mig.totalSitios} sitios (lectura en vivo)</div>
+      <div class="muted">${migGlobal.migradas} de ${migGlobal.total} carpetas reales migradas${mig ? ` · ${mig.totalCarpetas} carpetas en ${mig.sitiosCreados}/${mig.totalSitios} sitios (lectura en vivo)` : ' · inventario calculandose...'}</div>
     </div>
 
     <h2 style="margin-top:24px">Avance por persona</h2>
@@ -106,7 +119,7 @@ function Resumen({ data }) {
       </thead>
       <tbody>
         ${st.sitios.map((s) => {
-          const estr = mig.sitios.find((x) => x.slug === s.slug)
+          const estr = mig?.sitios?.find((x) => x.slug === s.slug)
           const m = statsMigracionSitio(s, estr)
           return html`
             <tr key=${s.slug}>

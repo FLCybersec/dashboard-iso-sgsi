@@ -2,5 +2,29 @@
   "_descripcion": "Mapa SEMILLA de clasificacion por carpeta para el dashboard SGSI. Lo mantiene Cowork en el repo (flujo inverso: el equipo crea/renombra carpetas directo en SharePoint; Cowork las clasifica aqui al detectarlas en el arbol vivo / inventario). Clave: '${slug}::${rutaRelativa}'. Valor: nivel de clasificacion ('Publica' | 'Interna' | 'Confidencial' | 'Restringida'). Esta semilla se combina con la del maestro (las entradas de aqui ganan). La clasificacion EFECTIVA que muestra el dashboard = override del sitio (editada por admin desde el dashboard, en el seguimiento) ?? esta semilla ?? 'sin clasificar'. NO inventar clasificaciones: dejar fuera del mapa lo que aun no se decide (saldra como 'sin clasificar').",
   "version": "1.0",
   "actualizado": "2026-06-19",
-  "clasificaciones": {}
+  "_nota_cowork": "Niveles PROPUESTOS por Cowork (2026-06-19) para las carpetas nuevas/renombradas del equipo, pendientes de visto bueno de Franco. 'SEUDOS' (K9) se deja fuera a proposito (significado no confirmado -> sale 'sin clasificar').",
+  "clasificaciones": {
+    "SGSI-RecursosHumanos::04.6 ALTAS IMSS ENSENADA": "Confidencial",
+    "SGSI-RecursosHumanos::04.8 BAJAS TIJUANA": "Confidencial",
+    "SGSI-RecursosHumanos::04.9 BAJAS ENSENADA": "Confidencial",
+    "SGSI-RecursosHumanos::04.10 CONTRATOS LABORALES TIJUANA Y ENSENADA": "Confidencial",
+    "SGSI-RecursosHumanos::04.11 GAFETE FEDERAL (CIP)": "Restringida",
+    "SGSI-RecursosHumanos::04.12 GAFETE SECRETARIA (CUIP)": "Restringida",
+    "SGSI-RecursosHumanos::04.13 MODALIDAD PARA DAR DE ALTA EL GIRO CIBERSEGURIDAD": "Interna",
+    "SGSI-RecursosHumanos::04.14 RELACION SOCIOS Y APODERADOS": "Confidencial",
+    "SGSI-K9::10.1 CANINOS": "Confidencial",
+    "SGSI-K9::10.2 RECURSO HUMANO": "Confidencial",
+    "SGSI-K9::10.3 CERTIFICACIONES": "Interna",
+    "SGSI-K9::10.4 CURSOS": "Interna",
+    "SGSI-K9::10.5 TRABLISA": "Confidencial",
+    "SGSI-K9::10.6 AEROMEXICO": "Confidencial",
+    "SGSI-K9::10.7 PERMISOS AUTORIZACIONES": "Restringida",
+    "SGSI-K9::10.8 SANIDAD": "Confidencial",
+    "SGSI-K9::10.10 NORMATIVIDAD": "Interna",
+    "SGSI-K9::10.11 CENTROS ENTRENAMIENTO": "Interna",
+    "SGSI-K9::10.12 FORMATOS": "Interna",
+    "SGSI-K9::10.13 SOPORTE FILMICO": "Interna",
+    "SGSI-Administracion::07.7 FORMATOS Y PLANTILLAS": "Interna",
+    "SGSI-Administracion::07.8 JMA FEDERALES": "Restringida"
+  }
 }

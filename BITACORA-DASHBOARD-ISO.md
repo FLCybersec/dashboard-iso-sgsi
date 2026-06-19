@@ -5,6 +5,64 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — FIX del bug de carga: vistas globales NO bloquean en el crawl (2026-06-19)
+
+Corregida la regresion. Las vistas globales (Sitios/Resumen/Ejecutivo/Apoyo/
+Evidencia) ya **no esperan** el recorrido vivo de los 12 sitios para renderizar.
+
+**Patron (stale-while-revalidate):** cada vista pinta de inmediato con estructura
++ seguimiento (rapido) + el inventario CACHEADO (`peekMigrationState`, una lectura
+idb, sin Graph). El recorrido vivo (`loadMigrationState`) corre en **segundo
+plano** y refresca las metricas al terminar. El render nunca bloquea en el crawl.
+
+- `migration-store`: nuevo `peekMigrationState()` (cache idb, posiblemente vencida,
+  sin tocar Graph). TTL del inventario subido a **15 min** (la estructura cambia
+  despacio); "Actualizar" lo fuerza. El crawl jamas corre en el camino de render.
+- Vistas: `HomeView`, `SitiosView`, `EjecutivoView`, `ApoyoView` -> peek + carga
+  en 2o plano, con indicador "Calculando/Actualizando inventario...". `EvidenciaView`
+  pinta con peek y **asegura el inventario fresco al EXPORTAR** (accion explicita,
+  con su "Generando..."), no al abrir.
+- **Degradado mientras llega el conteo:** sin inventario aun, el % cae al fallback
+  sobre entradas de seguimiento (ya existia `totalLiveDe`); las metricas se afinan
+  cuando el crawl de fondo termina. Vistas tolerantes a `mig === null`.
+
+**Sobre `list.itemCount`:** evaluado. Graph DELEGADO no expone un conteo recursivo
+de carpetas en una propiedad barata (`folder.childCount` es solo hijos inmediatos;
+no hay itemCount de biblioteca via Graph sin enumerar). Por eso el conteo exacto
+sigue siendo el recorrido, pero ahora **invisible** al usuario (2o plano + cache).
+Si mas adelante se quiere un denominador instantaneo, habria que SharePoint REST
+(`/_api/web/lists` ItemCount), que requiere otro token; no se hizo.
+
+**Tests:** **34/34 en verde** (build OK). Nuevo `no-bloqueo.spec.js`: con TODAS
+las llamadas de `children` retardadas 4s, Sitios y Resumen renderizan en <2s
+(prueba del no-bloqueo). Mock extendido con `delayChildrenMs`.
+
+---
+
+## BUG PRIORITARIO (Franco) — "Sitios"/Resumen tardan >5 min en cargar (2026-06-19)
+
+Sintoma: al entrar a "Sitios" tarda mas de 5 minutos. Regresion de la Tanda D.
+
+Causa probable: `migration-store` (reescrito) ahora hace un **crawl recursivo COMPLETO
+del drive de cada sitio** para las vistas globales (totalCarpetas reales). Con ~4214
+carpetas en 12 sitios (RH 2654, Finanzas 1018, K9 288...) ese recorrido por niveles via
+Graph es de minutos y BLOQUEA el render de Sitios/Resumen/Ejecutivo/Apoyo.
+
+Necesario (Code, propon e implementa): que las vistas globales NO bloqueen en un crawl
+completo. Opciones a valorar:
+- Render inmediato de la grilla de sitios; calcular conteos/% en segundo plano o bajo
+  demanda (no bloqueante).
+- Conteo barato del total por sitio sin recorrer todo: p. ej. `list.itemCount` de la
+  biblioteca (1 llamada por sitio) como denominador aproximado, en vez del BFS completo.
+- Cache idb del crawl con TTL largo + "Actualizar" manual; nunca crawl sincronico al abrir.
+- Degradado: si no hay conteo vivo aun, mostrar % sobre entradas de seguimiento (ya existe
+  el fallback "tracked") y refinar luego.
+
+Mientras tanto, la vista de UN sitio (lazy) va fluida; el problema es solo en las globales.
+Prioridad alta. Al corregir, actualizar bitacora.
+
+---
+
 ## Code — TANDA D cerrada: metricas sobre arbol vivo + estructura secundaria + huerfanos + ESPEC (2026-06-19) — REVISAR
 
 Cierra el plan A->D. **Para revision de Franco.** Las metricas ya no se calculan

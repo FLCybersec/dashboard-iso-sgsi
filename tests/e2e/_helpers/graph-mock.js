@@ -27,7 +27,7 @@ function parentRel(url) {
 export async function mockGraph(page, opts = {}) {
   // `denySites`: slugs de sitios a los que el usuario simulado NO tiene acceso
   // (resolver siteId responde 403, como SharePoint con permisos delegados).
-  const { foldersByDrive = {}, seguimientoSeed = null, denySites = [] } = opts
+  const { foldersByDrive = {}, seguimientoSeed = null, denySites = [], delayChildrenMs = 0 } = opts
   const puts = []
   // Como SharePoint real: el GET del seguimiento devuelve lo ULTIMO escrito con
   // PUT en ese sitio (y la semilla/404 mientras no se haya escrito).
@@ -106,6 +106,9 @@ export async function mockGraph(page, opts = {}) {
     // Children de un drive a cualquier nivel (raiz o subcarpeta). Devuelve los
     // hijos inmediatos derivados de las rutas completas configuradas.
     if (method === 'GET' && /\/root(\/children|:\/.*:\/children)/.test(url)) {
+      // Simula el coste del recorrido completo (crawl): util para probar que las
+      // vistas globales NO bloquean su render esperando estas llamadas.
+      if (delayChildrenMs) await new Promise((r) => setTimeout(r, delayChildrenMs))
       const driveId = (url.match(/\/drives\/([^/]+)\//) || [])[1] || 'drive-default'
       const rel = parentRel(url)
       const prefix = rel ? `${rel}/` : ''

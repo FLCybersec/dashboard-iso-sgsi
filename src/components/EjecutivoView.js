@@ -2,7 +2,7 @@ import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { loadStructure } from '../lib/structure-store.js'
 import { Cargando } from './Cargando.js'
-import { loadMigrationState } from '../lib/migration-store.js'
+import { loadMigrationState, peekMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   statsMigracionGlobal,
@@ -16,33 +16,40 @@ export function EjecutivoView() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
 
+  const build = (st, mig) => {
+    const aten = requiereAtencion(st, mig)
+    return {
+      global: statsMigracionGlobal(st, mig),
+      sitios: st.sitios.map((s) => ({ nombre: s.nombre, ...statsMigracionSitio(s, mig?.sitios?.find((x) => x.slug === s.slug)) })),
+      atencion:
+        aten.sinQuien.length + aten.restringidasVacias.length + aten.bloqueadas.length +
+        aten.sitiosEstancados.length + aten.huerfanos.length,
+      sitiosEstancados: aten.sitiosEstancados
+    }
+  }
+
   useEffect(() => {
     ;(async () => {
       setLoading(true)
       setError(null)
       try {
         const st = await loadStructure()
-        const mig = await loadMigrationState(st)
         await loadSeguimiento(st)
-        const aten = requiereAtencion(st, mig)
-        setData({
-          global: statsMigracionGlobal(st, mig),
-          sitios: st.sitios.map((s) => ({ nombre: s.nombre, ...statsMigracionSitio(s, mig.sitios.find((x) => x.slug === s.slug)) })),
-          atencion:
-            aten.sinQuien.length + aten.restringidasVacias.length + aten.bloqueadas.length +
-            aten.sitiosEstancados.length + aten.huerfanos.length,
-          sitiosEstancados: aten.sitiosEstancados
-        })
+        // Render inmediato con inventario cacheado; recorrido vivo en 2o plano.
+        setData(build(st, await peekMigrationState()))
+        setLoading(false)
+        loadMigrationState(st)
+          .then((mig) => setData(build(st, mig)))
+          .catch((e) => setError(e?.message || String(e)))
       } catch (e) {
         setError(e?.message || String(e))
-      } finally {
         setLoading(false)
       }
     })()
   }, [])
 
-  if (loading) return html`<${Cargando} titulo="Preparando resumen..." />`
-  if (error) return html`<div class="alert error">${error}</div>`
+  if (loading && !data) return html`<${Cargando} titulo="Preparando resumen..." />`
+  if (error && !data) return html`<div class="alert error">${error}</div>`
 
   const fecha = fechaHoy()
 

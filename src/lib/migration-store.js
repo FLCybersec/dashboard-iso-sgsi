@@ -18,7 +18,10 @@ import { cacheGet, cacheSet, cacheDelete } from './db.js'
 import { enParalelo } from './concurrencia.js'
 
 const CACHE_KEY = 'migration-state'
-const TTL_MS = 2 * 60 * 1000 // 2 minutos
+// El inventario vivo (recorrido completo de ~4214 carpetas) es CARO: TTL largo
+// para no repetirlo; "Actualizar" lo fuerza. NUNCA debe correr en el camino de
+// render (ver peekMigrationState + carga en segundo plano en las vistas).
+const TTL_MS = 15 * 60 * 1000 // 15 minutos
 
 const EMPTY = { folders: new Set(), itemIds: new Set(), files: new Map() }
 
@@ -70,7 +73,16 @@ function computeGlobal(sitios) {
   }
 }
 
-// Carga el inventario vivo de los 12 sitios. Usa cache idb (TTL 2 min) salvo `force`.
+// Lectura RAPIDA del inventario cacheado (idb), sin tocar Graph: devuelve lo que
+// haya (aunque este vencido) o null. Para que las vistas globales pinten YA y
+// disparen el recorrido vivo en segundo plano (stale-while-revalidate).
+export async function peekMigrationState() {
+  return (await cacheGet(CACHE_KEY)) || null
+}
+
+// Carga el inventario vivo de los 12 sitios. Usa cache idb (TTL) salvo `force`.
+// OJO: si no hay cache fresca, recorre todo (caro, minutos). Las vistas NO deben
+// awaitarla en el camino de render: peek + segundo plano.
 export async function loadMigrationState(structure, { force = false } = {}) {
   if (!force) {
     const cached = await cacheGet(CACHE_KEY)

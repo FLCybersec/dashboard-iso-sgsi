@@ -2,7 +2,7 @@ import { html } from 'htm/preact'
 import { useState, useEffect } from 'preact/hooks'
 import { loadStructure } from '../lib/structure-store.js'
 import { Cargando } from './Cargando.js'
-import { loadMigrationState } from '../lib/migration-store.js'
+import { loadMigrationState, peekMigrationState } from '../lib/migration-store.js'
 import {
   loadSeguimiento,
   getSeguimiento,
@@ -26,9 +26,10 @@ export function EvidenciaView() {
       setError(null)
       try {
         const structure = await loadStructure()
-        const mig = await loadMigrationState(structure)
         await loadSeguimiento(structure)
-        setData({ structure, mig, seg: getSeguimiento() })
+        // Render inmediato con inventario cacheado; el recorrido vivo (caro) se
+        // asegura al EXPORTAR (accion explicita), no al abrir la vista.
+        setData({ structure, mig: await peekMigrationState(), seg: getSeguimiento() })
       } catch (e) {
         setError(e?.message || String(e))
       } finally {
@@ -42,7 +43,12 @@ export function EvidenciaView() {
     setError(null)
     setDone(null)
     try {
-      const nombre = await exportEvidencia(data)
+      // El export necesita el inventario vivo (denominador + huerfanos): se
+      // asegura aqui (accion explicita), no al abrir la vista.
+      const mig = await loadMigrationState(data.structure)
+      const dataFresca = { ...data, mig }
+      setData(dataFresca)
+      const nombre = await exportEvidencia(dataFresca)
       setDone(`Evidencia generada: ${nombre}`)
     } catch (e) {
       setError(e?.message || String(e))
@@ -102,8 +108,8 @@ export function EvidenciaView() {
           <div class="lbl">Migracion global</div>
         </div>
         <div class="card card-sec">
-          <div class="num sec">${data.mig.totalCarpetas}</div>
-          <div class="lbl">Carpetas reales (SharePoint)</div>
+          <div class="num sec">${data.mig ? data.mig.totalCarpetas : '—'}</div>
+          <div class="lbl">Carpetas reales (SharePoint)${data.mig ? '' : ' · al exportar'}</div>
         </div>
         <div class="card">
           <div class="num">${Object.keys(data.seg?.nodos || {}).length}</div>
