@@ -88,17 +88,20 @@ function aplanarSitio(sitio) {
 export async function loadStructure() {
   if (cache) return cache
 
-  const res = await fetch(MASTER_URL, { cache: 'no-cache' })
+  // Maestro y mapa semilla de clasificacion EN PARALELO (dos estaticos
+  // independientes); el de clasificacion es opcional (ausente -> vacio).
+  const [res, rcRes] = await Promise.all([
+    fetch(MASTER_URL, { cache: 'no-cache' }),
+    fetch(CLASIF_URL, { cache: 'no-cache' }).catch(() => null)
+  ])
   if (!res.ok) {
     throw new Error(`No se pudo cargar la estructura maestra (HTTP ${res.status})`)
   }
   const raw = await res.json()
 
-  // Mapa semilla de clasificacion del repo (opcional; ausente -> vacio).
   let rawClasif = {}
   try {
-    const rc = await fetch(CLASIF_URL, { cache: 'no-cache' })
-    if (rc.ok) rawClasif = await rc.json()
+    if (rcRes && rcRes.ok) rawClasif = await rcRes.json()
   } catch {
     rawClasif = {}
   }

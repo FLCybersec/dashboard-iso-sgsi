@@ -13,7 +13,6 @@
   "dependencies": {
     "@azure/msal-browser": "^3.28.1",
     "@microsoft/microsoft-graph-client": "^3.0.7",
-    "chart.js": "^4.4.7",
     "exceljs": "^4.4.0",
     "htm": "^3.1.1",
     "idb": "^8.0.0",

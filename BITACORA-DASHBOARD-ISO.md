@@ -5,6 +5,33 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Code — Optimizacion de rendimiento y tiempos de carga (2026-06-19)
+
+Tras el fix del crawl bloqueante, pase de optimizacion (medido con `vite build`):
+
+- **Bundle inicial -45% gzip.** Al eliminar `AvanceChart` (Tanda D) se cayo
+  `chart.js` del bundle (de 617kB a 415kB); ahora quitada tambien de `package.json`
+  (dep muerta). **Vendor split** (`manualChunks`): se separan las dependencias
+  (MSAL + Graph SDK + preact) en un chunk `vendor` estable. Resultado:
+  - app `index`: **30.7 kB gzip** (antes ~111 kB) -> en cada release el usuario solo
+    re-descarga esto; el `vendor` (81 kB gzip) queda cacheado entre despliegues.
+  - `exceljs` (271 kB gzip) sigue **perezoso** (chunk async; solo al exportar),
+    fuera de `vendor`.
+- **Menos latencia en el arranque:** `structure-store` ahora pide el maestro y
+  `clasificaciones-sgsi.json` **en paralelo** (antes secuencial).
+- El recorrido vivo de los 12 sitios ya NO bloquea (fix previo) + cache idb 15 min;
+  las vistas globales pintan al instante.
+
+**Sobre el crawl:** no se sube la concurrencia (4 sitios / 8 por drive) a proposito,
+para no reintroducir el throttling 429 del lote 2026-06-12b; al ser de fondo, su
+coste es invisible. No hay conteo recursivo barato en Graph delegado (evaluado en el
+fix anterior), asi que el inventario exacto sigue siendo el recorrido, cacheado.
+
+**Tests:** suite **34/34 en verde** + `no-bloqueo.spec.js`. Build sin warnings de
+chunk salvo `exceljs` (perezoso, esperado).
+
+---
+
 ## Cowork — PREPARADO en paralelo: clasificacion semilla + color principales (2026-06-19)
 
 Mientras Code optimiza tiempos de carga, Cowork dejo listo (NO ejecutado aun; espera
