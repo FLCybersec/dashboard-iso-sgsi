@@ -5,6 +5,19 @@ No se avanza de tanda sin validacion de Franco.
 
 ---
 
+## Tarea para Code — Intercambio de titulos Juridico (2026-06-19)
+
+Autorizado por Franco. Solo cambia TITULOS de sitio (no URLs/slugs; reversible; no afecta
+accesos directos/sync existentes, que van por URL).
+- **`pnp/Renombrar-Sitios-Juridico.ps1`** (corre Code): el sitio existente con titulo
+  "JMA Juridico" (de Jorge, fuera del SGSI) -> "Juridico Jorge"; y SGSI-Juridico -> "JMA
+  Juridico". El script localiza el existente por titulo; si encuentra 0 o >1, NO toca nada
+  y avisa (revisar). Marca COLA.
+- **Maestro:** Cowork cambio `SGSI-Juridico.nombre` de "Juridico" a "JMA Juridico" (el
+  dashboard ya lo mostrara). Incluir en push.
+
+---
+
 ## Code — Re-corrido Colorear-Carpetas.ps1 tras fix de DireccionGobierno (2026-06-19)
 
 Tras la correccion de rutas de Cowork, re-ejecutado `pnp/Colorear-Carpetas.ps1`
